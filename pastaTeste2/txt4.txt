@@ -1,0 +1,4 @@
+Isto é
+um
+arquivo teste para
+uma função.
