@@ -2,8 +2,11 @@
 import os
 import csv
 import random
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+import pyedflib
+from scipy.signal import firwin, filtfilt
+import random
 
 # Funções em Python I
 def lerArquivoTexto(caminho):
@@ -303,5 +306,74 @@ def plotarParesCSV(caminho , modo):
 
         # Plotando os pares em um gráfico
         plt.plot(lista1, lista2, 'r-')
+
+    plt.show()
+
+# Manipulação de arquivos EDF
+def lerArquivoEDF(caminho, channels=None):
+    """
+    Função que lê os dados de um arquivo edf. A entrada é o nome do arquivo com o caminho até ele.
+    A saída é uma lista de listas como dados numpy.
+    """
+
+    reader = pyedflib.EdfReader(caminho)
+
+    if channels:
+        signals = []
+        signal_labels = reader.getSignalLabels()
+        for c in channels:
+            index = signal_labels.index(c)
+            signals.append(reader.readSignal(index))
+        signals = np.array(signals)
+    else:
+        n = reader.signals_in_file
+        signals = np.zeros((n, reader.getNSamples()[0]))
+        for i in np.arange(n):
+            signals[i, :] = reader.readSignal(i)
+
+    reader._close()
+    del reader
+    return signals
+
+def plotarEDF(conteudo , modo):
+    """
+    Para o parâmetro modo = 0:
+    Função que recebe uma matriz numpy e plota cada linha da matriz em um subplot diferente, até 5 subplots.
+
+    Para o parâmetro modo = 1:
+    Função que recebe uma matriz numpy e plota cada linha da matriz no mesmo subplot, sobrepondo 5 sinais.
+    """
+
+    # Plota cada linha da matriz em um subplot diferente, até 5 subplots
+    if modo == 0:
+        # Plotando o conteúdo em um gráfico
+        # Criando 5 subplots verticalmente, com o tamanho total de 8x6 polegadas
+        fig, axs = plt.subplots(5 ,figsize=(8, 6))
+
+        axs[0].axis([0, 2000, -50, 50])
+        axs[0].plot(conteudo[0][0:1920], 'r-')
+
+        axs[1].axis([0, 2000, -50, 50])
+        axs[1].plot(conteudo[1][0:1920], 'g-')
+
+        axs[2].axis([0, 2000, -50, 50])
+        axs[2].plot(conteudo[2][0:1920], 'b-')
+
+        axs[3].axis([0, 2000, -50, 50])
+        axs[3].plot(conteudo[3][0:1920], 'y-')
+
+        axs[4].axis([0, 2000, -50, 50])
+        axs[4].plot(conteudo[4][0:1920], 'm-')
+    # Plota cada linha da matriz no mesmo subplot, sobrepondo 5 sinais
+    else:
+        # Definindo os valores mínimos e máximos do eixo x, e os valores mínimos e máximos do eixo y
+        plt.axis([0, 2000, -50, 50])
+
+        # As primeiras 1920 amostras de cada canal serão plotadas para o mesmo gráfico
+        plt.plot(conteudo[0][0:1920], 'r-')
+        plt.plot(conteudo[1][0:1920], 'g-')
+        plt.plot(conteudo[2][0:1920], 'b-')
+        plt.plot(conteudo[3][0:1920], 'y-')
+        plt.plot(conteudo[4][0:1920], 'm-')
 
     plt.show()
