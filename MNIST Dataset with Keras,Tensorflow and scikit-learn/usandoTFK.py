@@ -50,6 +50,8 @@ X_test /= 255.
 print('X_train:\t{}' .format(X_train.shape),' -reshaped')
 print('X_test: \t{}' .format(X_test.shape),' -reshaped')
 
+plt.show() #
+
 # One Hot Enconding
 # one hot encode outputs
 y_train = to_categorical(y_train)
@@ -123,6 +125,8 @@ plt.xlabel('epoch')
 plt.legend(['train', 'test'])
 plt.tight_layout()
 
+plt.show() #
+
 max_loss = np.max(results.history['loss'])
 min_loss = np.min(results.history['loss'])
 print("Maximum Loss : {:.4f}".format(max_loss))
@@ -135,6 +139,8 @@ confusion_mtx = confusion_matrix(Y_true, prediction_values)
 sns.heatmap(confusion_mtx, annot=True, fmt="d")
 plt.ylabel('True')
 plt.xlabel('Predicted')
+
+plt.show() #
 
 # Save a model to JSON and HDF5
 # save weights to HDF5
@@ -155,3 +161,5 @@ for i in range(120):
     
     # label the image with the target value
     ax.text(0, 7, str(prediction_values[i]))
+
+plt.show() #
