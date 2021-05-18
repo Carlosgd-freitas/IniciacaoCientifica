@@ -114,6 +114,7 @@ plt.title('model accuracy')
 plt.ylabel('accuracy')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'])
+plt.show()
 
 # summarize history for loss
 plt.subplot(212)
@@ -124,8 +125,7 @@ plt.ylabel('loss')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'])
 plt.tight_layout()
-
-plt.show() #
+plt.show()
 
 max_loss = np.max(results.history['loss'])
 min_loss = np.min(results.history['loss'])
@@ -139,8 +139,7 @@ confusion_mtx = confusion_matrix(Y_true, prediction_values)
 sns.heatmap(confusion_mtx, annot=True, fmt="d")
 plt.ylabel('True')
 plt.xlabel('Predicted')
-
-plt.show() #
+plt.show()
 
 # Save a model to JSON and HDF5
 # save weights to HDF5
@@ -162,4 +161,4 @@ for i in range(120):
     # label the image with the target value
     ax.text(0, 7, str(prediction_values[i]))
 
-plt.show() #
+plt.show()
