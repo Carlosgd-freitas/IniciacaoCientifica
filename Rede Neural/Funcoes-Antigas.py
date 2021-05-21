@@ -96,3 +96,39 @@ def montarLabels(nAmostras, nClasses, nAmostrasPorIndividuo, individuoinicial):
         j += 1
 
     return arr
+
+# Código antigo do distribution do signal_cropping
+if distribution == 1.0:
+            i = window_size
+            while i <= content.shape[1]:
+                arr = content[: , (i-window_size):i]
+                x_data.append(arr)
+
+                arr2 = np.zeros((1,num_classes))
+                arr2[0, num_subject] = 1
+                y_data.append(arr2)
+
+                i += offset
+            return x_data, y_data
+        
+        else:
+            i = window_size
+            while i <= content.shape[1] * distribution:
+                arr = content[: , (i-window_size):i]
+                x_data.append(arr)
+
+                arr2 = np.zeros((1,num_classes))
+                arr2[0, num_subject] = 1
+                y_data.append(arr2)
+
+                i += offset
+            while i <= content.shape[1]:
+                arr = content[: , (i-window_size):i]
+                x_data_2.append(arr)
+
+                arr2 = np.zeros((1,num_classes))
+                arr2[0, num_subject] = 1
+                y_data_2.append(arr2)
+
+                i += offset
+            return x_data, y_data, x_data_2, y_data_2

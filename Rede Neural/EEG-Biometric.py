@@ -1,38 +1,55 @@
 import numpy as np
 import pyedflib
 import matplotlib.pyplot as plt
-import tensorflow.keras
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Flatten
 from tensorflow.keras.layers import Conv1D, MaxPooling1D, BatchNormalization
 from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.optimizers import SGD
+from scipy.signal import butter, sosfilt
 
 # import pandas as pd
 # from sklearn import metrics
-# from tensorflow.keras.utils import to_categorical
 
 np.random.seed()
 
-# Hyperparameters
-batchSize = 100       # Batch Size
-trainingEpochs = 5    # Total number of training epochs - Definitivo: 60
-learningRate = 0.01   # Initial learning rate
-
 # Tasks:
-# 1: Baseline, eyes open                                -> treino
-# 2: Baseline, eyes closed                              -> teste
-# 3: Task 1 (open and close left or right fist) - Run 1 -> treino
-# 7: Task 1 (open and close left or right fist) - Run 2 -> teste
+# 1: Baseline, eyes open                                -> train
+# 2: Baseline, eyes closed                              -> test
+# 3: Task 1 (open and close left or right fist) - Run 1 -> train
+# 7: Task 1 (open and close left or right fist) - Run 2 -> test
 
-# Função para ler um arquivo EDF
-def lerArquivoEDF(caminho, channels=None):
+# Hyperparameters
+batch_size = 100               # Batch Size
+training_epochs = 60           # Total number of training epochs - Definitivo: 60
+initial_learning_rate = 0.01   # Initial learning rate
+
+# Pre-processing Parameters
+band_pass_1 = [1, 50]          # First filter
+band_pass_2 = [10, 30]         # Second filter
+band_pass_3 = [30, 50]         # Third filter
+
+# Parameters used in process_signals() and load_data_EOEC()
+window_size = 1920
+offset = 480
+distribution = 0.9             # 90% | 10%
+
+# Other Parameters
+num_classes = 10               # Total number of classes
+num_channels = 64              # Number of channels in an EEG signal
+
+def read_EDF(path, channels=None):
     """
-    Função que lê os dados de um arquivo edf. A entrada é o nome do arquivo com o caminho até ele.
-    A saída é uma lista de listas como dados numpy.
+    Reads data from an EDF file and returns it in a numpy array format.
+
+    Parameters:
+        - path: path of the file that will be read.
+    
+    Optional Parameters:
+        - channels: number of channels that will be read. By default, this function reads all channels.
     """
 
-    reader = pyedflib.EdfReader(caminho)
+    reader = pyedflib.EdfReader(path)
 
     if channels:
         signals = []
@@ -51,176 +68,202 @@ def lerArquivoEDF(caminho, channels=None):
     del reader
     return signals
 
-# Função para compor x_train, x_val e x_test
-def recortarSinal(dadosX, dadosY, conteudo, tamanhoJanela, offset, limite, nIndividuo, nClasses, divisao=1.0, dadosX2=0, dadosY2=0):
+def butter_bandpass(lowcut, highcut, fs, order=5):
     """
-    Função que recorta um conteúdo (sinal EEG).
+    Auxiliar function for butter_bandpass_filter().
 
-    Considerando o formato de um sinal EEG como (tam1,tam2):
-        - tam1 é a quantidade de canais do sinal (eletrodos usados)
-        - tam2 é o número de amostras
-    Logo, tam1 não pode ser alterado, ou haveria perda de informações.
+    Parameters:
+        - lowcut: lowcut of the filter;
+        - highcut: highcut of the filter;
+        - fs: frequency of the data (sample).
+
+    Optional Parameters:
+        - order: order of the signal. This parameter is equal to 5 by default.
+    """
     
-    Esta função consiste em uma janela deslizante de tamanho igual à __tamanhoJanela__, que irá percorrer
-    por todo o sinal EEG __conteudo__, adicionando àquela janela à uma lista __dadosX__ e deslizando uma
-    quantidade igual à __offset__. Os labels correspondentes serão adicionados à uma lista __dadosY__,
-    utilizando os parâmetros __nIndividuo__ (Índice do indivíduo, de 1 à 109) e __nClasses__ (número total
-    de classes).
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+    sos = butter(order, [low, high], btype='band', output='sos')
+    return sos
 
-    A função será executada enquanto o índice do "final da janela" for menor ou igual ao __limite__.
+def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
+    """
+    Band-pass filters some data and returns it.
 
-    Deste modo, um __offset__ menor que __tamanhoJanela__ resultará em um maior número de amostras, 
-    correspondendo assim à um data augmentation.
-
-    Caso os parâmetros adicionais __divisao__ (decimal correspondente à uma porcentagem), __dadosX2__ e
-    __dadosY2__ (ambos sendo listas) sejam utilizados, Z% do processamento será armazenado em __dadosX__
-    e __dadosY__ e (100-Z)% será armazenado em __dadosX2__ e __dadosY2__, sendo Z a porcentagem
-    correspondente à __divisao__.
+    Parameters:
+        - data: data that will be band-pass filtered;
+        - lowcut: lowcut of the filter;
+        - highcut: highcut of the filter;
+        - fs: frequency of the data (sample).
+    
+    Optional Parameters:
+        - order: order of the signal. This parameter is equal to 5 by default.
     """
 
-    nIndividuo -= 1 # Indivíduo: 1~109 / Vetor arr: 0~108
+    sos = butter_bandpass(lowcut, highcut, fs, order=order)
+    y = sosfilt(sos, data)
+    return y
 
+def pre_processing(content):
+    """
+    Pre-processess the signals of each channel of an EEG signal. The signal will be band-pass filtered in 3
+    frequency bands. These bands are defined
+
+    Parameters:
+        - content: the EEG signal that will be pre-processed.
+    """
+
+    channels = content.shape[0]
+    c = 0
+
+    # First band: 1~50Hz
+    while c < channels:
+        signal = content[c, :]
+        content[c] = butter_bandpass_filter(signal, band_pass_1[0], band_pass_1[1], content.shape[1])
+        c += 1
+    c = 0
+
+    # Second band: 10~30Hz
+    while c < channels:
+        signal = content[c, :]
+        content[c] = butter_bandpass_filter(signal, band_pass_2[0], band_pass_2[1], content.shape[1])
+        c += 1
+    c = 0
+
+    # Third band: 30~50Hz
+    while c < channels:
+        signal = content[c, :]
+        content[c] = butter_bandpass_filter(signal, band_pass_3[0], band_pass_3[1], content.shape[1])
+        c += 1
+    c = 0
+
+    return content
+
+def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, num_classes, distribution=1.0, x_data_2=0, y_data_2=0):
+    """
+    Crops a content (EEG signal) and returns the processed signal and its' respective label using a sliding
+    window.
+
+    Considering that the format of an EEG signal is (s1,s2):
+        - s1 is the number of channels in the signals (electrodes used);
+        - s2 is the number of samples.
+
+    Parameters:
+        - x_data: list that stores the processed signals;
+        - y_data: list that stores the processed labels;
+        - content: EEG signal that will be processed;
+        - window_size: size of the sliding window. Considering all channels of the EEG signal will be used,
+        this number corresponds to s2;
+        - offset: amount of samples the window will slide in each iteration;
+        - num_subject: class of the subject;
+        - num_classes: total number of classes.
+    
+    Optional Parameters:
+        - distribution: a number in the interval (0,1]. (distribution * 100)% of the processed signals will be
+        stored in x_data and y_data, and [100 - (distribution * 100)]% will be stored in x_data_2 and y_data_2.
+        This number is 1.0 by default, corresponding to 100% of the data being stored in x_data and y_data, and
+        x_data_2 and y_data_2 not being used nor returned; 
+        - x_data_2: list that stores the processed signals;
+        - y_data_2: list that stores the processed labels;
+    """
+
+    num_subject -= 1 ## Subject: 1~109 / Array Positions: 0~108
+
+    # Checking the offset parameter
     if offset < 0:
-        print('ERRO: O offset não pode ser negativo.')
-        return dadosX, dadosY
+        print('ERROR: The offset parameter can\'t be negative.')
+        return x_data, y_data
     elif offset == 0:
-        print('ERRO: Um offset igual à 0 resultaria em "infinitas" janelas iguais.')
-        return dadosX, dadosY
+        print('ERROR: An offset equals to 0 would result in "infinite" equal windows.')
+        return x_data, y_data
+    # Checking the distribution parameter
+    elif distribution <= 0 or distribution > 1:
+        print('ERROR: The distribution parameter needs to be in the interval (0,1].')
+        return x_data, y_data
     else:
-        if divisao == 1.0:
-            i = tamanhoJanela
-            while True:
-                if i > limite:
-                    break
-                arr = conteudo[: , (i-tamanhoJanela):i]
-                dadosX.append(arr)
+        i = window_size
+        while i <= content.shape[1] * distribution:
+            arr = content[: , (i-window_size):i]
+            x_data.append(arr)
 
-                arr2 = np.zeros((1,nClasses))
-                arr2[0, nIndividuo] = 1
-                dadosY.append(arr2)
+            arr2 = np.zeros((1,num_classes))
+            arr2[0, num_subject] = 1
+            y_data.append(arr2)
 
-                i += offset
-            return dadosX, dadosY
-        elif divisao < 0:
-            print('ERRO: O parâmetro de divisão não pode ser negativo.')
-            return dadosX, dadosY
-        elif divisao == 0:
-            print('ERRO: Uma divisão igual à 0%'+' resultaria em duas listas vazias.')
-            return dadosX, dadosY
-        else:
-            i = tamanhoJanela
-            while True:
-                if i > (limite * divisao):
-                    break
-                arr = conteudo[: , (i-tamanhoJanela):i]
-                dadosX.append(arr)
+            i += offset
 
-                arr2 = np.zeros((1,nClasses))
-                arr2[0, nIndividuo] = 1
-                dadosY.append(arr2)
+        if distribution == 1.0:
+            return x_data, y_data
+        
+        while i <= content.shape[1]:
+            arr = content[: , (i-window_size):i]
+            x_data_2.append(arr)
 
-                i += offset
-            while True:
-                if i > limite:
-                    break
-                arr = conteudo[: , (i-tamanhoJanela):i]
-                dadosX2.append(arr)
+            arr2 = np.zeros((1,num_classes))
+            arr2[0, num_subject] = 1
+            y_data_2.append(arr2)
 
-                arr2 = np.zeros((1,nClasses))
-                arr2[0, nIndividuo] = 1
-                dadosY2.append(arr2)
+            i += offset
 
-                i += offset
-            return dadosX, dadosY, dadosX2, dadosY2
+        return x_data, y_data, x_data_2, y_data_2
 
-# Função que retorna os dados de treinamento, validação e teste para EO/EC
-def lerDadosEOEC():
-    # O offset definitivo será 20
+def load_data_EOEC():
+    """
+    Returns the processed signals and labels for training (x_train and y_train), validation (x_val and y_val) and
+    testing (x_test and y_test), using "Eyes Open" and "Eyes Closed" data and the following distribution:
+        - 90% of "Eyes Open" data (Task 1) will be used for training;
+        - 10% of "Eyes Open" data (Task 1) will be used for validation;
+        - 100% of "Eyes Closed" data (Task 2) will be used for testing.
 
-    # Processamento de x_train, y_train, x_val e y_val
+    The return of this function is in the format: x_train, x_val, x_test, y_train, y_val, y_test.
+    """
+
+    # Processing x_train, y_train, x_val e y_val
     x_trainL = list()
     x_valL = list()
     y_trainL = list()
     y_valL = list()
 
-    x_train_1 = lerArquivoEDF('./dataset/S001R01.edf')
-    x_trainL, y_train, x_valL, y_val = recortarSinal(x_trainL, y_trainL, x_train_1, 1920, 480, 9600, 1, 10, 0.9, x_valL, y_valL)
-    x_train_2 = lerArquivoEDF('./dataset/S002R01.edf')
-    x_trainL, y_train, x_valL, y_val = recortarSinal(x_trainL, y_trainL, x_train_2, 1920, 480, 9600, 2, 10, 0.9, x_valL, y_valL)
-    x_train_3 = lerArquivoEDF('./dataset/S003R01.edf')
-    x_trainL, y_train, x_valL, y_val = recortarSinal(x_trainL, y_trainL, x_train_3, 1920, 480, 9600, 3, 10, 0.9, x_valL, y_valL)
-    x_train_4 = lerArquivoEDF('./dataset/S004R01.edf')
-    x_trainL, y_train, x_valL, y_val = recortarSinal(x_trainL, y_trainL, x_train_4, 1920, 480, 9600, 4, 10, 0.9, x_valL, y_valL)
-    x_train_5 = lerArquivoEDF('./dataset/S005R01.edf')
-    x_trainL, y_train, x_valL, y_val = recortarSinal(x_trainL, y_trainL, x_train_5, 1920, 480, 9600, 5, 10, 0.9, x_valL, y_valL)
-    x_train_6 = lerArquivoEDF('./dataset/S006R01.edf')
-    x_trainL, y_train, x_valL, y_val = recortarSinal(x_trainL, y_trainL, x_train_6, 1920, 480, 9600, 6, 10, 0.9, x_valL, y_valL)
-    x_train_7 = lerArquivoEDF('./dataset/S007R01.edf')
-    x_trainL, y_train, x_valL, y_val = recortarSinal(x_trainL, y_trainL, x_train_7, 1920, 480, 9600, 7, 10, 0.9, x_valL, y_valL)
-    x_train_8 = lerArquivoEDF('./dataset/S008R01.edf')
-    x_trainL, y_train, x_valL, y_val = recortarSinal(x_trainL, y_trainL, x_train_8, 1920, 480, 9600, 8, 10, 0.9, x_valL, y_valL)
-    x_train_9 = lerArquivoEDF('./dataset/S009R01.edf')
-    x_trainL, y_train, x_valL, y_val = recortarSinal(x_trainL, y_trainL, x_train_9, 1920, 480, 9600, 9, 10, 0.9, x_valL, y_valL)
-    x_train_10 = lerArquivoEDF('./dataset/S010R01.edf')
-    x_trainL, y_train, x_valL, y_val = recortarSinal(x_trainL, y_trainL, x_train_10, 1920, 480, 9600, 10, 10, 0.9, x_valL, y_valL)
+    for i in range(1, num_classes + 1):
+        content_EO = read_EDF('./dataset/S{:03d}R01.edf'.format(i))
+        content_EO = pre_processing(content_EO)
+        x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, content_EO, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
+    
     x_train = np.asarray(x_trainL, dtype = object).astype('float32')
     x_val = np.asarray(x_valL, dtype = object).astype('float32')
     y_train = np.asarray(y_trainL, dtype = object).astype('float32')
     y_val = np.asarray(y_valL, dtype = object).astype('float32')
 
-    # Processamento de x_test e y_test
+    # Processing x_test e y_test
     x_testL = list()
     y_testL = list()
 
-    x_test_1 = lerArquivoEDF('./dataset/S001R02.edf')
-    x_testL, y_test = recortarSinal(x_testL, y_testL, x_test_1, 1920, 1920, 9600, 1, 10)
-    x_test_2 = lerArquivoEDF('./dataset/S002R02.edf')
-    x_testL, y_test = recortarSinal(x_testL, y_testL, x_test_2, 1920, 1920, 9600, 2, 10)
-    x_test_3 = lerArquivoEDF('./dataset/S003R02.edf')
-    x_testL, y_test = recortarSinal(x_testL, y_testL, x_test_3, 1920, 1920, 9600, 3, 10)
-    x_test_4 = lerArquivoEDF('./dataset/S004R02.edf')
-    x_testL, y_test = recortarSinal(x_testL, y_testL, x_test_4, 1920, 1920, 9600, 4, 10)
-    x_test_5 = lerArquivoEDF('./dataset/S005R02.edf')
-    x_testL, y_test = recortarSinal(x_testL, y_testL, x_test_5, 1920, 1920, 9600, 5, 10)
-    x_test_6 = lerArquivoEDF('./dataset/S006R02.edf')
-    x_testL, y_test = recortarSinal(x_testL, y_testL, x_test_6, 1920, 1920, 9600, 6, 10)
-    x_test_7 = lerArquivoEDF('./dataset/S007R02.edf')
-    x_testL, y_test = recortarSinal(x_testL, y_testL, x_test_7, 1920, 1920, 9600, 7, 10)
-    x_test_8 = lerArquivoEDF('./dataset/S008R02.edf')
-    x_testL, y_test = recortarSinal(x_testL, y_testL, x_test_8, 1920, 1920, 9600, 8, 10)
-    x_test_9 = lerArquivoEDF('./dataset/S009R02.edf')
-    x_testL, y_test = recortarSinal(x_testL, y_testL, x_test_9, 1920, 1920, 9600, 9, 10)
-    x_test_10 = lerArquivoEDF('./dataset/S010R02.edf')
-    x_testL, y_test = recortarSinal(x_testL, y_testL, x_test_10, 1920, 1920, 9600, 10, 10)
+    for i in range(1, num_classes + 1):
+        content_EC = read_EDF('./dataset/S{:03d}R01.edf'.format(i))
+        content_EC = pre_processing(content_EC)
+        x_testL, y_testL = signal_cropping(x_testL, y_testL, content_EC, window_size, window_size, i, num_classes)
+
     x_test = np.asarray(x_testL, dtype = object).astype('float32')
     y_test = np.asarray(y_testL, dtype = object).astype('float32')
 
-    # O formato inicial de um dadosY será "a x 1 x b". O reshape fará com que um dadosY fique com o
-    # formato correto "a x b"
-    y_train = y_train.reshape(y_train.shape[0],y_train.shape[2])
-    y_val = y_val.reshape(y_val.shape[0],y_val.shape[2])
-    y_test = y_test.reshape(y_test.shape[0],y_test.shape[2])
+    # The initial format of a "x_data" (EEG signal) will be "a x 64 x 1920", but the input shape of the CNN is
+    # "a x 1920 x 64".
+    x_train = x_train.reshape(x_train.shape[0], x_train.shape[2], x_train.shape[1])
+    x_val = x_val.reshape(x_val.shape[0], x_val.shape[2], x_val.shape[1])
+    x_test = x_test.reshape(x_test.shape[0], x_test.shape[2], x_test.shape[1])
+
+    # The initial format of a "y_data" (label) will be "a x 1 x b". The correct format is "a x b".
+    y_train = y_train.reshape(y_train.shape[0], y_train.shape[2])
+    y_val = y_val.reshape(y_val.shape[0], y_val.shape[2])
+    y_test = y_test.reshape(y_test.shape[0], y_test.shape[2])
 
     return x_train, x_val, x_test, y_train, y_val, y_test
 
-# Dados
-x_train, x_val, x_test, y_train, y_val, y_test = lerDadosEOEC()
-
-# Imprimindo formatos
-print(f'x_train: {x_train.shape}')
-print(f'x_val: {x_val.shape}')
-print(f'x_test: {x_test.shape}')
-print(f'y_train: {y_train.shape}')
-print(f'y_val: {y_val.shape}')
-print(f'y_test: {y_test.shape}')
-
-# One Hot Enconding
-# y_train = to_categorical(y_train, num_classes=10)
-# y_val = to_categorical(y_val, num_classes=10)
-# y_test = to_categorical(y_test, num_classes=10)
-
-# Função para reduzir o learning rate conforme epochs
 def scheduler(current_epoch, learning_rate):
+    """
+    Lowers the learning rate hyperparameter relative to the number of epochs.
+    """
     if current_epoch < 2:
         learning_rate = 0.01
         return learning_rate
@@ -231,12 +274,14 @@ def scheduler(current_epoch, learning_rate):
         learning_rate = 0.0001
         return learning_rate
 
-# Criando o modelo
 def create_model():
+    """
+    Create and returns the CNN model.
+    """
     model = Sequential()
 
     # Conv1
-    model.add(Conv1D(96, (11), input_shape=(1920, 64), activation='relu'))
+    model.add(Conv1D(96, (11), input_shape=(window_size, num_channels), activation='relu'))
     model.add(BatchNormalization())
     # Pool1
     model.add(MaxPooling1D(strides=4))
@@ -261,63 +306,39 @@ def create_model():
     # Dropout
     model.add(Dropout(0.1))
     # FC4
-    model.add(Dense(10, activation='softmax')) # A camada final terá 109 nodos
+    model.add(Dense(num_classes, activation='softmax'))
 
     return model
 
 model = create_model()
 model.summary()
 
-## Teste de resgape antigo ##
-# train_data = tensorflow.data.Dataset.from_tensor_slices((x_train, y_train))
-# valid_data = tensorflow.data.Dataset.from_tensor_slices((x_val, y_val))
+# Loading the data
+x_train, x_val, x_test, y_train, y_val, y_test = load_data_EOEC()
 
-# results = model.fit(train_data,
-#                     batch_size = batchSize,
-#                     epochs = trainingEpochs,
-#                     validation_data = valid_data
-#                     )
-#############################
+# Printing data formats
+print(f'x_train: {x_train.shape}')
+print(f'x_val: {x_val.shape}')
+print(f'x_test: {x_test.shape}')
+print(f'y_train: {y_train.shape}')
+print(f'y_val: {y_val.shape}')
+print(f'y_test: {y_test.shape}')
 
-# Optimizador
-opt = SGD(learning_rate=learningRate, momentum=0.9)
-
-# Compilando o modelo
+# Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
+opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
 model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-
-# Reshape dos dados de input -> a x 64 x 1920 -> a x 1920 x 64
-a = x_train.shape[0]
-b = x_train.shape[1]
-c = x_train.shape[2]
-
-x_train = x_train.reshape(a, c, b)
-
-a = x_val.shape[0]
-b = x_val.shape[1]
-c = x_val.shape[2]
-
-x_val = x_val.reshape(a, c, b)
-
-a = x_test.shape[0]
-b = x_test.shape[1]
-c = x_test.shape[2]
-
-x_test = x_test.reshape(a, c, b)
-
-# Definindo o LearningRateScheduler
 callback = LearningRateScheduler(scheduler, verbose=0)
-
-# Executando o modelo
 results = model.fit(x_train,
                     y_train,
-                    batch_size = batchSize,
-                    epochs = trainingEpochs,
+                    batch_size = batch_size,
+                    epochs = training_epochs,
                     callbacks = [callback],
                     validation_data = (x_val, y_val)
                     )
 
 # Test the model
-prediction_values = model.predict_classes(x_test)
+# prediction_values = model.predict_classes(x_test)
+# prediction_values = (model.predict(x) > 0.5).astype("int32") - binary classification
 prediction_values = np.argmax(model.predict(x_test), axis=-1)
 
 # Evaluate the model to see the accuracy
@@ -325,7 +346,7 @@ print("Evaluating on training set...")
 (loss, accuracy) = model.evaluate(x_train,y_train, verbose=0)
 print("loss={:.4f}, accuracy: {:.4f}%".format(loss,accuracy * 100))
 
-# print("Evaluating on testing set...")
+print("Evaluating on testing set...")
 (loss, accuracy) = model.evaluate(x_test, y_test, verbose=0)
 print("loss={:.4f}, accuracy: {:.4f}%".format(loss,accuracy * 100))
 
