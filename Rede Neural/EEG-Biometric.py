@@ -7,21 +7,19 @@ from tensorflow.keras.layers import Conv1D, MaxPooling1D, BatchNormalization
 from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.optimizers import SGD
 from scipy.signal import butter, sosfilt
-
-# import pandas as pd
-# from sklearn import metrics
+from sklearn.metrics.pairwise import euclidean_distances
 
 np.random.seed()
 
 # Tasks:
-# 1: Baseline, eyes open                                -> train
-# 2: Baseline, eyes closed                              -> test
+# 1: Baseline, eyes open                       
+# 2: Baseline, eyes closed
 # 3: Task 1 (open and close left or right fist) - Run 1 -> train
 # 7: Task 1 (open and close left or right fist) - Run 2 -> test
 
 # Hyperparameters
 batch_size = 100               # Batch Size
-training_epochs = 60           # Total number of training epochs - Definitivo: 60
+training_epochs = 60           # Total number of training epochs
 initial_learning_rate = 0.01   # Initial learning rate
 
 # Pre-processing Parameters
@@ -240,7 +238,7 @@ def load_data_EOEC():
     y_testL = list()
 
     for i in range(1, num_classes + 1):
-        content_EC = read_EDF('./dataset/S{:03d}R01.edf'.format(i))
+        content_EC = read_EDF('./dataset/S{:03d}R02.edf'.format(i))
         content_EC = pre_processing(content_EC)
         x_testL, y_testL = signal_cropping(x_testL, y_testL, content_EC, window_size, window_size, i, num_classes)
 
@@ -278,35 +276,35 @@ def create_model():
     """
     Create and returns the CNN model.
     """
-    model = Sequential()
+    model = Sequential(name='Biometric_for_Identification')
 
     # Conv1
-    model.add(Conv1D(96, (11), input_shape=(window_size, num_channels), activation='relu'))
-    model.add(BatchNormalization())
+    model.add(Conv1D(96, (11), input_shape=(window_size, num_channels), activation='relu', name='Conv1'))
+    model.add(BatchNormalization(name='Norm1'))
     # Pool1
-    model.add(MaxPooling1D(strides=4))
+    model.add(MaxPooling1D(strides=4, name='Pool1'))
     # Conv2
-    model.add(Conv1D(128, (9), activation='relu'))
-    model.add(BatchNormalization())
+    model.add(Conv1D(128, (9), activation='relu', name='Conv2'))
+    model.add(BatchNormalization(name='Norm2'))
     # Pool2
-    model.add(MaxPooling1D(strides=2))
+    model.add(MaxPooling1D(strides=2, name='Pool2'))
     # Conv3
-    model.add(Conv1D(256, (9), activation='relu')) 
-    model.add(BatchNormalization())
+    model.add(Conv1D(256, (9), activation='relu', name='Conv3')) 
+    model.add(BatchNormalization(name='Norm3'))
     # Pool3
-    model.add(MaxPooling1D(strides=2))
+    model.add(MaxPooling1D(strides=2, name='Pool3'))
     # FC1
     model.add(Flatten())
-    model.add(Dense(4096, activation='relu'))
+    model.add(Dense(4096, activation='relu', name='FC1'))
     # FC2
-    model.add(Dense(4096, activation='relu'))
+    model.add(Dense(4096, activation='relu', name='FC2'))
     # FC3
-    model.add(Dense(256))
-    model.add(BatchNormalization())
+    model.add(Dense(256, name='FC3'))
+    model.add(BatchNormalization(name='Norm4'))
     # Dropout
-    model.add(Dropout(0.1))
+    model.add(Dropout(0.1, name='Drop'))
     # FC4
-    model.add(Dense(num_classes, activation='softmax'))
+    model.add(Dense(num_classes, activation='softmax', name='FC4'))
 
     return model
 
@@ -317,12 +315,13 @@ model.summary()
 x_train, x_val, x_test, y_train, y_val, y_test = load_data_EOEC()
 
 # Printing data formats
+print('\nData formats:')
 print(f'x_train: {x_train.shape}')
 print(f'x_val: {x_val.shape}')
 print(f'x_test: {x_test.shape}')
 print(f'y_train: {y_train.shape}')
 print(f'y_val: {y_val.shape}')
-print(f'y_test: {y_test.shape}')
+print(f'y_test: {y_test.shape}\n')
 
 # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
@@ -336,19 +335,21 @@ results = model.fit(x_train,
                     validation_data = (x_val, y_val)
                     )
 
-# Test the model
-# prediction_values = model.predict_classes(x_test)
-# prediction_values = (model.predict(x) > 0.5).astype("int32") - binary classification
-prediction_values = np.argmax(model.predict(x_test), axis=-1)
+# Saving model weights
+model.save('model_weights.h5')
 
 # Evaluate the model to see the accuracy
-print("Evaluating on training set...")
-(loss, accuracy) = model.evaluate(x_train,y_train, verbose=0)
-print("loss={:.4f}, accuracy: {:.4f}%".format(loss,accuracy * 100))
+print('\nEvaluating on training set...')
+(loss, accuracy) = model.evaluate(x_train, y_train, verbose = 0)
+print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
 
-print("Evaluating on testing set...")
-(loss, accuracy) = model.evaluate(x_test, y_test, verbose=0)
-print("loss={:.4f}, accuracy: {:.4f}%".format(loss,accuracy * 100))
+print('Evaluating on validation set...')
+(loss, accuracy) = model.evaluate(x_val, y_val, verbose = 0)
+print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+
+print('Evaluating on testing set...')
+(loss, accuracy) = model.evaluate(x_test, y_test, verbose = 0)
+print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
 
 # Summarize history for accuracy and loss
 # summarize history for accuracy
@@ -376,42 +377,142 @@ max_loss = np.max(results.history['loss'])
 min_loss = np.min(results.history['loss'])
 print("Maximum Loss : {:.4f}".format(max_loss))
 print("Minimum Loss : {:.4f}".format(min_loss))
-print("Loss difference : {:.4f}".format((max_loss - min_loss)))
+print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
+# Removing the last 2 layers of the model and getting the features array
+model_for_verification = Sequential(name='Biometric_for_Verification')
+for layer in model.layers[:-2]:
+    model_for_verification.add(layer)
+model_for_verification.summary()
+model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+model_for_verification.load_weights('model_weights.h5', by_name=True)
+x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
-# model = model[0:-2] # modificar
+def one_hot_encoding_to_classes(y_data):
+    """
+    Takes a 2D numpy array that contains one-hot encoded labels and returns a 1D numpy array that contains
+    the classes.
 
-# calculate the loss on the test set
-# X_pred = model.predict(X_test)
-# X_pred = X_pred.reshape(X_pred.shape[0], X_pred.shape[2])
-# X_pred = pd.DataFrame(X_pred, columns=test.columns)
-# X_pred.index = test.index
-# scored = pd.DataFrame(index=test.index)
-# Xtest = X_test.reshape(X_test.shape[0], X_test.shape[2])
-# scored['Loss_mae'] = np.mean(np.abs(X_pred-Xtest), axis = 1)
+    Parameters:
+        - y_data: 2D numpy array in the format (number of samples, number of classes).
+    """
 
-# Function to compute EER based on FAR and FRR values
-# def find_EER(far, frr):
-#    far_optimum = 0
-#    frr_optimum = 0
-#    x = np.absolute((np.array(far) - np.array(frr)))
-#    print("diff_far_frr=", x)
-#    print("min_diff_far_frr=", min(x))
-#    y = np.nanargmin(x)
-#    print("index of min difference=", y)
-#    far_optimum = far[y]
-#    frr_optimum = frr[y]
-#    return far_optimum, frr_optimum
+    i = 0
+    j = 0
+    num_samples = y_data.shape[0]
+    arr = np.zeros(shape=(num_samples, 1))
 
-# Compute FPR, TPR, and Thresholds using ROC_curve from sci-kit learn
-# fpr, tpr,  threshold = metrics.roc_curve(Y_test, scored, pos_label=1)
-# fnr = 1 - tpr # get FNR , however FPR is same as FAR
-# far_optimum, frr_optimum = find_EER(fpr, fnr)
-# print("far_optimum = ", far_optimum)
-# print("frr_optimum = ", frr_optimum)
-# EER = max(far_optimum, frr_optimum)
-# EER_scores.append(EER*100)
-# HTER = 0.5 * (far_optimum + frr_optimum)
-# HTER_scores.append(HTER*100)
-# print("EER_scores: maximum of the FAR OR FRR when |FAR -FRR| is minimized ", EER_scores)
-# print("HTER_scores (0.5 * (FAR+FRR)*100: ", HTER_scores)
+    while i < num_samples:
+        while y_data[i, j] != 1:
+            j += 1
+        arr[i] = j+1
+        i += 1
+    
+    return arr
+
+def calc_metrics(feature1, label1, feature2, label2, plot_det=True, save_det=False, path=None):
+    """
+    Calculates Decidability, Equal Error Rate (EER) and returns them, as well as the respective thresholds.
+
+    Parameters:
+        - feature1: one of the feature vectors;
+        - label1: labels of the feature1 vector;
+        - feature2: one of the feature vectors;
+        - label2: labels of the feature2 vector.
+    
+    Optional Parameters:
+        - plot_det: if set to True, plots the Detection Error Trade-Off (DET) graph. True by default;
+        - save_det: if set to True, saves the Detection Error Trade-Off (DET) graph in a png file. False by default;
+        - path: file path that will store the Detection Error Trade-Off (DET) graph. No file path is selected by
+        default.
+    """
+
+    resolu = 5000
+
+    feature1 = feature1.T
+    xmax = np.amax(feature1,axis=0)
+    xmin = np.amin(feature1,axis=0)
+    x = feature1
+    feature1 = (x - xmin)/(xmax - xmin)
+    feature1 = feature1.T
+
+    feature2 = feature2.T
+    xmax = np.amax(feature2, axis=0)
+    xmin = np.amin(feature2, axis=0)
+    x = feature2
+    feature2 = (x - xmin) / (xmax - xmin)
+    feature2 = feature2.T
+
+    # All against all euclidean distance
+    dist = euclidean_distances(feature1, feature2)
+
+    # Separating distances from genuine pairs and impostor pairs
+    same_list = []
+    dif_list = []
+    for row in range(len(label1)):
+        for col in range(row+1, len(label2)):
+            if (label1[row] == label2[col]):
+                same_list.append(dist[row, col])
+            else:
+                dif_list.append(dist[row, col])
+
+    same = np.array(same_list)
+    dif = np.array(dif_list)
+
+    # Mean and standard deviation of both vectors
+    mean_same = np.mean(same)
+    mean_dif = np.mean(dif)
+    std_same = np.std(same)
+    std_dif = np.std(dif)
+
+    # Decidability
+    d = abs(mean_dif - mean_same) / np.sqrt(0.5 * (std_same ** 2 + std_dif ** 2))
+
+    dmin = np.amin(same)
+    dmax = np.amax(dif)
+
+    # Calculate False Match Rate and False NonMatch Rate for different thresholds
+    FMR = np.zeros(resolu)
+    FNMR = np.zeros(resolu)
+    t = np.linspace(dmin, dmax, resolu)
+
+    for t_val in range(resolu):
+        fm = np.sum(dif <= t[t_val])
+        FMR[t_val] = fm / len(dif)
+
+    for t_val in range(resolu):
+        fnm = np.sum(same > t[t_val])
+        FNMR[t_val] = fnm / len(same)
+
+    # DET graph (FMR x FNMR)
+    plt.figure()
+    plt.plot(FMR, FNMR, color='darkorange', label='DET curve')
+    plt.plot([0, 1], [0, 1], color='navy', linestyle='--')
+    plt.xlabel('False Match Rate')
+    plt.ylabel('False NonMatch Rate')
+    plt.title('Detection Error Trade-Off')
+    plt.legend(loc="lower right")
+
+    # If plot_det = True, plots FMR x FNMR
+    if plot_det == True:
+        plt.show()
+
+    # If save_det = True, saves FMR x FNMR to a file
+    if save_det == True:
+        plt.savefig(path + r'EER.png', format='png')
+    
+    plt.clf()
+
+    # Equal Error Rate (EER)
+    abs_diffs = np.abs(FMR - FNMR)
+    min_index = np.argmin(abs_diffs)
+    eer = (FMR[min_index] + FNMR[min_index])/2
+    thresholds = t[min_index]
+
+    return d, eer, thresholds
+
+# Calculating EER and Decidability
+y_test_classes = one_hot_encoding_to_classes(y_test)
+d, eer, thresholds = calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
+print(f'EER: {eer}')
+print(f'Decidability: {d}')

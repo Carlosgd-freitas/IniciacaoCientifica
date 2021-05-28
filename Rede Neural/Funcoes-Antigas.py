@@ -132,3 +132,91 @@ if distribution == 1.0:
 
                 i += offset
             return x_data, y_data, x_data_2, y_data_2
+
+def same_subject(index_1, index_2, total_samples):
+    """
+    Takes the index of 2 samples and returns if they correspond to the same subject or not.
+
+    A part of this function consists on calculating aux and aux2:
+        - aux: index of the first sample that corresponds to the same subject as the lowest index in the input;
+        - aux_2: index of the last sample that corresponds to the same subject as the lowest index in the input;
+
+    If the indexes of the 2 samples are in the interval [aux, aux2], then this function returns 1,
+    indicating they correspond to the same subject. Otherwise, this function returns 0, indicating they
+    correspond to different subjects.
+
+    Parameters:
+        - index_1: index of the first sample;
+        - index_2: index of the second sample;
+        - total_samples: total number of samples;
+    """
+
+    samples_per_subject = total_samples / num_classes
+    aux = 0
+
+    if index_1 == index_2: # Same sample
+        return 1
+    elif index_1 < index_2:
+        while aux < index_1:
+            if aux + samples_per_subject > index_1:
+                break
+            else:
+                aux += samples_per_subject
+        aux_2 = aux + samples_per_subject - 1
+
+        if index_1 >= aux and index_1 <= aux_2 and index_2 >= aux and index_2 <= aux_2:
+            return 1
+        else:
+            return 0
+    else:
+        while aux < index_2:
+            if aux + samples_per_subject > index_2:
+                break
+            else:
+                aux += samples_per_subject
+        aux_2 = aux + samples_per_subject - 1
+
+        if index_1 >= aux and index_1 <= aux_2 and index_2 >= aux and index_2 <= aux_2:
+            return 1
+        else:
+            return 0
+
+# All-vs-all comparations
+i = 0
+j = 0
+k = x_pred.shape[0]
+t = 200 # Threshold
+
+true_genuine = 0
+false_genuine = 0
+true_imposter = 0
+false_imposter = 0
+
+while i < k:
+    j = 0
+    while j < k:
+        dist = np.linalg.norm(x_pred[i] - x_pred[j])
+
+        if dist <= t: # Genuine
+            if same_subject(i, j, k) == 1:
+                true_genuine += 1
+            else:
+                false_genuine += 1
+        else: # Imposter
+            if same_subject(i, j, k) == 1:
+                true_imposter += 1
+            else:
+                false_imposter += 1
+        j += 1
+    i += 1
+
+print(f'true_genuine = {true_genuine}')
+print(f'false_genuine = {false_genuine}')
+print(f'true_imposter = {true_imposter}')
+print(f'false_imposter = {false_imposter}')
+
+far = false_genuine/(false_genuine + true_imposter)
+frr = false_imposter/(false_imposter + true_genuine)
+
+print(f'far = {far}')
+print(f'frr = {frr}')
