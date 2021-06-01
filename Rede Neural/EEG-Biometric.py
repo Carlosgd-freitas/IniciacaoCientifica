@@ -23,9 +23,9 @@ training_epochs = 60           # Total number of training epochs
 initial_learning_rate = 0.01   # Initial learning rate
 
 # Pre-processing Parameters
-band_pass_1 = [1, 50]          # First filter
-band_pass_2 = [10, 30]         # Second filter
-band_pass_3 = [30, 50]         # Third filter
+band_pass_1 = [1, 50]          # First filter option, 1~50Hz
+band_pass_2 = [10, 30]         # Second filter option, 10~30Hz
+band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 
 # Parameters used in process_signals() and load_data_EOEC()
 window_size = 1920
@@ -103,38 +103,46 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
     y = sosfilt(sos, data)
     return y
 
-def pre_processing(content):
+def pre_processing(content, filter_option = 4):
     """
-    Pre-processess the signals of each channel of an EEG signal. The signal will be band-pass filtered in 3
-    frequency bands. These bands are defined
+    Pre-processess the signals of each channel of an EEG signal using band-pass filters.
 
     Parameters:
         - content: the EEG signal that will be pre-processed.
+    
+    Optional Parameters:
+        - filter_option: determines what filter will be used. If equal to:
+            * 1, band_pass_1 will be used;
+            * 2, band_pass_2 will be used;
+            * 3, band_pass_3 will be used;
+            * 4, band_pass_1, band_pass_2 and band_pass_3 will be used, in this order. This is the default value.
     """
 
     channels = content.shape[0]
     c = 0
 
-    # First band: 1~50Hz
-    while c < channels:
-        signal = content[c, :]
-        content[c] = butter_bandpass_filter(signal, band_pass_1[0], band_pass_1[1], content.shape[1])
-        c += 1
-    c = 0
+    # Using first band-filter
+    if(filter_option == 1 or filter_option == 4):
+        while c < channels:
+            signal = content[c, :]
+            content[c] = butter_bandpass_filter(signal, band_pass_1[0], band_pass_1[1], content.shape[1])
+            c += 1
+        c = 0
 
-    # Second band: 10~30Hz
-    while c < channels:
-        signal = content[c, :]
-        content[c] = butter_bandpass_filter(signal, band_pass_2[0], band_pass_2[1], content.shape[1])
-        c += 1
-    c = 0
+    # Using second band-filter
+    if(filter_option == 2 or filter_option == 4):
+        while c < channels:
+            signal = content[c, :]
+            content[c] = butter_bandpass_filter(signal, band_pass_2[0], band_pass_2[1], content.shape[1])
+            c += 1
+        c = 0
 
-    # Third band: 30~50Hz
-    while c < channels:
-        signal = content[c, :]
-        content[c] = butter_bandpass_filter(signal, band_pass_3[0], band_pass_3[1], content.shape[1])
-        c += 1
-    c = 0
+    # Using third band-filter
+    if(filter_option == 3 or filter_option == 4):
+        while c < channels:
+            signal = content[c, :]
+            content[c] = butter_bandpass_filter(signal, band_pass_3[0], band_pass_3[1], content.shape[1])
+            c += 1
 
     return content
 
