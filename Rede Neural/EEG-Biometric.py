@@ -1,5 +1,6 @@
 import numpy as np
 import pyedflib
+import os
 import matplotlib.pyplot as plt
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Flatten
@@ -46,8 +47,13 @@ def read_EDF(path, channels=None):
     Optional Parameters:
         - channels: number of channels that will be read. By default, this function reads all channels.
     """
+    
+    file_folder = os.path.dirname(os.path.abspath(__file__))
+    new_path = os.path.join(file_folder, path) # talvez soh S{:03d}R01.edf ?
+    reader = pyedflib.EdfReader(new_path)
 
-    reader = pyedflib.EdfReader(path)
+    # file_folder = os.path.dirname(__file__)
+    # new_path = os.path.relpath(path, file_folder)
 
     if channels:
         signals = []
