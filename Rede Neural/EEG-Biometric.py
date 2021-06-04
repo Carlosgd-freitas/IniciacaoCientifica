@@ -238,7 +238,7 @@ def load_data_EOEC():
     y_valL = list()
 
     for i in range(1, num_classes + 1):
-        content_EO = read_EDF('./dataset/S{:03d}R01.edf'.format(i))
+        content_EO = read_EDF('/media/work/carlosfreitas/IniciacaoCientifica/Rede Neural/Dataset/S{:03d}R01.edf'.format(i)) # './dataset/S{:03d}R01.edf'
         content_EO = pre_processing(content_EO)
         x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, content_EO, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
     
@@ -252,7 +252,7 @@ def load_data_EOEC():
     y_testL = list()
 
     for i in range(1, num_classes + 1):
-        content_EC = read_EDF('./dataset/S{:03d}R02.edf'.format(i))
+        content_EC = read_EDF('/media/work/carlosfreitas/IniciacaoCientifica/Rede Neural/Dataset/S{:03d}R02.edf'.format(i)) # './dataset/S{:03d}R02.edf'
         content_EC = pre_processing(content_EC)
         x_testL, y_testL = signal_cropping(x_testL, y_testL, content_EC, window_size, window_size, i, num_classes)
 
