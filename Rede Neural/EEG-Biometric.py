@@ -12,6 +12,8 @@ from sklearn.metrics.pairwise import euclidean_distances
 
 np.random.seed()
 
+os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true' ##
+
 # Tasks:
 # 1: Baseline, eyes open                       
 # 2: Baseline, eyes closed
@@ -49,7 +51,7 @@ def read_EDF(path, channels=None):
     """
     
     file_folder = os.path.dirname(os.path.abspath(__file__))
-    new_path = os.path.join(file_folder, path) # talvez soh S{:03d}R01.edf ?
+    new_path = os.path.join(file_folder, path)
     reader = pyedflib.EdfReader(new_path)
 
     # file_folder = os.path.dirname(__file__)
