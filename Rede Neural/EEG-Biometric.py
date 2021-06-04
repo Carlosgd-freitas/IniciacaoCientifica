@@ -12,8 +12,6 @@ from sklearn.metrics.pairwise import euclidean_distances
 
 np.random.seed()
 
-os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true' ##
-
 # Tasks:
 # 1: Baseline, eyes open                       
 # 2: Baseline, eyes closed
@@ -30,10 +28,10 @@ band_pass_1 = [1, 50]          # First filter option, 1~50Hz
 band_pass_2 = [10, 30]         # Second filter option, 10~30Hz
 band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 
-# Parameters used in process_signals() and load_data_EOEC()
+# Parameters used in process_signals() and load_data()
 window_size = 1920
 offset = 480
-distribution = 0.9             # 90% | 10%
+distribution = 0.9             # 90% for training | 10% for validation
 
 # Other Parameters
 num_classes = 10               # Total number of classes
@@ -222,25 +220,29 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
 
         return x_data, y_data, x_data_2, y_data_2
 
-def load_data_EOEC():
+def load_data(folder_path, train_task, test_task):
     """
     Returns the processed signals and labels for training (x_train and y_train), validation (x_val and y_val) and
-    testing (x_test and y_test), using "Eyes Open" and "Eyes Closed" data and the following distribution:
-        - 90% of "Eyes Open" data (Task 1) will be used for training;
-        - 10% of "Eyes Open" data (Task 1) will be used for validation;
-        - 100% of "Eyes Closed" data (Task 2) will be used for testing.
+    testing (x_test and y_test).
 
     The return of this function is in the format: x_train, x_val, x_test, y_train, y_val, y_test.
+
+    Parameters:
+        - folder_path: path of the folder in which the the EDF files are stored.
+        E.g. if this python script is in the same folder as the sub-folder used to store the EDF files, and this
+        sub-folder is called "Dataset", then this parameter should be: './Dataset/';
+        - train_task: number of the experimental run that will be used to create train and validation data;
+        - test_task: number of the experimental run that will be used to create testing data.
     """
 
-    # Processing x_train, y_train, x_val e y_val
+    # Processing x_train, y_train, x_val and y_val
     x_trainL = list()
     x_valL = list()
     y_trainL = list()
     y_valL = list()
 
     for i in range(1, num_classes + 1):
-        content_EO = read_EDF('/media/work/carlosfreitas/IniciacaoCientifica/Rede Neural/Dataset/S{:03d}R01.edf'.format(i)) # './dataset/S{:03d}R01.edf'
+        content_EO = read_EDF(folder_path+'S{:03d}R{:02d}.edf'.format(i,train_task))
         content_EO = pre_processing(content_EO)
         x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, content_EO, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
     
@@ -249,25 +251,26 @@ def load_data_EOEC():
     y_train = np.asarray(y_trainL, dtype = object).astype('float32')
     y_val = np.asarray(y_valL, dtype = object).astype('float32')
 
-    # Processing x_test e y_test
+    # Processing x_test and y_test
     x_testL = list()
     y_testL = list()
 
     for i in range(1, num_classes + 1):
-        content_EC = read_EDF('/media/work/carlosfreitas/IniciacaoCientifica/Rede Neural/Dataset/S{:03d}R02.edf'.format(i)) # './dataset/S{:03d}R02.edf'
+        content_EC = read_EDF(folder_path+'S{:03d}R{:02d}.edf'.format(i,test_task))
         content_EC = pre_processing(content_EC)
         x_testL, y_testL = signal_cropping(x_testL, y_testL, content_EC, window_size, window_size, i, num_classes)
 
     x_test = np.asarray(x_testL, dtype = object).astype('float32')
     y_test = np.asarray(y_testL, dtype = object).astype('float32')
 
-    # The initial format of a "x_data" (EEG signal) will be "a x 64 x 1920", but the input shape of the CNN is
-    # "a x 1920 x 64".
+    # The initial format of a "x_data" (EEG signal) will be "a x num_channels x window_size", but the 
+    # input shape of the CNN is "a x window_size x num_channels".
     x_train = x_train.reshape(x_train.shape[0], x_train.shape[2], x_train.shape[1])
     x_val = x_val.reshape(x_val.shape[0], x_val.shape[2], x_val.shape[1])
     x_test = x_test.reshape(x_test.shape[0], x_test.shape[2], x_test.shape[1])
 
-    # The initial format of a "y_data" (label) will be "a x 1 x b". The correct format is "a x b".
+    # The initial format of a "y_data" (label) will be "a x 1 x num_classes", but the correct format
+    # is "a x num_classes".
     y_train = y_train.reshape(y_train.shape[0], y_train.shape[2])
     y_val = y_val.reshape(y_val.shape[0], y_val.shape[2])
     y_test = y_test.reshape(y_test.shape[0], y_test.shape[2])
@@ -290,7 +293,7 @@ def scheduler(current_epoch, learning_rate):
 
 def create_model():
     """
-    Create and returns the CNN model.
+    Creates and returns the CNN model.
     """
     model = Sequential(name='Biometric_for_Identification')
 
@@ -328,7 +331,8 @@ model = create_model()
 model.summary()
 
 # Loading the data
-x_train, x_val, x_test, y_train, y_val, y_test = load_data_EOEC()
+# x_train, x_val, x_test, y_train, y_val, y_test = load_data('./Dataset/', 1, 2)
+x_train, x_val, x_test, y_train, y_val, y_test = load_data('/media/work/carlosfreitas/IniciacaoCientifica/Rede Neural/Dataset/', 1, 2)
 
 # Printing data formats
 print('\nData formats:')
