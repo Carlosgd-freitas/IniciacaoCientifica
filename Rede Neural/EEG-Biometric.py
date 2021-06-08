@@ -30,11 +30,11 @@ band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 
 # Parameters used in process_signals() and load_data()
 window_size = 1920
-offset = 480
+offset = 20
 distribution = 0.9             # 90% for training | 10% for validation
 
 # Other Parameters
-num_classes = 10               # Total number of classes
+num_classes = 109              # Total number of classes
 num_channels = 64              # Number of channels in an EEG signal
 
 def read_EDF(path, channels=None):
@@ -51,9 +51,6 @@ def read_EDF(path, channels=None):
     file_folder = os.path.dirname(os.path.abspath(__file__))
     new_path = os.path.join(file_folder, path)
     reader = pyedflib.EdfReader(new_path)
-
-    # file_folder = os.path.dirname(__file__)
-    # new_path = os.path.relpath(path, file_folder)
 
     if channels:
         signals = []
@@ -381,6 +378,8 @@ plt.ylabel('accuracy')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'])
 plt.show()
+plt.savefig(r'accuracy.png', format='png')
+plt.clf()
 
 # summarize history for loss
 plt.subplot(212)
@@ -392,6 +391,8 @@ plt.xlabel('epoch')
 plt.legend(['train', 'test'])
 plt.tight_layout()
 plt.show()
+plt.savefig(r'loss.png', format='png')
+plt.clf()
 
 max_loss = np.max(results.history['loss'])
 min_loss = np.min(results.history['loss'])
