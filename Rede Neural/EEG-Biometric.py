@@ -240,7 +240,7 @@ def load_data(folder_path, train_task, test_task):
 
     for i in range(1, num_classes + 1):
         content_EO = read_EDF(folder_path+'S{:03d}R{:02d}.edf'.format(i,train_task))
-        content_EO = pre_processing(content_EO, filter_option = 1)
+        content_EO = pre_processing(content_EO, filter_option = 2)
         x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, content_EO, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
     
     x_train = np.asarray(x_trainL, dtype = object).astype('float32')
@@ -254,7 +254,7 @@ def load_data(folder_path, train_task, test_task):
 
     for i in range(1, num_classes + 1):
         content_EC = read_EDF(folder_path+'S{:03d}R{:02d}.edf'.format(i,test_task))
-        content_EC = pre_processing(content_EC, filter_option = 1)
+        content_EC = pre_processing(content_EC, filter_option = 2)
         x_testL, y_testL = signal_cropping(x_testL, y_testL, content_EC, window_size, window_size, i, num_classes)
 
     x_test = np.asarray(x_testL, dtype = object).astype('float32')
