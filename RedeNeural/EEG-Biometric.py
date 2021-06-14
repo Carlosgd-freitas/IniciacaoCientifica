@@ -129,8 +129,8 @@ def pre_processing(content, filter_option = 1):
     if(filter_option == 1 or filter_option == 4):
         while c < channels:
             signal = content[c, :]
-            # content[c] = butter_bandpass_filter(signal, band_pass_1[0], band_pass_1[1], content.shape[1], 12)
-            content[c] = butter_bandpass_filter(signal, band_pass_1[0], band_pass_1[1], frequency, 12)
+            content[c] = butter_bandpass_filter(signal, band_pass_1[0], band_pass_1[1], content.shape[1], 12)
+            # content[c] = butter_bandpass_filter(signal, band_pass_1[0], band_pass_1[1], frequency, 12)
             c += 1
         c = 0
 
