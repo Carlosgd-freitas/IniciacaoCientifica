@@ -331,7 +331,7 @@ model.summary()
 
 # Loading the data
 # x_train, x_val, x_test, y_train, y_val, y_test = load_data('./Dataset/', 1, 2)
-x_train, x_val, x_test, y_train, y_val, y_test = load_data('/media/work/carlosfreitas/IniciacaoCientifica/Rede Neural/Dataset/', 1, 2)
+x_train, x_val, x_test, y_train, y_val, y_test = load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', 1, 2)
 
 # Printing data formats
 print('\nData formats:')
