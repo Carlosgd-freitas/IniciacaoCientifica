@@ -30,7 +30,7 @@ band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 
 # Parameters used in process_signals() and load_data()
 window_size = 1920
-offset = 35
+offset = 20
 distribution = 0.9             # 90% for training | 10% for validation
 
 # Other Parameters
@@ -136,7 +136,7 @@ def pre_processing(content, filter_option = 1):
     if(filter_option == 2 or filter_option == 4):
         while c < channels:
             signal = content[c, :]
-            content[c] = butter_bandpass_filter(signal, band_pass_2[0], band_pass_2[1], content.shape[1], 12)
+            content[c] = butter_bandpass_filter(signal, band_pass_2[0], band_pass_2[1], 160, 12)
             c += 1
         c = 0
 
