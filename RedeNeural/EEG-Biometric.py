@@ -70,7 +70,7 @@ def read_EDF(path, channels=None):
     del reader
     return signals
 
-def butter_bandpass(lowcut, highcut, fs, order=5):
+def butter_bandpass(lowcut, highcut, fs, order):
     """
     Auxiliar function for butter_bandpass_filter().
 
@@ -78,9 +78,7 @@ def butter_bandpass(lowcut, highcut, fs, order=5):
         - lowcut: lowcut of the filter;
         - highcut: highcut of the filter;
         - fs: frequency of the data (sample).
-
-    Optional Parameters:
-        - order: order of the signal. This parameter is equal to 5 by default.
+        - order: order of the signal.
     """
     
     nyq = 0.5 * fs
@@ -89,7 +87,7 @@ def butter_bandpass(lowcut, highcut, fs, order=5):
     sos = butter(order, [low, high], btype='band', output='sos')
     return sos
 
-def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
+def butter_bandpass_filter(data, lowcut, highcut, fs, order=12):
     """
     Band-pass filters some data and returns it.
 
@@ -100,14 +98,14 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
         - fs: frequency of the data (sample).
     
     Optional Parameters:
-        - order: order of the signal. This parameter is equal to 5 by default.
+        - order: order of the signal. This parameter is equal to 12 by default.
     """
 
-    sos = butter_bandpass(lowcut, highcut, fs, order=order)
+    sos = butter_bandpass(lowcut, highcut, fs, order)
     y = sosfilt(sos, data)
     return y
 
-def pre_processing(content, filter_option = 1):
+def pre_processing(content, filter_option = 3):
     """
     Pre-processess the signals of each channel of an EEG signal using band-pass filters.
 
@@ -116,9 +114,9 @@ def pre_processing(content, filter_option = 1):
     
     Optional Parameters:
         - filter_option: determines what filter will be used. If equal to:
-            * 1, band_pass_1 will be used. This is the default value;
+            * 1, band_pass_1 will be used;
             * 2, band_pass_2 will be used;
-            * 3, band_pass_3 will be used;
+            * 3, band_pass_3 will be used. This is the default value;
             * 4, band_pass_1, band_pass_2 and band_pass_3 will be used, in this order.
     """
 
@@ -147,6 +145,15 @@ def pre_processing(content, filter_option = 1):
             signal = content[c, :]
             content[c] = butter_bandpass_filter(signal, band_pass_3[0], band_pass_3[1], frequency, 12)
             c += 1
+        c = 0
+    
+    # Normalizing the signal
+    while c < channels:
+        content[c] -= np.mean(content[c])
+        content[c] += np.absolute(np.amin(content[c]))
+        content[c] /= np.std(content[c])
+        content[c] /= np.amax(content[c])
+        c += 1
 
     return content
 
@@ -241,7 +248,7 @@ def load_data(folder_path, train_task, test_task):
 
     for i in range(1, num_classes + 1):
         content_EO = read_EDF(folder_path+'S{:03d}R{:02d}.edf'.format(i,train_task))
-        content_EO = pre_processing(content_EO, 4)
+        content_EO = pre_processing(content_EO, 3)
         x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, content_EO, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
     
     x_train = np.asarray(x_trainL, dtype = object).astype('float32')
@@ -255,7 +262,7 @@ def load_data(folder_path, train_task, test_task):
 
     for i in range(1, num_classes + 1):
         content_EC = read_EDF(folder_path+'S{:03d}R{:02d}.edf'.format(i,test_task))
-        content_EC = pre_processing(content_EC, 4)
+        content_EC = pre_processing(content_EC, 3)
         x_testL, y_testL = signal_cropping(x_testL, y_testL, content_EC, window_size, window_size, i, num_classes)
 
     x_test = np.asarray(x_testL, dtype = object).astype('float32')
