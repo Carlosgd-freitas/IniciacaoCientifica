@@ -148,12 +148,12 @@ def pre_processing(content, filter_option = 3):
         c = 0
     
     # Normalizing the signal
-    # while c < channels:
-        # content[c] -= np.mean(content[c])
-        # content[c] += np.absolute(np.amin(content[c]))
-        # content[c] /= np.std(content[c])
-        # content[c] /= np.amax(content[c])
-        # c += 1
+    while c < channels:
+        content[c] -= np.mean(content[c])
+        content[c] += np.absolute(np.amin(content[c]))
+        content[c] /= np.std(content[c])
+        content[c] /= np.amax(content[c])
+        c += 1
 
     return content
 
