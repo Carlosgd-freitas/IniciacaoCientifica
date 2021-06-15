@@ -24,6 +24,7 @@ training_epochs = 60           # Total number of training epochs
 initial_learning_rate = 0.01   # Initial learning rate
 
 # Pre-processing Parameters
+frequency = 160                # Frequency of the sampling
 band_pass_1 = [1, 50]          # First filter option, 1~50Hz
 band_pass_2 = [10, 30]         # Second filter option, 10~30Hz
 band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
@@ -128,7 +129,7 @@ def pre_processing(content, filter_option = 1):
     if(filter_option == 1 or filter_option == 4):
         while c < channels:
             signal = content[c, :]
-            content[c] = butter_bandpass_filter(signal, band_pass_1[0], band_pass_1[1], content.shape[1], 12)
+            content[c] = butter_bandpass_filter(signal, band_pass_1[0], band_pass_1[1], frequency, 12)
             c += 1
         c = 0
 
@@ -136,7 +137,7 @@ def pre_processing(content, filter_option = 1):
     if(filter_option == 2 or filter_option == 4):
         while c < channels:
             signal = content[c, :]
-            content[c] = butter_bandpass_filter(signal, band_pass_2[0], band_pass_2[1], 160, 12)
+            content[c] = butter_bandpass_filter(signal, band_pass_2[0], band_pass_2[1], frequency, 12)
             c += 1
         c = 0
 
@@ -144,7 +145,7 @@ def pre_processing(content, filter_option = 1):
     if(filter_option == 3 or filter_option == 4):
         while c < channels:
             signal = content[c, :]
-            content[c] = butter_bandpass_filter(signal, band_pass_3[0], band_pass_3[1], content.shape[1], 12)
+            content[c] = butter_bandpass_filter(signal, band_pass_3[0], band_pass_3[1], frequency, 12)
             c += 1
 
     return content
@@ -240,7 +241,7 @@ def load_data(folder_path, train_task, test_task):
 
     for i in range(1, num_classes + 1):
         content_EO = read_EDF(folder_path+'S{:03d}R{:02d}.edf'.format(i,train_task))
-        content_EO = pre_processing(content_EO, 2)
+        content_EO = pre_processing(content_EO, 1)
         x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, content_EO, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
     
     x_train = np.asarray(x_trainL, dtype = object).astype('float32')
@@ -254,7 +255,7 @@ def load_data(folder_path, train_task, test_task):
 
     for i in range(1, num_classes + 1):
         content_EC = read_EDF(folder_path+'S{:03d}R{:02d}.edf'.format(i,test_task))
-        content_EC = pre_processing(content_EC, 2)
+        content_EC = pre_processing(content_EC, 1)
         x_testL, y_testL = signal_cropping(x_testL, y_testL, content_EC, window_size, window_size, i, num_classes)
 
     x_test = np.asarray(x_testL, dtype = object).astype('float32')
