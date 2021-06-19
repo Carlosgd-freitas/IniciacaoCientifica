@@ -220,3 +220,81 @@ frr = false_imposter/(false_imposter + true_genuine)
 
 print(f'far = {far}')
 print(f'frr = {frr}')
+
+# Plotando o data augmentation
+def load_data(folder_path, train_task, test_task):
+    """
+    Returns the processed signals and labels for training (x_train and y_train), validation (x_val and y_val) and
+    testing (x_test and y_test).
+
+    The return of this function is in the format: x_train, x_val, x_test, y_train, y_val, y_test.
+
+    Parameters:
+        - folder_path: path of the folder in which the the EDF files are stored.
+        E.g. if this python script is in the same folder as the sub-folder used to store the EDF files, and this
+        sub-folder is called "Dataset", then this parameter should be: './Dataset/';
+        - train_task: number of the experimental run that will be used to create train and validation data;
+        - test_task: number of the experimental run that will be used to create testing data.
+    """
+
+    # Processing x_train, y_train, x_val and y_val
+    x_trainL = list()
+    x_valL = list()
+    y_trainL = list()
+    y_valL = list()
+
+    fig, axs = plt.subplots(3) #
+
+    for i in range(1, num_classes + 1):
+        content_EO = read_EDF(folder_path+'S{:03d}R{:02d}.edf'.format(i,train_task))
+        content_EO = pre_processing(content_EO, 4)
+
+        if i == 1:
+            print(f'content_EO[0].shape = {content_EO[0].shape}')
+            axs[0].axis([0, 10000, 0, 1])
+            axs[0].plot(content_EO[0], 'b-') #
+
+        x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, content_EO, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
+    
+    x_train = np.asarray(x_trainL, dtype = object).astype('float32')
+    x_val = np.asarray(x_valL, dtype = object).astype('float32')
+    y_train = np.asarray(y_trainL, dtype = object).astype('float32')
+    y_val = np.asarray(y_valL, dtype = object).astype('float32')
+
+    #
+    print(f'x_train.shape = {x_train.shape}')
+    print(f'x_train[0].shape = {x_train[0].shape}')
+    print(f'x_train[1].shape = {x_train[1].shape}')
+    
+    axs[1].axis([0, 2000, 0, 1])
+    axs[1].plot(x_train[0][0], 'r-')
+    axs[2].axis([0, 2000, 0, 1])
+    axs[2].plot(x_train[1][0], 'g-')
+    plt.show()
+    #
+
+    # Processing x_test and y_test
+    x_testL = list()
+    y_testL = list()
+
+    for i in range(1, num_classes + 1):
+        content_EC = read_EDF(folder_path+'S{:03d}R{:02d}.edf'.format(i,test_task))
+        content_EC = pre_processing(content_EC, 4)
+        x_testL, y_testL = signal_cropping(x_testL, y_testL, content_EC, window_size, window_size, i, num_classes)
+
+    x_test = np.asarray(x_testL, dtype = object).astype('float32')
+    y_test = np.asarray(y_testL, dtype = object).astype('float32')
+
+    # The initial format of a "x_data" (EEG signal) will be "a x num_channels x window_size", but the 
+    # input shape of the CNN is "a x window_size x num_channels".
+    x_train = x_train.reshape(x_train.shape[0], x_train.shape[2], x_train.shape[1])
+    x_val = x_val.reshape(x_val.shape[0], x_val.shape[2], x_val.shape[1])
+    x_test = x_test.reshape(x_test.shape[0], x_test.shape[2], x_test.shape[1])
+
+    # The initial format of a "y_data" (label) will be "a x 1 x num_classes", but the correct format
+    # is "a x num_classes".
+    y_train = y_train.reshape(y_train.shape[0], y_train.shape[2])
+    y_val = y_val.reshape(y_val.shape[0], y_val.shape[2])
+    y_test = y_test.reshape(y_test.shape[0], y_test.shape[2])
+
+    return x_train, x_val, x_test, y_train, y_val, y_test
