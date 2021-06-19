@@ -20,7 +20,7 @@ np.random.seed()
 
 # Hyperparameters
 batch_size = 100               # Batch Size
-training_epochs = 60           # Total number of training epochs
+training_epochs = 30           # Total number of training epochs
 initial_learning_rate = 0.01   # Initial learning rate
 
 # Pre-processing Parameters
@@ -540,5 +540,5 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
 # Calculating EER and Decidability
 y_test_classes = one_hot_encoding_to_classes(y_test)
 d, eer, thresholds = calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
-print(f'EER: {eer}')
+print(f'EER: {eer*100.0} %')
 print(f'Decidability: {d}')
