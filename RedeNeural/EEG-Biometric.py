@@ -12,12 +12,6 @@ from sklearn.metrics.pairwise import euclidean_distances
 
 np.random.seed()
 
-# Tasks:
-# 1: Baseline, eyes open
-# 2: Baseline, eyes closed
-# 3: Task 1 (open and close left or right fist) - Run 1 -> train
-# 7: Task 1 (open and close left or right fist) - Run 2 -> test
-
 # Hyperparameters
 batch_size = 100               # Batch Size
 training_epochs = 60           # Total number of training epochs
