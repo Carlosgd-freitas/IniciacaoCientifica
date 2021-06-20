@@ -89,7 +89,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=12):
         - data: data that will be band-pass filtered;
         - lowcut: lowcut of the filter;
         - highcut: highcut of the filter;
-        - fs: frequency of the data (sample).
+        - fs: frequency of the data (sampling).
     
     Optional Parameters:
         - order: order of the signal. This parameter is equal to 12 by default.
@@ -99,49 +99,38 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=12):
     y = sosfilt(sos, data)
     return y
 
-def pre_processing(content, filter_option = 3):
+def pre_processing(content, lowcut, highcut, frequency):
     """
-    Pre-processess the signals of each channel of an EEG signal using band-pass filters.
+    Pre-processess each channel of an EEG signal using band-pass filters.
 
     Parameters:
-        - content: the EEG signal that will be pre-processed.
-    
-    Optional Parameters:
-        - filter_option: determines what filter will be used. If equal to:
-            * 1, band_pass_1 will be used;
-            * 2, band_pass_2 will be used;
-            * 3, band_pass_3 will be used. This is the default value;
-            * 4, band_pass_1, band_pass_2 and band_pass_3 will be used, in this order.
+        - content: the EEG signal that will be band-pass filtered;
+        - lowcut: lowcut of the filter;
+        - highcut: highcut of the filter;
+        - frequency: frequency of the data (sampling).
     """
 
     channels = content.shape[0]
     c = 0
 
-    # Using first band-filter
-    if(filter_option == 1 or filter_option == 4):
-        while c < channels:
-            signal = content[c, :]
-            content[c] = butter_bandpass_filter(signal, band_pass_1[0], band_pass_1[1], frequency, 12)
-            c += 1
-        c = 0
+    while c < channels:
+        signal = content[c, :]
+        content[c] = butter_bandpass_filter(signal, lowcut, highcut, frequency)
+        c += 1
 
-    # Using second band-filter
-    if(filter_option == 2 or filter_option == 4):
-        while c < channels:
-            signal = content[c, :]
-            content[c] = butter_bandpass_filter(signal, band_pass_2[0], band_pass_2[1], frequency, 12)
-            c += 1
-        c = 0
+    return content
 
-    # Using third band-filter
-    if(filter_option == 3 or filter_option == 4):
-        while c < channels:
-            signal = content[c, :]
-            content[c] = butter_bandpass_filter(signal, band_pass_3[0], band_pass_3[1], frequency, 12)
-            c += 1
-        c = 0
+def normalize_signal(content):
+    """
+    Normalizes each channel of an EEG signal.
+
+    Parameters:
+        - content: the EEG signal that will be normalized.
+    """
+
+    channels = content.shape[0]
+    c = 0
     
-    # Normalizing the signal
     while c < channels:
         content[c] -= np.mean(content[c])
         content[c] += np.absolute(np.amin(content[c]))
@@ -241,9 +230,10 @@ def load_data(folder_path, train_task, test_task):
     y_valL = list()
 
     for i in range(1, num_classes + 1):
-        content_EO = read_EDF(folder_path+'S{:03d}R{:02d}.edf'.format(i,train_task))
-        content_EO = pre_processing(content_EO, 2)
-        x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, content_EO, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
+        train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i,i,train_task))
+        train_content = pre_processing(train_content, band_pass_2[0], band_pass_2[1], frequency)
+        train_content = normalize_signal(train_content)
+        x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
     
     x_train = np.asarray(x_trainL, dtype = object).astype('float32')
     x_val = np.asarray(x_valL, dtype = object).astype('float32')
@@ -255,9 +245,10 @@ def load_data(folder_path, train_task, test_task):
     y_testL = list()
 
     for i in range(1, num_classes + 1):
-        content_EC = read_EDF(folder_path+'S{:03d}R{:02d}.edf'.format(i,test_task))
-        content_EC = pre_processing(content_EC, 2)
-        x_testL, y_testL = signal_cropping(x_testL, y_testL, content_EC, window_size, window_size, i, num_classes)
+        test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i,i,test_task))
+        test_content = pre_processing(test_content, band_pass_2[0], band_pass_2[1], frequency)
+        test_content = normalize_signal(test_content)
+        x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content, window_size, window_size, i, num_classes)
 
     x_test = np.asarray(x_testL, dtype = object).astype('float32')
     y_test = np.asarray(y_testL, dtype = object).astype('float32')
@@ -370,8 +361,7 @@ print('Evaluating on testing set...')
 (loss, accuracy) = model.evaluate(x_test, y_test, verbose = 0)
 print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
 
-# Summarize history for accuracy and loss
-# summarize history for accuracy
+# Summarize history for accuracy
 plt.subplot(211)
 plt.plot(results.history['accuracy'])
 plt.plot(results.history['val_accuracy'])
@@ -379,11 +369,10 @@ plt.title('model accuracy')
 plt.ylabel('accuracy')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'])
-plt.show()
 plt.savefig(r'accuracy.png', format='png')
-plt.clf()
+plt.show()
 
-# summarize history for loss
+# Summarize history for loss
 plt.subplot(212)
 plt.plot(results.history['loss'])
 plt.plot(results.history['val_loss'])
@@ -392,9 +381,8 @@ plt.ylabel('loss')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'])
 plt.tight_layout()
-plt.show()
 plt.savefig(r'loss.png', format='png')
-plt.clf()
+plt.show()
 
 max_loss = np.max(results.history['loss'])
 min_loss = np.min(results.history['loss'])
@@ -507,7 +495,6 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
         FNMR[t_val] = fnm / len(same)
 
     # DET graph (FMR x FNMR)
-    plt.figure()
     plt.plot(FMR, FNMR, color='darkorange', label='DET curve')
     plt.plot([0, 1], [0, 1], color='navy', linestyle='--')
     plt.xlabel('False Match Rate')
