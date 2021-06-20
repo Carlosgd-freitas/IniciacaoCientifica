@@ -369,8 +369,6 @@ plt.title('model accuracy')
 plt.ylabel('accuracy')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'])
-plt.savefig(r'accuracy.png', format='png')
-plt.show()
 
 # Summarize history for loss
 plt.subplot(212)
@@ -381,7 +379,7 @@ plt.ylabel('loss')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'])
 plt.tight_layout()
-plt.savefig(r'loss.png', format='png')
+plt.savefig(r'accuracy-loss.png', format='png')
 plt.show()
 
 max_loss = np.max(results.history['loss'])
