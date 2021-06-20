@@ -20,7 +20,7 @@ np.random.seed()
 
 # Hyperparameters
 batch_size = 100               # Batch Size
-training_epochs = 40           # Total number of training epochs
+training_epochs = 20           # Total number of training epochs
 initial_learning_rate = 0.01   # Initial learning rate
 
 # Pre-processing Parameters
