@@ -13,7 +13,7 @@ from sklearn.metrics.pairwise import euclidean_distances
 np.random.seed()
 
 # Tasks:
-# 1: Baseline, eyes open                       
+# 1: Baseline, eyes open
 # 2: Baseline, eyes closed
 # 3: Task 1 (open and close left or right fist) - Run 1 -> train
 # 7: Task 1 (open and close left or right fist) - Run 2 -> test
@@ -31,7 +31,7 @@ band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 
 # Parameters used in process_signals() and load_data()
 window_size = 1920
-offset = 35
+offset = 40
 distribution = 0.9             # 90% for training | 10% for validation
 
 # Other Parameters
