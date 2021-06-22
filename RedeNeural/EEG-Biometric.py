@@ -208,7 +208,7 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
 
         return x_data, y_data, x_data_2, y_data_2
 
-def load_data(folder_path, train_task, test_task):
+def load_data(folder_path, train_tasks, test_tasks, verbose=0):
     """
     Returns the processed signals and labels for training (x_train and y_train), validation (x_val and y_val) and
     testing (x_test and y_test).
@@ -219,21 +219,31 @@ def load_data(folder_path, train_task, test_task):
         - folder_path: path of the folder in which the the EDF files are stored.
         E.g. if this python script is in the same folder as the sub-folder used to store the EDF files, and this
         sub-folder is called "Dataset", then this parameter should be: './Dataset/';
-        - train_task: number of the experimental run that will be used to create train and validation data;
-        - test_task: number of the experimental run that will be used to create testing data.
+        - train_tasks: list that contains the numbers of the experimental runs that will be used to create train
+        and validation data;
+        - test_tasks: list that contains the numbers of the experimental runs that will be used to create testing
+        data.
+    
+    Optional Parameters:
+        - verbose: if set to 1, prints what type of data (training/validation or testing) is currently being
+        processed. Default value is 0.
     """
 
     # Processing x_train, y_train, x_val and y_val
+    if(verbose):
+        print('Training and Validation data is being processed...')
+
     x_trainL = list()
     x_valL = list()
     y_trainL = list()
     y_valL = list()
 
-    for i in range(1, num_classes + 1):
-        train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i,i,train_task))
-        train_content = pre_processing(train_content, band_pass_2[0], band_pass_2[1], frequency)
-        train_content = normalize_signal(train_content)
-        x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
+    for train_task in train_tasks:
+        for i in range(1, num_classes + 1):
+            train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task))
+            train_content = pre_processing(train_content, band_pass_2[0], band_pass_2[1], frequency)
+            train_content = normalize_signal(train_content)
+            x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
     
     x_train = np.asarray(x_trainL, dtype = object).astype('float32')
     x_val = np.asarray(x_valL, dtype = object).astype('float32')
@@ -241,14 +251,18 @@ def load_data(folder_path, train_task, test_task):
     y_val = np.asarray(y_valL, dtype = object).astype('float32')
 
     # Processing x_test and y_test
+    if(verbose):
+        print('Testing data is being processed...')
+
     x_testL = list()
     y_testL = list()
 
-    for i in range(1, num_classes + 1):
-        test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i,i,test_task))
-        test_content = pre_processing(test_content, band_pass_2[0], band_pass_2[1], frequency)
-        test_content = normalize_signal(test_content)
-        x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content, window_size, window_size, i, num_classes)
+    for test_task in test_tasks:
+        for i in range(1, num_classes + 1):
+            test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task))
+            test_content = pre_processing(test_content, band_pass_2[0], band_pass_2[1], frequency)
+            test_content = normalize_signal(test_content)
+            x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content, window_size, window_size, i, num_classes)
 
     x_test = np.asarray(x_testL, dtype = object).astype('float32')
     y_test = np.asarray(y_testL, dtype = object).astype('float32')
@@ -321,8 +335,8 @@ model = create_model()
 model.summary()
 
 # Loading the data
-# x_train, x_val, x_test, y_train, y_val, y_test = load_data('./Dataset/', 1, 2)
-x_train, x_val, x_test, y_train, y_val, y_test = load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', 1, 2)
+# x_train, x_val, x_test, y_train, y_val, y_test = load_data('./Dataset/', [3, 11], [7], 1)
+x_train, x_val, x_test, y_train, y_val, y_test = load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', [3, 11], [7])
 
 # Printing data formats
 print('\nData formats:')
