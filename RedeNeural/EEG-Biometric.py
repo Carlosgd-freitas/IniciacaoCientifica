@@ -32,6 +32,22 @@ distribution = 0.9             # 90% for training | 10% for validation
 num_classes = 109              # Total number of classes
 num_channels = 64              # Number of channels in an EEG signal
 
+# Tasks:
+# Task 1 - EO
+# Task 2 - EC
+# Task 3 - T1R1
+# Task 4 - T2R1
+# Task 5 - T3R1
+# Task 6 - T4R1
+# Task 7 - T1R2
+# Task 8 - T2R2
+# Task 9 - T3R2
+# Task 10 - T4R2
+# Task 11 - T1R3
+# Task 12 - T2R3
+# Task 13 - T3R3
+# Task 14 - T4R3
+
 def read_EDF(path, channels=None):
     """
     Reads data from an EDF file and returns it in a numpy array format.
@@ -336,7 +352,7 @@ model.summary()
 
 # Loading the data
 # x_train, x_val, x_test, y_train, y_val, y_test = load_data('./Dataset/', [3, 11], [7], 1)
-x_train, x_val, x_test, y_train, y_val, y_test = load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', [3, 11], [7])
+x_train, x_val, x_test, y_train, y_val, y_test = load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', [3, 11], [8])
 
 # Printing data formats
 print('\nData formats:')
