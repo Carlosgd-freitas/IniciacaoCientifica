@@ -25,7 +25,7 @@ band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 
 # Parameters used in process_signals() and load_data()
 window_size = 1920
-offset = 400
+offset = 200
 distribution = 0.9             # 90% for training | 10% for validation
 
 # Other Parameters
