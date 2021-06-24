@@ -23,10 +23,19 @@ band_pass_1 = [1, 50]          # First filter option, 1~50Hz
 band_pass_2 = [10, 30]         # Second filter option, 10~30Hz
 band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 
-# Parameters used in process_signals() and load_data()
+# Parameters used in load_data()
+train = [4, 8, 12]             # Tasks used for training and validation
+test = [7]                     # Tasks used for testing
 window_size = 1920
 offset = 200
 distribution = 0.9             # 90% for training | 10% for validation
+
+# Channels for some lobes of the brain
+frontal_lobe   = [22, 23, 24, 25, 26, 27, 28, 29, 30,
+                  31, 32, 33, 34, 35, 36, 37, 38, 39,
+                  40]
+motor_cortex   = [8, 9, 10, 11, 12, 13, 14]
+occipital_lobe = [56, 57, 58, 59, 60, 61, 62, 63]
 
 # Other Parameters
 num_classes = 109              # Total number of classes
@@ -56,7 +65,7 @@ def read_EDF(path, channels=None):
         - path: path of the file that will be read.
     
     Optional Parameters:
-        - channels: number of channels that will be read. By default, this function reads all channels.
+        - channels: list of channels that will be read. By default, this function reads all channels.
     """
     
     file_folder = os.path.dirname(os.path.abspath(__file__))
@@ -351,8 +360,8 @@ model = create_model()
 model.summary()
 
 # Loading the data
-# x_train, x_val, x_test, y_train, y_val, y_test = load_data('./Dataset/', [3, 11], [7], 1)
-x_train, x_val, x_test, y_train, y_val, y_test = load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', [4, 8, 12], [7])
+# x_train, x_val, x_test, y_train, y_val, y_test = load_data('./Dataset/', train, test, 1)
+x_train, x_val, x_test, y_train, y_val, y_test = load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', train, test)
 
 # Printing data formats
 print('\nData formats:')
