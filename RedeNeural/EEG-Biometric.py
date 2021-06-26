@@ -400,10 +400,9 @@ def create_model_with_inception(remove_last_layer=False):
     """
 
     inputs = Input(shape=(window_size, num_channels))
-    block_1 = InceptionBasicBlock(inputs, 1)
-    block_2 = InceptionBasicBlock(block_1, 2)
-    block_3 = InceptionFlatBlock(block_2, 3)
-    fc_1 = Dense(256, name='FC1')(block_3)
+    block_1 = InceptionFlatBlock(inputs, 1)
+    # block_2 = InceptionBasicBlock(block_1, 2)
+    fc_1 = Dense(256, name='FC1')(block_1)
     
     # Model used for Identification
     if(remove_last_layer == False):
