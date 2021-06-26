@@ -320,36 +320,36 @@ def scheduler(current_epoch, learning_rate):
         learning_rate = 0.0001
         return learning_rate
 
-def InceptionBasicBlock(input_img, filters_sizes=(64, 96, 128, 16, 32, 128, 32), factor=1):
+def InceptionBasicBlock(input_img, block_index, filters_sizes=(64, 96, 128, 16, 32, 128, 32), factor=1):
     """
     Creates and returns an inception block for a CNN.
     """
-    conv1_1_1 = Conv1D(int(filters_sizes[0] * factor), 1, padding='same', activation='relu', name=f'conv1_1_1_f{factor}')(input_img)
-    conv2_1_1 = Conv1D(int(filters_sizes[1] * factor), 1, padding='same', activation='relu', name=f'conv2_1_1_f{factor}')(input_img)
-    conv2_1_2 = Conv1D(int(filters_sizes[2] * factor), 5, padding='same', activation='relu', name=f'conv2_1_2_f{factor}')(conv2_1_1)
-    conv3_1_1 = Conv1D(int(filters_sizes[3] * factor), 1, padding='same', activation='relu', name=f'conv3_1_1_f{factor}')(input_img)
-    conv3_3_3 = Conv1D(int(filters_sizes[4] * factor), 3, padding='same', activation='relu', name=f'conv3_3_3_f{factor}')(conv3_1_1)
-    conv4_1_1 = Conv1D(int(filters_sizes[5] * factor), 2, padding='same', activation='relu', name=f'conv4_1_1_f{factor}')(input_img)
-    maxP_3_1 = MaxPooling1D(pool_size=3, strides=1, padding="same", name=f'maxP_3_1_f{factor}')(conv4_1_1)
-    conv4_1_2 = Conv1D(int(filters_sizes[6] * factor), 1, padding='same', activation='relu', name=f'conv4_1_2_f{factor}')(maxP_3_1)
+    conv1_1_1 = Conv1D(int(filters_sizes[0] * factor), 1, padding='same', activation='relu', name=f'conv1_{block_index}_1_f{factor}')(input_img)
+    conv2_1_1 = Conv1D(int(filters_sizes[1] * factor), 1, padding='same', activation='relu', name=f'conv2_{block_index}_1_f{factor}')(input_img)
+    conv2_1_2 = Conv1D(int(filters_sizes[2] * factor), 5, padding='same', activation='relu', name=f'conv2_{block_index}_2_f{factor}')(conv2_1_1)
+    conv3_1_1 = Conv1D(int(filters_sizes[3] * factor), 1, padding='same', activation='relu', name=f'conv3_{block_index}_1_f{factor}')(input_img)
+    conv3_1_2 = Conv1D(int(filters_sizes[4] * factor), 3, padding='same', activation='relu', name=f'conv3_{block_index}_2_f{factor}')(conv3_1_1)
+    conv4_1_1 = Conv1D(int(filters_sizes[5] * factor), 2, padding='same', activation='relu', name=f'conv4_{block_index}_1_f{factor}')(input_img)
+    maxP_3_1 = MaxPooling1D(pool_size=3, strides=1, padding="same", name=f'maxP_3_{block_index}_f{factor}')(conv4_1_1)
+    conv4_1_2 = Conv1D(int(filters_sizes[6] * factor), 1, padding='same', activation='relu', name=f'conv4_{block_index}_2_f{factor}')(maxP_3_1)
 
-    result = Concatenate(axis=2)([conv1_1_1, conv2_1_2, conv3_3_3, conv4_1_2])
+    result = Concatenate(axis=2)([conv1_1_1, conv2_1_2, conv3_1_2, conv4_1_2])
     return result
 
-def InceptionFlatBlock(input_img, filters_sizes=(64, 96, 128, 16, 32, 128, 32), factor=1):
+def InceptionFlatBlock(input_img, block_index, filters_sizes=(64, 96, 128, 16, 32, 128, 32), factor=1):
     """
     Creates and returns an inception block for a CNN, with a flat output (Equivalent to Flatten() operation).
     """
-    conv1_1_1 = Conv1D(int(filters_sizes[0] * factor), 1, padding='same', activation='relu', name=f'conv1_1_1_f{factor}')(input_img)
-    conv2_1_1 = Conv1D(int(filters_sizes[1] * factor), 1, padding='same', activation='relu', name=f'conv2_1_1_f{factor}')(input_img)
-    conv2_1_2 = Conv1D(int(filters_sizes[2] * factor), 5, padding='same', activation='relu', name=f'conv2_1_2_f{factor}')(conv2_1_1)
-    conv3_1_1 = Conv1D(int(filters_sizes[3] * factor), 1, padding='same', activation='relu', name=f'conv3_1_1_f{factor}')(input_img)
-    conv3_3_3 = Conv1D(int(filters_sizes[4] * factor), 3, padding='same', activation='relu', name=f'conv3_3_3_f{factor}')(conv3_1_1)
-    conv4_1_1 = Conv1D(int(filters_sizes[5] * factor), 2, padding='same', activation='relu', name=f'conv4_1_1_f{factor}')(input_img)
-    maxP_3_1 = MaxPooling1D(pool_size=3, strides=1, padding="same", name=f'maxP_3_1_f{factor}')(conv4_1_1)
-    conv4_1_2 = Conv1D(int(filters_sizes[6] * factor), 1, padding='same', activation='relu', name=f'conv4_1_2_f{factor}')(maxP_3_1)
+    conv1_1_1 = Conv1D(int(filters_sizes[0] * factor), 1, padding='same', activation='relu', name=f'conv1_{block_index}_1_f{factor}')(input_img)
+    conv2_1_1 = Conv1D(int(filters_sizes[1] * factor), 1, padding='same', activation='relu', name=f'conv2_{block_index}_1_f{factor}')(input_img)
+    conv2_1_2 = Conv1D(int(filters_sizes[2] * factor), 5, padding='same', activation='relu', name=f'conv2_{block_index}_2_f{factor}')(conv2_1_1)
+    conv3_1_1 = Conv1D(int(filters_sizes[3] * factor), 1, padding='same', activation='relu', name=f'conv3_{block_index}_1_f{factor}')(input_img)
+    conv3_1_2 = Conv1D(int(filters_sizes[4] * factor), 3, padding='same', activation='relu', name=f'conv3_{block_index}_2_f{factor}')(conv3_1_1)
+    conv4_1_1 = Conv1D(int(filters_sizes[5] * factor), 2, padding='same', activation='relu', name=f'conv4_{block_index}_1_f{factor}')(input_img)
+    maxP_3_1 = MaxPooling1D(pool_size=3, strides=1, padding="same", name=f'maxP_3_{block_index}_f{factor}')(conv4_1_1)
+    conv4_1_2 = Conv1D(int(filters_sizes[6] * factor), 1, padding='same', activation='relu', name=f'conv4_{block_index}_2_f{factor}')(maxP_3_1)
 
-    concat = Concatenate(axis=2)([conv1_1_1, conv2_1_2, conv3_3_3, conv4_1_2])
+    concat = Concatenate(axis=2)([conv1_1_1, conv2_1_2, conv3_1_2, conv4_1_2])
     result = Flatten()(concat)
 
     return result
@@ -400,8 +400,8 @@ def create_model_with_inception(remove_last_layer=False):
     """
 
     inputs = Input(shape=(window_size, num_channels))
-    block_1 = InceptionBasicBlock(inputs)
-    block_2 = InceptionFlatBlock(block_1, factor = 2)
+    block_1 = InceptionBasicBlock(inputs, 1)
+    block_2 = InceptionFlatBlock(block_1, 2)
     fc_1 = Dense(256, name='FC1')(block_2)
     
     # Model used for Identification
