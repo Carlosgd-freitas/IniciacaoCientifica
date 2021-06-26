@@ -14,7 +14,7 @@ np.random.seed()
 
 # Hyperparameters
 batch_size = 100               # Batch Size
-training_epochs = 40           # Total number of training epochs
+training_epochs = 60           # Total number of training epochs
 initial_learning_rate = 0.01   # Initial learning rate
 
 # Pre-processing Parameters
@@ -323,6 +323,16 @@ def scheduler(current_epoch, learning_rate):
 def InceptionBasicBlock(input_img, block_index, filters_sizes=(64, 96, 128, 16, 32, 128, 32), factor=1):
     """
     Creates and returns an inception block for a CNN.
+
+    Parameters:
+        - input_img: input data for the inception block;
+        - block_index: index of the inception block;
+    
+    Optional Parameters:
+        - filters_sizes: tuple of filter sizes for each of the 7 convolution layers of this inception block. Default
+        tuple is (64, 96, 128, 16, 32, 128, 32);
+        - factor: used to multiply the number of filters used in each convolution layer simultaneously. Default
+        value is 1:
     """
     conv1_1_1 = Conv1D(int(filters_sizes[0] * factor), 1, padding='same', activation='relu', name=f'conv1_{block_index}_1_f{factor}')(input_img)
     conv2_1_1 = Conv1D(int(filters_sizes[1] * factor), 1, padding='same', activation='relu', name=f'conv2_{block_index}_1_f{factor}')(input_img)
@@ -338,7 +348,17 @@ def InceptionBasicBlock(input_img, block_index, filters_sizes=(64, 96, 128, 16, 
 
 def InceptionFlatBlock(input_img, block_index, filters_sizes=(64, 96, 128, 16, 32, 128, 32), factor=1):
     """
-    Creates and returns an inception block for a CNN, with a flat output (Equivalent to Flatten() operation).
+    Creates and returns an inception block for a CNN, with a flat output (Equivalent to a Flatten() operation).
+
+    Parameters:
+        - input_img: input data for the inception block;
+        - block_index: index of the inception block;
+    
+    Optional Parameters:
+        - filters_sizes: tuple of filter sizes for each of the 7 convolution layers of this inception block. Default
+        tuple is (64, 96, 128, 16, 32, 128, 32);
+        - factor: used to multiply the number of filters used in each convolution layer simultaneously. Default
+        value is 1:
     """
     conv1_1_1 = Conv1D(int(filters_sizes[0] * factor), 1, padding='same', activation='relu', name=f'conv1_{block_index}_1_f{factor}')(input_img)
     conv2_1_1 = Conv1D(int(filters_sizes[1] * factor), 1, padding='same', activation='relu', name=f'conv2_{block_index}_1_f{factor}')(input_img)
@@ -400,9 +420,9 @@ def create_model_with_inception(remove_last_layer=False):
     """
 
     inputs = Input(shape=(window_size, num_channels))
-    block_1 = InceptionFlatBlock(inputs, 1)
-    # block_2 = InceptionBasicBlock(block_1, 2)
-    fc_1 = Dense(256, name='FC1')(block_1)
+    block_1 = InceptionBasicBlock(inputs, 1)
+    block_2 = InceptionFlatBlock(block_1, 2)
+    fc_1 = Dense(256, name='FC1')(block_2)
     
     # Model used for Identification
     if(remove_last_layer == False):
