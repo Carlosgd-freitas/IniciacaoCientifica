@@ -298,3 +298,29 @@ def load_data(folder_path, train_task, test_task):
     y_test = y_test.reshape(y_test.shape[0], y_test.shape[2])
 
     return x_train, x_val, x_test, y_train, y_val, y_test
+
+def InceptionBasicBlock(input_img, block_index, filters_sizes=(64, 96, 128, 16, 32, 128, 32), factor=1):
+    """
+    Creates and returns an inception block for a CNN.
+
+    Parameters:
+        - input_img: input data for the inception block;
+        - block_index: index of the inception block;
+    
+    Optional Parameters:
+        - filters_sizes: tuple of filter sizes for each of the 7 convolution layers of this inception block. Default
+        tuple is (64, 96, 128, 16, 32, 128, 32);
+        - factor: used to multiply the number of filters used in each convolution layer simultaneously. Default
+        value is 1:
+    """
+    conv1_1_1 = Conv1D(int(filters_sizes[0] * factor), 1, padding='same', activation='relu', name=f'conv1_{block_index}_1_f{factor}')(input_img)
+    conv2_1_1 = Conv1D(int(filters_sizes[1] * factor), 1, padding='same', activation='relu', name=f'conv2_{block_index}_1_f{factor}')(input_img)
+    conv2_1_2 = Conv1D(int(filters_sizes[2] * factor), 5, padding='same', activation='relu', name=f'conv2_{block_index}_2_f{factor}')(conv2_1_1)
+    conv3_1_1 = Conv1D(int(filters_sizes[3] * factor), 1, padding='same', activation='relu', name=f'conv3_{block_index}_1_f{factor}')(input_img)
+    conv3_1_2 = Conv1D(int(filters_sizes[4] * factor), 3, padding='same', activation='relu', name=f'conv3_{block_index}_2_f{factor}')(conv3_1_1)
+    conv4_1_1 = Conv1D(int(filters_sizes[5] * factor), 2, padding='same', activation='relu', name=f'conv4_{block_index}_1_f{factor}')(input_img)
+    maxP_3_1 = MaxPooling1D(pool_size=3, strides=1, padding="same", name=f'maxP_3_{block_index}_f{factor}')(conv4_1_1)
+    conv4_1_2 = Conv1D(int(filters_sizes[6] * factor), 1, padding='same', activation='relu', name=f'conv4_{block_index}_2_f{factor}')(maxP_3_1)
+
+    result = Concatenate(axis=2)([conv1_1_1, conv2_1_2, conv3_1_2, conv4_1_2])
+    return result
