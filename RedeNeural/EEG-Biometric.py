@@ -480,12 +480,11 @@ def create_model_with_SE(remove_last_layer=False):
 
     inputs = Input(shape=(window_size, num_channels))
     block_1 = SEBlock(inputs)
-    norm_1 = BatchNormalization(name='Norm1')(block_1)
-    block_2 = SEBlock(norm_1)
-    norm_2 = BatchNormalization(name='Norm2')(block_2)
-    block_3 = SEBlock(norm_2, 'flat')
-    norm_3 = BatchNormalization(name='Norm3')(block_3)
-    fc_1 = Dense(4096, name='FC1')(norm_3)
+    block_2 = SEBlock(block_1)
+    block_3 = SEBlock(block_2)
+    block_4 = SEBlock(block_3)
+    block_5 = SEBlock(block_4, 'flat')
+    fc_1 = Dense(4096, name='FC1')(block_5)
     fc_2 = Dense(4096, name='FC2')(fc_1)
     fc_3 = Dense(256, name='FC3')(fc_2)
     
