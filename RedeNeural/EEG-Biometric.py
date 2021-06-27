@@ -488,8 +488,18 @@ def create_model_with_SE(remove_last_layer=False):
     block_7 = SEBlock(block_6)
     block_8 = SEBlock(block_7)
     block_9 = SEBlock(block_8)
-    block_10 = SEBlock(block_9, 'flat')
-    fc_1 = Dense(256, name='FC1')(block_10)
+    block_10 = SEBlock(block_9)
+    block_11 = SEBlock(block_10)
+    block_12 = SEBlock(block_11)
+    block_13 = SEBlock(block_12)
+    block_14 = SEBlock(block_13)
+    block_15 = SEBlock(block_14)
+    block_16 = SEBlock(block_15)
+    block_17 = SEBlock(block_16)
+    block_18 = SEBlock(block_17)
+    block_19 = SEBlock(block_18)
+    block_20 = SEBlock(block_19, 'flat')
+    fc_1 = Dense(256, name='FC1')(block_20)
     
     # Model used for Identification
     if(remove_last_layer == False):
