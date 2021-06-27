@@ -10,6 +10,7 @@ from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.optimizers import SGD
 from scipy.signal import butter, sosfilt
 from sklearn.metrics.pairwise import euclidean_distances
+from tensorflow.python.keras.layers import normalization_v2
 
 np.random.seed()
 
@@ -479,25 +480,23 @@ def create_model_with_SE(remove_last_layer=False):
 
     inputs = Input(shape=(window_size, num_channels))
     block_1 = SEBlock(inputs)
-    block_2 = SEBlock(block_1)
-    block_3 = SEBlock(block_2)
-    block_4 = SEBlock(block_3)
-    block_5 = SEBlock(block_4)
-    block_6 = SEBlock(block_5)
-    block_7 = SEBlock(block_6)
-    block_8 = SEBlock(block_7)
-    block_9 = SEBlock(block_8)
-    block_10 = SEBlock(block_9, 'flat')
-    fc_1 = Dense(256, name='FC1')(block_10)
+    norm_1 = BatchNormalization(name='Norm1')(block_1)
+    block_2 = SEBlock(norm_1)
+    norm_2 = BatchNormalization(name='Norm2')(block_2)
+    block_3 = SEBlock(norm_2, 'flat')
+    norm_3 = BatchNormalization(name='Norm3')(block_3)
+    fc_1 = Dense(4096, name='FC1')(norm_3)
+    fc_2 = Dense(4096, name='FC2')(fc_1)
+    fc_3 = Dense(256, name='FC3')(fc_2)
     
     # Model used for Identification
     if(remove_last_layer == False):
-        fc_2 = Dense(num_classes, activation='softmax', name='FC2')(fc_1)
-        model = Model(inputs=inputs, outputs=fc_2, name='Biometric_for_Identification')
+        fc_4 = Dense(num_classes, activation='softmax', name='FC4')(fc_3)
+        model = Model(inputs=inputs, outputs=fc_4, name='Biometric_for_Identification')
         
     # Model used for Verification
     else:
-        model = Model(inputs=inputs, outputs=fc_1, name='Biometric_for_Verification')
+        model = Model(inputs=inputs, outputs=fc_3, name='Biometric_for_Verification')
 
     return model
 
