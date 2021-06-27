@@ -483,23 +483,8 @@ def create_model_with_SE(remove_last_layer=False):
     block_2 = SEBlock(block_1)
     block_3 = SEBlock(block_2)
     block_4 = SEBlock(block_3)
-    block_5 = SEBlock(block_4)
-    block_6 = SEBlock(block_5)
-    block_7 = SEBlock(block_6)
-    block_8 = SEBlock(block_7)
-    block_9 = SEBlock(block_8)
-    block_10 = SEBlock(block_9)
-    block_11 = SEBlock(block_10)
-    block_12 = SEBlock(block_11)
-    block_13 = SEBlock(block_12)
-    block_14 = SEBlock(block_13)
-    block_15 = SEBlock(block_14)
-    block_16 = SEBlock(block_15)
-    block_17 = SEBlock(block_16)
-    block_18 = SEBlock(block_17)
-    block_19 = SEBlock(block_18)
-    block_20 = SEBlock(block_19, 'flat')
-    fc_1 = Dense(256, name='FC1')(block_20)
+    block_5 = SEBlock(block_4, 'flat')
+    fc_1 = Dense(256, name='FC1')(block_5)
     
     # Model used for Identification
     if(remove_last_layer == False):
@@ -513,8 +498,8 @@ def create_model_with_SE(remove_last_layer=False):
     return model
 
 # model = create_model()
-# model = create_model_with_inception()
-model = create_model_with_SE()
+model = create_model_with_inception()
+# model = create_model_with_SE()
 model.summary()
 
 # Loading the data
@@ -595,18 +580,18 @@ print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 # x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 # Removing the last layer of the model with inception blocks and getting the features array
-# model_for_verification = create_model_with_inception(True)
-# model_for_verification.summary()
-# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-# model_for_verification.load_weights('model_weights.h5', by_name=True)
-# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
-
-# Removing the last layer of the model with squeeze & excitation blocks and getting the features array
-model_for_verification = create_model_with_SE(True)
+model_for_verification = create_model_with_inception(True)
 model_for_verification.summary()
 model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
 model_for_verification.load_weights('model_weights.h5', by_name=True)
 x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+
+# Removing the last layer of the model with squeeze & excitation blocks and getting the features array
+# model_for_verification = create_model_with_SE(True)
+# model_for_verification.summary()
+# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+# model_for_verification.load_weights('model_weights.h5', by_name=True)
+# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 def one_hot_encoding_to_classes(y_data):
     """
