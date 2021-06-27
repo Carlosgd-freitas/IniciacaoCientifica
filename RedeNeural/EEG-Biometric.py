@@ -483,8 +483,13 @@ def create_model_with_SE(remove_last_layer=False):
     block_2 = SEBlock(block_1)
     block_3 = SEBlock(block_2)
     block_4 = SEBlock(block_3)
-    block_5 = SEBlock(block_4, 'flat')
-    fc_1 = Dense(256, name='FC1')(block_5)
+    block_5 = SEBlock(block_4)
+    block_6 = SEBlock(block_5)
+    block_7 = SEBlock(block_6)
+    block_8 = SEBlock(block_7)
+    block_9 = SEBlock(block_8)
+    block_10 = SEBlock(block_9, 'flat')
+    fc_1 = Dense(256, name='FC1')(block_10)
     
     # Model used for Identification
     if(remove_last_layer == False):
