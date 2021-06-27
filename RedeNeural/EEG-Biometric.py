@@ -484,18 +484,16 @@ def create_model_with_SE(remove_last_layer=False):
     block_3 = SEBlock(block_2)
     block_4 = SEBlock(block_3)
     block_5 = SEBlock(block_4, 'flat')
-    fc_1 = Dense(4096, name='FC1')(block_5)
-    fc_2 = Dense(4096, name='FC2')(fc_1)
-    fc_3 = Dense(256, name='FC3')(fc_2)
+    fc_1 = Dense(256, name='FC1')(block_5)
     
     # Model used for Identification
     if(remove_last_layer == False):
-        fc_4 = Dense(num_classes, activation='softmax', name='FC4')(fc_3)
-        model = Model(inputs=inputs, outputs=fc_4, name='Biometric_for_Identification')
+        fc_2 = Dense(num_classes, activation='softmax', name='FC2')(fc_1)
+        model = Model(inputs=inputs, outputs=fc_2, name='Biometric_for_Identification')
         
     # Model used for Verification
     else:
-        model = Model(inputs=inputs, outputs=fc_3, name='Biometric_for_Verification')
+        model = Model(inputs=inputs, outputs=fc_1, name='Biometric_for_Verification')
 
     return model
 
