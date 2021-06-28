@@ -32,17 +32,16 @@ offset = 200
 distribution = 0.9             # 90% for training | 10% for validation
 
 # Channels for some lobes of the brain
-frontal_lobe   = [22, 23, 24, 25, 26, 27, 28, 29, 30,
-                  31, 32, 33, 34, 35, 36, 37, 38, 39,
-                  40]
-motor_cortex   = [8, 9, 10, 11, 12, 13, 14]
-occipital_lobe = [56, 57, 58, 59, 60, 61, 62, 63]
+frontal_lobe   = ['Fp1.', 'Fpz.', 'Fp2.', 'Af7.', 'Af3.', 'Afz.', 'Af4.', 'Af8.', 'F7..', 'F5..', 'F3..',
+                  'F1..', 'Fz..', 'F2..', 'F4..', 'F6..', 'F8..', 'Ft7.', 'Ft8.']
+motor_cortex   = ['C5..', 'C3..', 'C1..', 'Cz..', 'C2..', 'C4..', 'C6..']
+occipital_lobe = ['Po7.', 'Po3.', 'Poz.', 'Po4.', 'Po8.', 'O1..', 'Oz..', 'O2..']
 
 # 9 channels present in Yang et al. article
-frontal_lobe_yang = [26, 27, 28]
-motor_cortex_yang = [10, 11, 12]
-occipital_lobe_yang = [61, 62, 63]
-all_channels_yang = [10, 11, 12, 26, 27, 28, 61, 62, 63]
+frontal_lobe_yang = ['Af3.', 'Afz.', 'Af4.']
+motor_cortex_yang = ['C1..', 'Cz..', 'C2..']
+occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
+all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
 
 # Other Parameters
 num_classes = 109              # Total number of classes
@@ -72,7 +71,13 @@ def read_EDF(path, channels=None):
         - path: path of the file that will be read.
     
     Optional Parameters:
-        - channels: list of channels that will be read. By default, this function reads all channels.
+        - channels: list of channel codes that will be read. By default, this function reads all channels.
+        The list containing all channel codes is: ['Fc5.', 'Fc3.', 'Fc1.', 'Fcz.', 'Fc2.', 'Fc4.', 'Fc6.',
+        'C5..', 'C3..', 'C1..', 'Cz..', 'C2..', 'C4..', 'C6..', 'Cp5.', 'Cp3.', 'Cp1.', 'Cpz.', 'Cp2.',
+        'Cp4.', 'Cp6.', 'Fp1.', 'Fpz.', 'Fp2.', 'Af7.', 'Af3.', 'Afz.', 'Af4.', 'Af8.', 'F7..', 'F5..',
+        'F3..', 'F1..', 'Fz..', 'F2..', 'F4..', 'F6..', 'F8..', 'Ft7.', 'Ft8.', 'T7..', 'T8..', 'T9..',
+        'T10.', 'Tp7.', 'Tp8.', 'P7..', 'P5..', 'P3..', 'P1..', 'Pz..', 'P2..', 'P4..', 'P6..', 'P8..',
+        'Po7.', 'Po3.', 'Poz.', 'Po4.', 'Po8.', 'O1..', 'Oz..', 'O2..', 'Iz..']
     """
     
     file_folder = os.path.dirname(os.path.abspath(__file__))
