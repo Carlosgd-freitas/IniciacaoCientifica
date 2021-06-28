@@ -10,7 +10,6 @@ from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.optimizers import SGD
 from scipy.signal import butter, sosfilt
 from sklearn.metrics.pairwise import euclidean_distances
-from tensorflow.python.keras.layers import normalization_v2
 
 np.random.seed()
 
@@ -26,8 +25,8 @@ band_pass_2 = [10, 30]         # Second filter option, 10~30Hz
 band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 
 # Parameters used in load_data()
-train = [1]                    # Tasks used for training and validation
-test = [2]                     # Tasks used for testing
+train = [3, 11]                # Tasks used for training and validation
+test = [7]                     # Tasks used for testing
 window_size = 1920
 offset = 200
 distribution = 0.9             # 90% for training | 10% for validation
@@ -201,7 +200,7 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
         - y_data_2: list that stores the processed labels;
     """
 
-    num_subject -= 1 ## Subject: 1~109 / Array Positions: 0~108
+    num_subject -= 1 # Subject: 1~109 / Array Positions: 0~108
 
     # Checking the offset parameter
     if offset < 0:
@@ -273,7 +272,7 @@ def load_data(folder_path, train_tasks, test_tasks, verbose=0):
 
     for train_task in train_tasks:
         for i in range(1, num_classes + 1):
-            train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task))
+            train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task), frontal_lobe_yang)
             train_content = pre_processing(train_content, band_pass_2[0], band_pass_2[1], frequency)
             train_content = normalize_signal(train_content)
             x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
@@ -292,7 +291,7 @@ def load_data(folder_path, train_tasks, test_tasks, verbose=0):
 
     for test_task in test_tasks:
         for i in range(1, num_classes + 1):
-            test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task))
+            test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task), frontal_lobe_yang)
             test_content = pre_processing(test_content, band_pass_2[0], band_pass_2[1], frequency)
             test_content = normalize_signal(test_content)
             x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content, window_size, window_size, i, num_classes)
