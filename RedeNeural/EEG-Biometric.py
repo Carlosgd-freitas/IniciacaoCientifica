@@ -501,8 +501,8 @@ def create_model_with_SE(remove_last_layer=False):
 
     return model
 
-# model = create_model()
-model = create_model_with_inception()
+model = create_model()
+# model = create_model_with_inception()
 # model = create_model_with_SE()
 model.summary()
 
@@ -575,20 +575,20 @@ print("Minimum Loss : {:.4f}".format(min_loss))
 print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
 # Removing the last 2 layers of the model and getting the features array
-# model_for_verification = Sequential(name='Biometric_for_Verification')
-# for layer in model.layers[:-2]:
-#     model_for_verification.add(layer)
-# model_for_verification.summary()
-# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-# model_for_verification.load_weights('model_weights.h5', by_name=True)
-# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
-
-# Removing the last layer of the model with inception blocks and getting the features array
-model_for_verification = create_model_with_inception(True)
+model_for_verification = Sequential(name='Biometric_for_Verification')
+for layer in model.layers[:-2]:
+    model_for_verification.add(layer)
 model_for_verification.summary()
 model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
 model_for_verification.load_weights('model_weights.h5', by_name=True)
 x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+
+# Removing the last layer of the model with inception blocks and getting the features array
+# model_for_verification = create_model_with_inception(True)
+# model_for_verification.summary()
+# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+# model_for_verification.load_weights('model_weights.h5', by_name=True)
+# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 # Removing the last layer of the model with squeeze & excitation blocks and getting the features array
 # model_for_verification = create_model_with_SE(True)
