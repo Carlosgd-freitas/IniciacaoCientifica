@@ -82,8 +82,11 @@ def read_EDF(path, channels=None):
     if channels:
         signals = []
         signal_labels = reader.getSignalLabels()
+        print(reader.getSignalLabels()) #
         for c in channels:
+            print(f'c = {c}') #
             index = signal_labels.index(c)
+            print(f'index = {index}') #
             signals.append(reader.readSignal(index))
         signals = np.array(signals)
     else:
