@@ -45,7 +45,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 
 # Other Parameters
 num_classes = 109              # Total number of classes
-num_channels = 3 #64           # Number of channels in an EEG signal
+num_channels = 9 #64           # Number of channels in an EEG signal
 
 # Tasks:
 # Task 1 - EO
