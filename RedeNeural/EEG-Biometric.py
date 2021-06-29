@@ -25,7 +25,7 @@ band_pass_2 = [10, 30]         # Second filter option, 10~30Hz
 band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 
 # Parameters used in load_data()
-train = [3, 4, 8, 12]          # Tasks used for training and validation
+train = [3, 4, 8, 11]          # Tasks used for training and validation
 test = [7]                     # Tasks used for testing
 window_size = 1920
 offset = 200
