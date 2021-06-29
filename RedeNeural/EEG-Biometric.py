@@ -25,8 +25,8 @@ band_pass_2 = [10, 30]         # Second filter option, 10~30Hz
 band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 
 # Parameters used in load_data()
-train = [5, 13]                # Tasks used for training and validation
-test = [9]                     # Tasks used for testing
+train = [6, 14]                # Tasks used for training and validation
+test = [10]                     # Tasks used for testing
 window_size = 1920
 offset = 200
 distribution = 0.9             # 90% for training | 10% for validation
@@ -45,7 +45,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 
 # Other Parameters
 num_classes = 109              # Total number of classes
-num_channels = 9 #64           # Number of channels in an EEG signal
+num_channels = 3 #64           # Number of channels in an EEG signal
 
 # Tasks:
 # Task 1 - EO
@@ -277,7 +277,7 @@ def load_data(folder_path, train_tasks, test_tasks, verbose=0):
 
     for train_task in train_tasks:
         for i in range(1, num_classes + 1):
-            train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task), all_channels_yang)
+            train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task), frontal_lobe_yang)
             train_content = pre_processing(train_content, band_pass_2[0], band_pass_2[1], frequency)
             train_content = normalize_signal(train_content)
             x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
@@ -296,7 +296,7 @@ def load_data(folder_path, train_tasks, test_tasks, verbose=0):
 
     for test_task in test_tasks:
         for i in range(1, num_classes + 1):
-            test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task), all_channels_yang)
+            test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task), frontal_lobe_yang)
             test_content = pre_processing(test_content, band_pass_2[0], band_pass_2[1], frequency)
             test_content = normalize_signal(test_content)
             x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content, window_size, window_size, i, num_classes)
