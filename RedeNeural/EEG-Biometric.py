@@ -25,7 +25,7 @@ band_pass_2 = [10, 30]         # Second filter option, 10~30Hz
 band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 
 # Parameters used in load_data()
-train = [6, 14]                # Tasks used for training and validation
+train = [1]                    # Tasks used for training and validation
 test = [2]                     # Tasks used for testing
 window_size = 1920
 offset = 200
@@ -44,7 +44,7 @@ occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
 
 # Other Parameters
-num_classes = 109              # Total number of classes
+num_classes = 10 #9              # Total number of classes
 num_channels = 9 #64           # Number of channels in an EEG signal
 
 # Tasks:
@@ -157,23 +157,57 @@ def pre_processing(content, lowcut, highcut, frequency):
 
     return content
 
-def normalize_signal(content):
+def normalize_signal(content, mode):
     """
-    Normalizes each channel of an EEG signal.
+    Normalizes an EEG signal.
 
     Parameters:
         - content: the EEG signal that will be normalized.
+        - mode: how the EEG signal will be normalized:
+            * 'each_channel': each channel of the EEG signal will be used to compute the mean, standard deviation,
+            minimum and maximum values, which will be applied only to themselves in order to normalize them.
+            * 'all_channels': all channels of the EEG signal will be used to compute the mean, standard deviation,
+            minimum and maximum values, which will be applied to each signal in order to normalize them.
+            * 'all_classes': all EEG signals of every individual will be used to compute the mean, standard
+            deviation, minimum and maximum values, which will be applied to each signal in order to normalize them.
     """
 
     channels = content.shape[0]
     c = 0
     
-    while c < channels:
-        content[c] -= np.mean(content[c])
-        content[c] += np.absolute(np.amin(content[c]))
-        content[c] /= np.std(content[c])
-        content[c] /= np.amax(content[c])
-        c += 1
+    if(mode == 'each_channel'):
+        while c < channels:
+            content[c] -= np.mean(content[c])
+            content[c] += np.absolute(np.amin(content[c]))
+            content[c] /= np.std(content[c])
+            content[c] /= np.amax(content[c])
+            c += 1
+    elif(mode == 'all_channels'):
+        mean = np.mean(content)
+        standard_deviation = np.std(content)
+        min_value = np.amin(content)
+        max_value = np.amax(content)
+
+        while c < channels:
+            content[c] -= mean
+            content[c] += np.absolute(min_value)
+            content[c] /= standard_deviation
+            content[c] /= max_value
+            c += 1
+    elif(mode == 'all_classes'):
+        print(f'mean of everyone: {np.mean(content)}') ##########
+
+        mean = np.mean(content)
+        standard_deviation = np.std(content)
+        min_value = np.amin(content)
+        max_value = np.amax(content)
+
+        content -= mean
+        content += np.absolute(min_value)
+        content /= standard_deviation
+        content /= max_value
+    else:
+        print('ERROR: Invalid mode parameter.')
 
     return content
 
@@ -279,13 +313,16 @@ def load_data(folder_path, train_tasks, test_tasks, verbose=0):
         for i in range(1, num_classes + 1):
             train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task), all_channels_yang)
             train_content = pre_processing(train_content, band_pass_2[0], band_pass_2[1], frequency)
-            train_content = normalize_signal(train_content)
+            train_content = normalize_signal(train_content, 'all_channels')
             x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
     
     x_train = np.asarray(x_trainL, dtype = object).astype('float32')
     x_val = np.asarray(x_valL, dtype = object).astype('float32')
     y_train = np.asarray(y_trainL, dtype = object).astype('float32')
     y_val = np.asarray(y_valL, dtype = object).astype('float32')
+
+    # x_train = normalize_signal(x_train, 'all_classes')
+    # x_val = normalize_signal(x_val, 'all_classes')
 
     # Processing x_test and y_test
     if(verbose):
@@ -298,19 +335,21 @@ def load_data(folder_path, train_tasks, test_tasks, verbose=0):
         for i in range(1, num_classes + 1):
             test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task), all_channels_yang)
             test_content = pre_processing(test_content, band_pass_2[0], band_pass_2[1], frequency)
-            test_content = normalize_signal(test_content)
+            test_content = normalize_signal(test_content, 'all_channels')
             x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content, window_size, window_size, i, num_classes)
 
     x_test = np.asarray(x_testL, dtype = object).astype('float32')
     y_test = np.asarray(y_testL, dtype = object).astype('float32')
 
-    # The initial format of a "x_data" (EEG signal) will be "a x num_channels x window_size", but the 
+    # x_test = normalize_signal(x_test, 'all_classes')
+
+    # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
     # input shape of the CNN is "a x window_size x num_channels".
     x_train = x_train.reshape(x_train.shape[0], x_train.shape[2], x_train.shape[1])
     x_val = x_val.reshape(x_val.shape[0], x_val.shape[2], x_val.shape[1])
     x_test = x_test.reshape(x_test.shape[0], x_test.shape[2], x_test.shape[1])
 
-    # The initial format of a "y_data" (label) will be "a x 1 x num_classes", but the correct format
+    # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
     # is "a x num_classes".
     y_train = y_train.reshape(y_train.shape[0], y_train.shape[2])
     y_val = y_val.reshape(y_val.shape[0], y_val.shape[2])
@@ -507,8 +546,8 @@ model = create_model()
 model.summary()
 
 # Loading the data
-# x_train, x_val, x_test, y_train, y_val, y_test = load_data('./Dataset/', train, test, 1)
-x_train, x_val, x_test, y_train, y_val, y_test = load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', train, test)
+x_train, x_val, x_test, y_train, y_val, y_test = load_data('./Dataset/', train, test, 1)
+# x_train, x_val, x_test, y_train, y_val, y_test = load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', train, test)
 
 # Printing data formats
 print('\nData formats:')
