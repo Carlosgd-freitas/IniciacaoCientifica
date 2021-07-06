@@ -184,27 +184,41 @@ def normalize_signal(content, mode):
             c += 1
     elif(mode == 'all_channels'):
         mean = np.mean(content)
-        standard_deviation = np.std(content)
-        min_value = np.amin(content)
-        max_value = np.amax(content)
-
         while c < channels:
             content[c] -= mean
+            c += 1
+        c = 0
+
+        min_value = np.amin(content)
+        while c < channels:
             content[c] += np.absolute(min_value)
+            c += 1
+        c = 0
+
+        standard_deviation = np.std(content)
+        while c < channels:
             content[c] /= standard_deviation
+            c += 1
+        c = 0
+
+        max_value = np.amax(content)
+        while c < channels:
             content[c] /= max_value
             c += 1
+        c = 0
     elif(mode == 'all_classes'):
         print(f'mean of everyone: {np.mean(content)}') ##########
 
         mean = np.mean(content)
-        standard_deviation = np.std(content)
-        min_value = np.amin(content)
-        max_value = np.amax(content)
-
         content -= mean
+
+        min_value = np.amin(content)
         content += np.absolute(min_value)
+
+        standard_deviation = np.std(content)
         content /= standard_deviation
+
+        max_value = np.amax(content)
         content /= max_value
     else:
         print('ERROR: Invalid mode parameter.')
