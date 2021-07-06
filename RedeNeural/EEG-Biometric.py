@@ -28,7 +28,7 @@ band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 train = [1]                    # Tasks used for training and validation
 test = [2]                     # Tasks used for testing
 window_size = 1920
-offset = 40
+offset = 200
 distribution = 0.9             # 90% for training | 10% for validation
 
 # Channels for some lobes of the brain
