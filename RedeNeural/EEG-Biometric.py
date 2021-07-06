@@ -326,7 +326,7 @@ def load_data(folder_path, train_tasks, test_tasks, verbose=0):
     for train_task in train_tasks:
         for i in range(1, num_classes + 1):
             train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task))
-            train_content = pre_processing(train_content, band_pass_2[0], band_pass_2[1], frequency)
+            train_content = pre_processing(train_content, band_pass_3[0], band_pass_3[1], frequency)
             train_content = normalize_signal(train_content, 'all_channels')
             x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
     
@@ -348,7 +348,7 @@ def load_data(folder_path, train_tasks, test_tasks, verbose=0):
     for test_task in test_tasks:
         for i in range(1, num_classes + 1):
             test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task))
-            test_content = pre_processing(test_content, band_pass_2[0], band_pass_2[1], frequency)
+            test_content = pre_processing(test_content, band_pass_3[0], band_pass_3[1], frequency)
             test_content = normalize_signal(test_content, 'all_channels')
             x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content, window_size, window_size, i, num_classes)
 
