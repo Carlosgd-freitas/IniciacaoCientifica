@@ -44,8 +44,8 @@ occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
 
 # Other Parameters
-num_classes = 10 #9              # Total number of classes
-num_channels = 9 #64           # Number of channels in an EEG signal
+num_classes = 109              # Total number of classes
+num_channels = 64              # Number of channels in an EEG signal
 
 # Tasks:
 # Task 1 - EO
@@ -325,7 +325,7 @@ def load_data(folder_path, train_tasks, test_tasks, verbose=0):
 
     for train_task in train_tasks:
         for i in range(1, num_classes + 1):
-            train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task), all_channels_yang)
+            train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task))
             train_content = pre_processing(train_content, band_pass_2[0], band_pass_2[1], frequency)
             train_content = normalize_signal(train_content, 'all_channels')
             x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
@@ -347,7 +347,7 @@ def load_data(folder_path, train_tasks, test_tasks, verbose=0):
 
     for test_task in test_tasks:
         for i in range(1, num_classes + 1):
-            test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task), all_channels_yang)
+            test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task))
             test_content = pre_processing(test_content, band_pass_2[0], band_pass_2[1], frequency)
             test_content = normalize_signal(test_content, 'all_channels')
             x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content, window_size, window_size, i, num_classes)
@@ -560,8 +560,8 @@ model = create_model()
 model.summary()
 
 # Loading the data
-x_train, x_val, x_test, y_train, y_val, y_test = load_data('./Dataset/', train, test, 1)
-# x_train, x_val, x_test, y_train, y_val, y_test = load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', train, test)
+# x_train, x_val, x_test, y_train, y_val, y_test = load_data('./Dataset/', train, test, 1)
+x_train, x_val, x_test, y_train, y_val, y_test = load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', train, test)
 
 # Printing data formats
 print('\nData formats:')
