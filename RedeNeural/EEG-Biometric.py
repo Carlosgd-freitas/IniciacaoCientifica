@@ -28,7 +28,7 @@ band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 train = [1]                    # Tasks used for training and validation
 test = [2]                     # Tasks used for testing
 window_size = 1920
-offset = 35
+offset = 40
 distribution = 0.9             # 90% for training | 10% for validation
 
 # Channels for some lobes of the brain
@@ -561,7 +561,7 @@ model.summary()
 
 # Loading the data
 # x_train, x_val, x_test, y_train, y_val, y_test = load_data('./Dataset/', train, test, 1)
-x_train, x_val, x_test, y_train, y_val, y_test = load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', train, test)
+x_train, x_val, x_test, y_train, y_val, y_test = load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', train, test, 1)
 
 # Printing data formats
 print('\nData formats:')
