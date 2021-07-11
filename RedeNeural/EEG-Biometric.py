@@ -25,10 +25,10 @@ band_pass_2 = [10, 30]         # Second filter option, 10~30Hz
 band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 
 # Parameters used in load_data()
-train = [1]                    # Tasks used for training and validation
-test = [2]                     # Tasks used for testing
+train = [5, 13]                # Tasks used for training and validation
+test = [7]                     # Tasks used for testing
 window_size = 1920
-offset = 200
+offset = 40
 distribution = 0.9             # 90% for training | 10% for validation
 
 # Channels for some lobes of the brain
@@ -183,11 +183,7 @@ def normalize_signal(content, mode):
             content[c] /= np.amax(content[c])
             c += 1
     elif(mode == 'all_channels'):
-        mean = np.mean(content)
-        while c < channels:
-            content[c] -= mean
-            c += 1
-        c = 0
+        content -= np.mean(content)
 
         min_value = np.amin(content)
         while c < channels:
@@ -327,7 +323,7 @@ def load_data(folder_path, train_tasks, test_tasks, verbose=0):
         for i in range(1, num_classes + 1):
             train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task))
             train_content = pre_processing(train_content, band_pass_3[0], band_pass_3[1], frequency)
-            train_content = normalize_signal(train_content, 'all_channels')
+            # train_content = normalize_signal(train_content, 'all_channels')
             x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
     
     x_train = np.asarray(x_trainL, dtype = object).astype('float32')
@@ -349,7 +345,7 @@ def load_data(folder_path, train_tasks, test_tasks, verbose=0):
         for i in range(1, num_classes + 1):
             test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task))
             test_content = pre_processing(test_content, band_pass_3[0], band_pass_3[1], frequency)
-            test_content = normalize_signal(test_content, 'all_channels')
+            # test_content = normalize_signal(test_content, 'all_channels')
             x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content, window_size, window_size, i, num_classes)
 
     x_test = np.asarray(x_testL, dtype = object).astype('float32')
@@ -554,9 +550,46 @@ def create_model_with_SE(remove_last_layer=False):
 
     return model
 
-model = create_model()
+def create_model_identification(remove_last_layer=False):
+    """
+    Creates and returns the CNN model meant to have the greatest performance on identification.
+
+    Optional Parameters:
+        - remove_last_layer: if True, the model created won't have the fully connected block at the end with a
+        softmax activation function.
+    """
+
+    inputs = Input(shape=(window_size, num_channels))
+    se_1 = SEBlock(inputs)
+    conv_1 = Conv1D(96, (11), activation='relu') (se_1)
+    norm_1 = BatchNormalization() (conv_1)
+    pool_1 = MaxPooling1D(strides=4) (norm_1)
+    inception_1 = InceptionBlock(pool_1, 1)
+    conv_2 = Conv1D(256, (9), activation='relu') (inception_1)
+    norm_2 = BatchNormalization() (conv_2)
+    pool_2 = MaxPooling1D(strides=2) (norm_2)
+    flat = Flatten() (pool_2)
+    fc_1 = Dense(4096)(flat)
+    fc_2 = Dense(4096)(fc_1)
+    fc_3 = Dense(256)(fc_2)
+    
+    # Model used for Identification
+    if(remove_last_layer == False):
+        norm_3 = BatchNormalization()(fc_3)
+        drop = Dropout(0.1) (norm_3)
+        fc_4 = Dense(num_classes, activation='softmax') (drop)
+        model = Model(inputs=inputs, outputs=fc_4, name='Biometric_for_Identification')
+        
+    # Model used for Verification
+    else:
+        model = Model(inputs=inputs, outputs=fc_3, name='Biometric_for_Verification')
+
+    return model
+
+# model = create_model()
 # model = create_model_with_inception()
 # model = create_model_with_SE()
+model = create_model_identification()
 model.summary()
 
 # Loading the data
@@ -628,13 +661,13 @@ print("Minimum Loss : {:.4f}".format(min_loss))
 print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
 # Removing the last 2 layers of the model and getting the features array
-model_for_verification = Sequential(name='Biometric_for_Verification')
-for layer in model.layers[:-2]:
-    model_for_verification.add(layer)
-model_for_verification.summary()
-model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-model_for_verification.load_weights('model_weights.h5', by_name=True)
-x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+# model_for_verification = Sequential(name='Biometric_for_Verification')
+# for layer in model.layers[:-2]:
+#     model_for_verification.add(layer)
+# model_for_verification.summary()
+# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+# model_for_verification.load_weights('model_weights.h5', by_name=True)
+# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 # Removing the last layer of the model with inception blocks and getting the features array
 # model_for_verification = create_model_with_inception(True)
@@ -649,6 +682,13 @@ x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 # model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
 # model_for_verification.load_weights('model_weights.h5', by_name=True)
 # x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+
+# Removing the last layer of the model with the greatest performance on identification and getting the features array
+model_for_verification = create_model_identification(True)
+model_for_verification.summary()
+model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+model_for_verification.load_weights('model_weights.h5', by_name=True)
+x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 def one_hot_encoding_to_classes(y_data):
     """
