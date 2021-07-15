@@ -591,12 +591,12 @@ def create_model_identification(remove_last_layer=False):
     norm_2 = BatchNormalization() (conv_2)
     pool_2 = MaxPooling1D(strides=2) (norm_2)
 
-    conv_3 = Conv1D(256, (9), activation='relu') (pool_2)
-    norm_3 = BatchNormalization() (conv_3)
-    pool_3 = MaxPooling1D(strides=2) (norm_3)
+    # conv_3 = Conv1D(256, (9), activation='relu') (pool_2)
+    # norm_3 = BatchNormalization() (conv_3)
+    # pool_3 = MaxPooling1D(strides=2) (norm_3)
 
-    flat = Flatten() (pool_3)
-    # flat = Flatten() (pool_2)
+    # flat = Flatten() (pool_3)
+    flat = Flatten() (pool_2)
     fc_1 = Dense(4096)(flat)
     fc_2 = Dense(4096)(fc_1)
     fc_3 = Dense(256)(fc_2)
