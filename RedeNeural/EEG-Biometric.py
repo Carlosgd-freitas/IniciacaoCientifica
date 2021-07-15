@@ -577,17 +577,17 @@ def create_model_identification(remove_last_layer=False):
     """
 
     inputs = Input(shape=(window_size, num_channels))
-    # se_1 = SEBlock(inputs)
-    # conv_1 = Conv1D(96, (11), activation='relu') (se_1)
+    se_1 = SEBlock(inputs)
+    conv_1 = Conv1D(96, (11), activation='relu') (se_1)
 
-    conv_1 = Conv1D(96, (11), activation='relu') (inputs)
+    # conv_1 = Conv1D(96, (11), activation='relu') (inputs)
     norm_1 = BatchNormalization() (conv_1)
     pool_1 = MaxPooling1D(strides=4) (norm_1)
 
-    # inception_1 = InceptionBlock(pool_1, 1)
-    # conv_2 = Conv1D(256, (9), activation='relu') (inception_1)
+    inception_1 = InceptionBlock(pool_1, 1)
+    conv_2 = Conv1D(256, (9), activation='relu') (inception_1)
 
-    conv_2 = Conv1D(128, (9), activation='relu') (pool_1)
+    # conv_2 = Conv1D(128, (9), activation='relu') (pool_1)
     norm_2 = BatchNormalization() (conv_2)
     pool_2 = MaxPooling1D(strides=2) (norm_2)
 
@@ -616,10 +616,10 @@ def create_model_identification(remove_last_layer=False):
 
     return model
 
-model = create_model()
+# model = create_model()
 # model = create_model_with_inception()
 # model = create_model_with_SE()
-# model = create_model_identification()
+model = create_model_identification()
 model.summary()
 
 # Loading the data
@@ -691,13 +691,13 @@ print("Minimum Loss : {:.4f}".format(min_loss))
 print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
 # Removing the last 2 layers of the model and getting the features array
-model_for_verification = Sequential(name='Biometric_for_Verification')
-for layer in model.layers[:-2]:
-    model_for_verification.add(layer)
-model_for_verification.summary()
-model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-model_for_verification.load_weights('model_weights.h5', by_name=True)
-x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+# model_for_verification = Sequential(name='Biometric_for_Verification')
+# for layer in model.layers[:-2]:
+#     model_for_verification.add(layer)
+# model_for_verification.summary()
+# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+# model_for_verification.load_weights('model_weights.h5', by_name=True)
+# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 # Removing the last layer of the model with inception blocks and getting the features array
 # model_for_verification = create_model_with_inception(True)
@@ -714,11 +714,11 @@ x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 # x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 # Removing the last layer of the model with the greatest performance on identification and getting the features array
-# model_for_verification = create_model_identification(True)
-# model_for_verification.summary()
-# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-# model_for_verification.load_weights('model_weights.h5', by_name=True)
-# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+model_for_verification = create_model_identification(True)
+model_for_verification.summary()
+model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+model_for_verification.load_weights('model_weights.h5', by_name=True)
+x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 def one_hot_encoding_to_classes(y_data):
     """
