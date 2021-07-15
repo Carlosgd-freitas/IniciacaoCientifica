@@ -8,7 +8,7 @@ from tensorflow.keras.layers import Concatenate, GlobalAveragePooling1D, Reshape
 from tensorflow.keras import Input, Model
 from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.optimizers import SGD
-from scipy.signal import butter, sosfilt
+from scipy.signal import butter, sosfilt, filtfilt, sosfiltfilt
 from sklearn.metrics.pairwise import euclidean_distances
 
 np.random.seed()
@@ -25,10 +25,10 @@ band_pass_2 = [10, 30]         # Second filter option, 10~30Hz
 band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 
 # Parameters used in load_data()
-train = [5, 13]                # Tasks used for training and validation
+train = [5]                # Tasks used for training and validation
 test = [7]                     # Tasks used for testing
 window_size = 1920
-offset = 40
+offset = 200
 distribution = 0.9             # 90% for training | 10% for validation
 
 # Channels for some lobes of the brain
@@ -134,6 +134,14 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=12):
 
     sos = butter_bandpass(lowcut, highcut, fs, order)
     y = sosfilt(sos, data)
+
+    # trocar por b, a ao invés de sos?
+    # nyq = 0.5 * fs
+    # low = lowcut / nyq
+    # high = highcut / nyq
+    # sos = butter(order, [low, high], btype='band', analog=False, output='sos') # parameter: fs=fs?; order = 6 or 12?
+    # y = sosfiltfilt(sos, data)
+
     return y
 
 def pre_processing(content, lowcut, highcut, frequency):
@@ -177,13 +185,18 @@ def normalize_signal(content, mode):
     
     if(mode == 'each_channel'):
         while c < channels:
+            print(f'mean {c} = {np.mean(content[c])}') #
+
             content[c] -= np.mean(content[c])
             content[c] += np.absolute(np.amin(content[c]))
             content[c] /= np.std(content[c])
             content[c] /= np.amax(content[c])
+
             c += 1
     elif(mode == 'all_channels'):
         content -= np.mean(content)
+
+        print(f'mean = {np.mean(content)}') #
 
         min_value = np.amin(content)
         while c < channels:
@@ -322,8 +335,11 @@ def load_data(folder_path, train_tasks, test_tasks, verbose=0):
     for train_task in train_tasks:
         for i in range(1, num_classes + 1):
             train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task))
+            # print(f'\nsubject {i}') ###
+            # print(f'train_content = {train_content}') ###
             train_content = pre_processing(train_content, band_pass_3[0], band_pass_3[1], frequency)
-            # train_content = normalize_signal(train_content, 'all_channels')
+            # print(f'train_content.shape = {train_content.shape}') ###
+            # train_content = normalize_signal(train_content, 'each_channel')
             x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content, window_size, offset, i, num_classes, distribution, x_valL, y_valL)
     
     x_train = np.asarray(x_trainL, dtype = object).astype('float32')
@@ -345,7 +361,8 @@ def load_data(folder_path, train_tasks, test_tasks, verbose=0):
         for i in range(1, num_classes + 1):
             test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task))
             test_content = pre_processing(test_content, band_pass_3[0], band_pass_3[1], frequency)
-            # test_content = normalize_signal(test_content, 'all_channels')
+            # print(f'\nsubject {i}')#
+            # test_content = normalize_signal(test_content, 'each_channel')
             x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content, window_size, window_size, i, num_classes)
 
     x_test = np.asarray(x_testL, dtype = object).astype('float32')
@@ -599,10 +616,10 @@ def create_model_identification(remove_last_layer=False):
 
     return model
 
-# model = create_model()
+model = create_model()
 # model = create_model_with_inception()
 # model = create_model_with_SE()
-model = create_model_identification()
+# model = create_model_identification()
 model.summary()
 
 # Loading the data
@@ -674,13 +691,13 @@ print("Minimum Loss : {:.4f}".format(min_loss))
 print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
 # Removing the last 2 layers of the model and getting the features array
-# model_for_verification = Sequential(name='Biometric_for_Verification')
-# for layer in model.layers[:-2]:
-#     model_for_verification.add(layer)
-# model_for_verification.summary()
-# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-# model_for_verification.load_weights('model_weights.h5', by_name=True)
-# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+model_for_verification = Sequential(name='Biometric_for_Verification')
+for layer in model.layers[:-2]:
+    model_for_verification.add(layer)
+model_for_verification.summary()
+model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+model_for_verification.load_weights('model_weights.h5', by_name=True)
+x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 # Removing the last layer of the model with inception blocks and getting the features array
 # model_for_verification = create_model_with_inception(True)
@@ -697,11 +714,11 @@ print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 # x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 # Removing the last layer of the model with the greatest performance on identification and getting the features array
-model_for_verification = create_model_identification(True)
-model_for_verification.summary()
-model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-model_for_verification.load_weights('model_weights.h5', by_name=True)
-x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+# model_for_verification = create_model_identification(True)
+# model_for_verification.summary()
+# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+# model_for_verification.load_weights('model_weights.h5', by_name=True)
+# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 def one_hot_encoding_to_classes(y_data):
     """
