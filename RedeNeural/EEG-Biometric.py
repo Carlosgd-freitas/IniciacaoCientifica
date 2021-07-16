@@ -577,27 +577,27 @@ def create_model_identification(remove_last_layer=False):
     """
 
     inputs = Input(shape=(window_size, num_channels))
-    se_1 = SEBlock(inputs)
-    conv_1 = Conv1D(96, (11), activation='relu') (se_1)
+    # se_1 = SEBlock(inputs)
+    # conv_1 = Conv1D(96, (11), activation='relu') (se_1)
 
-    # conv_1 = Conv1D(96, (11), activation='relu') (inputs)
+    conv_1 = Conv1D(96, (11), activation='relu') (inputs)
     norm_1 = BatchNormalization() (conv_1)
     pool_1 = MaxPooling1D(strides=4) (norm_1)
 
-    # inception_1 = InceptionBlock(pool_1, 1)
-    # conv_2 = Conv1D(256, (9), activation='relu') (inception_1)
-    conv_2 = Conv1D(256, (9), activation='relu') (pool_1)
+    inception_1 = InceptionBlock(pool_1, 1)
+    conv_2 = Conv1D(256, (9), activation='relu') (inception_1)
+    # conv_2 = Conv1D(256, (9), activation='relu') (pool_1)
 
     # conv_2 = Conv1D(128, (9), activation='relu') (pool_1)
     norm_2 = BatchNormalization() (conv_2)
     pool_2 = MaxPooling1D(strides=2) (norm_2)
 
-    conv_3 = Conv1D(256, (9), activation='relu') (pool_2)
-    norm_3 = BatchNormalization() (conv_3)
-    pool_3 = MaxPooling1D(strides=2) (norm_3)
+    # conv_3 = Conv1D(256, (9), activation='relu') (pool_2)
+    # norm_3 = BatchNormalization() (conv_3)
+    # pool_3 = MaxPooling1D(strides=2) (norm_3)
 
-    flat = Flatten() (pool_3)
-    # flat = Flatten() (pool_2)
+    # flat = Flatten() (pool_3)
+    flat = Flatten() (pool_2)
     fc_1 = Dense(4096)(flat)
     fc_2 = Dense(4096)(fc_1)
     fc_3 = Dense(256)(fc_2)
