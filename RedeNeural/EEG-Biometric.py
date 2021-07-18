@@ -579,9 +579,9 @@ def create_model_identification(remove_last_layer=False):
     """
 
     inputs = Input(shape=(window_size, num_channels))
-    # x = SEBlock(inputs)
+    x = SEBlock(inputs)
 
-    x = Conv1D(96, (11), activation='relu') (inputs)
+    x = Conv1D(96, (11), activation='relu') (x)
     x = BatchNormalization() (x)
     x = MaxPooling1D(strides=4) (x)
 
