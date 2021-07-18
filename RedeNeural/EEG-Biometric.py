@@ -11,7 +11,7 @@ from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.optimizers import SGD
 from scipy.signal import butter, sosfilt, filtfilt, sosfiltfilt
 from sklearn.metrics.pairwise import euclidean_distances
-from transformers import TFAutoModel, AutoTokenizer, BertTokenizer
+# from transformers import TFAutoModel, AutoTokenizer, BertTokenizer
 
 np.random.seed()
 
@@ -613,43 +613,43 @@ def create_model_identification(remove_last_layer=False):
 
     return model
 
-def create_model_transformers(remove_last_layer=False):
-    """
-    Creates the CNN model using transformers and returns it, along with the input IDs and attention masks.
+# def create_model_transformers(remove_last_layer=False):
+#     """
+#     Creates the CNN model using transformers and returns it, along with the input IDs and attention masks.
 
-    The return of this function is in the format: input_ids, mask, model.
+#     The return of this function is in the format: input_ids, mask, model.
 
-    Optional Parameters:
-        - remove_last_layer: if True, the model created won't have the fully connected block at the end with a
-        softmax activation function.
-    """
+#     Optional Parameters:
+#         - remove_last_layer: if True, the model created won't have the fully connected block at the end with a
+#         softmax activation function.
+#     """
 
-    bert = TFAutoModel.from_pretrained("bert-base-cased")
+#     bert = TFAutoModel.from_pretrained("bert-base-cased")
 
-    input_ids = Input(shape=(window_size, num_channels), name = 'input_ids', dtype = 'int32')
-    mask = Input(shape=(window_size, num_channels), name = 'attention_mask', dtype = 'int32')
-    embeddings = bert(input_ids, attention_mask=mask)[0]
+#     input_ids = Input(shape=(window_size, num_channels), name = 'input_ids', dtype = 'int32')
+#     mask = Input(shape=(window_size, num_channels), name = 'attention_mask', dtype = 'int32')
+#     embeddings = bert(input_ids, attention_mask=mask)[0]
 
-    # conv_1 = Conv1D(96, (11), activation='relu') (embeddings)
-    # norm_1 = BatchNormalization() (conv_1)
-    # pool_1 = MaxPooling1D(strides=4) (norm_1)
-    # flat = Flatten() (pool_1)
+#     # conv_1 = Conv1D(96, (11), activation='relu') (embeddings)
+#     # norm_1 = BatchNormalization() (conv_1)
+#     # pool_1 = MaxPooling1D(strides=4) (norm_1)
+#     # flat = Flatten() (pool_1)
 
-    flat = Flatten() (embeddings)
-    fc_1 = Dense(256)(flat)
+#     flat = Flatten() (embeddings)
+#     fc_1 = Dense(256)(flat)
     
-    # Model used for Identification
-    if(remove_last_layer == False):
-        fc_2 = Dense(num_classes, activation='softmax')(fc_1)
-        model = Model(inputs=[input_ids, mask], outputs=fc_2, name='Biometric_for_Identification')
+#     # Model used for Identification
+#     if(remove_last_layer == False):
+#         fc_2 = Dense(num_classes, activation='softmax')(fc_1)
+#         model = Model(inputs=[input_ids, mask], outputs=fc_2, name='Biometric_for_Identification')
         
-    # Model used for Verification
-    else:
-        model = Model(inputs=[input_ids, mask], outputs=fc_1, name='Biometric_for_Verification')
+#     # Model used for Verification
+#     else:
+#         model = Model(inputs=[input_ids, mask], outputs=fc_1, name='Biometric_for_Verification')
 
-    #model.layers[2].trainable = False # freeze the BERT layer
+#     #model.layers[2].trainable = False # freeze the BERT layer
 
-    return input_ids, mask, model
+#     return input_ids, mask, model
 
 # model = create_model()
 # model = create_model_with_inception()
