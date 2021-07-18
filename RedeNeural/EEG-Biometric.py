@@ -10,6 +10,7 @@ from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.optimizers import SGD
 from scipy.signal import butter, sosfilt, filtfilt, sosfiltfilt
 from sklearn.metrics.pairwise import euclidean_distances
+from transformers import TFAutoModel, AutoTokenizer
 
 np.random.seed()
 
@@ -25,10 +26,10 @@ band_pass_2 = [10, 30]         # Second filter option, 10~30Hz
 band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 
 # Parameters used in load_data()
-train = [13]                   # Tasks used for training and validation
-test = [7]                     # Tasks used for testing
+train = [1]                    # Tasks used for training and validation
+test = [2]                     # Tasks used for testing
 window_size = 1920
-offset = 40
+offset = 1920
 distribution = 0.9             # 90% for training | 10% for validation
 
 # Channels for some lobes of the brain
@@ -44,8 +45,8 @@ occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
 
 # Other Parameters
-num_classes = 109              # Total number of classes
-num_channels = 64              # Number of channels in an EEG signal
+num_classes = 10#9              # Total number of classes
+num_channels = 9#64              # Number of channels in an EEG signal
 
 # Tasks:
 # Task 1 - EO
@@ -617,10 +618,49 @@ def create_model_identification(remove_last_layer=False):
 
     return model
 
+def create_model_transformers(remove_last_layer=False):
+    """
+    Creates the CNN model using transformers and returns it, along with the input IDs and attention masks.
+
+    The return of this function is in the format: input_ids, mask, model.
+
+    Optional Parameters:
+        - remove_last_layer: if True, the model created won't have the fully connected block at the end with a
+        softmax activation function.
+    """
+
+    bert = TFAutoModel.from_pretrained("bert-base-cased")
+
+    input_ids = Input(shape=(window_size, num_channels), name = 'input_ids', dtype = 'int32')
+    mask = Input(shape=(window_size, num_channels), name = 'attention_mask', dtype = 'int32')
+    embeddings = bert(input_ids, attention_mask=mask)
+
+    # conv_1 = Conv1D(96, (11), activation='relu') (embeddings)
+    # norm_1 = BatchNormalization() (conv_1)
+    # pool_1 = MaxPooling1D(strides=4) (norm_1)
+    # flat = Flatten() (pool_1)
+
+    flat = Flatten() (embeddings)
+    fc_1 = Dense(256)(flat)
+    
+    # Model used for Identification
+    if(remove_last_layer == False):
+        fc_2 = Dense(num_classes, activation='softmax')(fc_1)
+        model = Model(inputs=[input_ids, mask], outputs=fc_2, name='Biometric_for_Identification')
+        
+    # Model used for Verification
+    else:
+        model = Model(inputs=[input_ids, mask], outputs=fc_1, name='Biometric_for_Verification')
+
+    #model.layers[2].trainable = False # freeze the BERT layer
+
+    return input_ids, mask, model
+
 # model = create_model()
 # model = create_model_with_inception()
 # model = create_model_with_SE()
-model = create_model_identification()
+# model = create_model_identification()
+input_ids, mask, model = create_model_transformers()
 model.summary()
 
 # Loading the data
@@ -636,11 +676,35 @@ print(f'y_train: {y_train.shape}')
 print(f'y_val: {y_val.shape}')
 print(f'y_test: {y_test.shape}\n')
 
+# Tokenization for Model using Transformers
+tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
+
+def tokenize(data):
+    tokens = tokenizer.encode_plus(data, max_length=window_size, truncation=True,
+                        pad_to_max_length=True, add_special_tokens=True,
+                        return_attention_mask=True, return_token_type_ids=False,
+                        return_tensors='tf')
+    return tokens['input_ids'], tokens['attention_mask']
+
+tokenize(x_train)
+tokenize(x_val)
+tokenize(x_test)
+
+
 # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
 model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
 callback = LearningRateScheduler(scheduler, verbose=0)
 results = model.fit(x_train,
+                    y_train,
+                    batch_size = batch_size,
+                    epochs = training_epochs,
+                    callbacks = [callback],
+                    validation_data = (x_val, y_val)
+                    )
+results = model.fit(
+                    {"input_ids": input_ids,
+                    "attention_mask": mask},
                     y_train,
                     batch_size = batch_size,
                     epochs = training_epochs,
@@ -715,7 +779,14 @@ print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 # x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 # Removing the last layer of the model with the greatest performance on identification and getting the features array
-model_for_verification = create_model_identification(True)
+# model_for_verification = create_model_identification(True)
+# model_for_verification.summary()
+# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+# model_for_verification.load_weights('model_weights.h5', by_name=True)
+# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+
+# Removing the last layer of the model using transformers and getting the features array
+model_for_verification = create_model_transformers(True)
 model_for_verification.summary()
 model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
 model_for_verification.load_weights('model_weights.h5', by_name=True)
