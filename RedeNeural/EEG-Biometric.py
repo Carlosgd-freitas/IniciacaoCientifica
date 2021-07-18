@@ -10,7 +10,7 @@ from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.optimizers import SGD
 from scipy.signal import butter, sosfilt, filtfilt, sosfiltfilt
 from sklearn.metrics.pairwise import euclidean_distances
-from transformers import TFAutoModel, AutoTokenizer
+from transformers import TFAutoModel, AutoTokenizer, BertTokenizer
 
 np.random.seed()
 
@@ -629,11 +629,12 @@ def create_model_transformers(remove_last_layer=False):
         softmax activation function.
     """
 
-    bert = TFAutoModel.from_pretrained("bert-base-cased")
+    # bert = TFAutoModel.from_pretrained("bert-base-cased")
+    bert = BertTokenizer.from_pretrained("bert-base-cased")
 
     input_ids = Input(shape=(window_size, num_channels), name = 'input_ids', dtype = 'int32')
     mask = Input(shape=(window_size, num_channels), name = 'attention_mask', dtype = 'int32')
-    embeddings = bert(input_ids, attention_mask=mask)
+    embeddings = bert(input_ids, attention_mask=mask)[0]
 
     # conv_1 = Conv1D(96, (11), activation='relu') (embeddings)
     # norm_1 = BatchNormalization() (conv_1)
