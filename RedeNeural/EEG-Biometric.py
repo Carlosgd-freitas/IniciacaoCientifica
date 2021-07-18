@@ -1,3 +1,4 @@
+from re import X
 import numpy as np
 import pyedflib
 import os
@@ -29,7 +30,7 @@ band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 train = [1]                    # Tasks used for training and validation
 test = [2]                     # Tasks used for testing
 window_size = 1920
-offset = 1920
+offset = 40
 distribution = 0.9             # 90% for training | 10% for validation
 
 # Channels for some lobes of the brain
@@ -45,8 +46,8 @@ occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
 
 # Other Parameters
-num_classes = 10#9              # Total number of classes
-num_channels = 9#64              # Number of channels in an EEG signal
+num_classes = 109              # Total number of classes
+num_channels = 64              # Number of channels in an EEG signal
 
 # Tasks:
 # Task 1 - EO
@@ -578,43 +579,37 @@ def create_model_identification(remove_last_layer=False):
     """
 
     inputs = Input(shape=(window_size, num_channels))
-    # se_1 = SEBlock(inputs)
-    # conv_1 = Conv1D(96, (11), activation='relu') (se_1)
+    # x = SEBlock(inputs)
 
-    conv_1 = Conv1D(96, (11), activation='relu') (inputs)
-    norm_1 = BatchNormalization() (conv_1)
-    pool_1 = MaxPooling1D(strides=4) (norm_1)
+    x = Conv1D(96, (11), activation='relu') (inputs)
+    x = BatchNormalization() (x)
+    x = MaxPooling1D(strides=4) (x)
 
-    inception_1 = InceptionBlock(pool_1, 1)
-    conv_2 = Conv1D(256, (9), activation='relu') (inception_1)
-    # conv_2 = Conv1D(256, (9), activation='relu') (pool_1)
+    # inception_1 = InceptionBlock(pool_1, 1)
 
-    # conv_2 = Conv1D(128, (9), activation='relu') (pool_1)
-    norm_2 = BatchNormalization() (conv_2)
-    pool_2 = MaxPooling1D(strides=2) (norm_2)
+    x = Conv1D(128, (9), activation='relu') (x)
+    x = BatchNormalization() (x)
+    x = MaxPooling1D(strides=2) (x)
 
-    # conv_3 = Conv1D(256, (9), activation='relu') (pool_2)
-    # norm_3 = BatchNormalization() (conv_3)
-    # pool_3 = MaxPooling1D(strides=2) (norm_3)
+    x = Conv1D(256, (9), activation='relu') (x)
+    x = BatchNormalization() (x)
+    x = MaxPooling1D(strides=2) (x)
 
-    # flat = Flatten() (pool_3)
-    flat = Flatten() (pool_2)
-    fc_1 = Dense(4096)(flat)
-    fc_2 = Dense(4096)(fc_1)
-    fc_3 = Dense(256)(fc_2)
+    x = Flatten() (x)
+    x = Dense(4096)(x)
+    x = Dense(4096)(x)
+    x = Dense(256)(x)
     
     # Model used for Identification
     if(remove_last_layer == False):
-        # norm_3 = BatchNormalization()(fc_3)
-        norm_4 = BatchNormalization()(fc_3)
-        # drop = Dropout(0.1) (norm_3)
-        drop = Dropout(0.1) (norm_4)
-        fc_4 = Dense(num_classes, activation='softmax') (drop)
-        model = Model(inputs=inputs, outputs=fc_4, name='Biometric_for_Identification')
+        x = BatchNormalization()(x)
+        x = Dropout(0.1) (x)
+        x = Dense(num_classes, activation='softmax') (x)
+        model = Model(inputs=inputs, outputs=x, name='Biometric_for_Identification')
         
     # Model used for Verification
     else:
-        model = Model(inputs=inputs, outputs=fc_3, name='Biometric_for_Verification')
+        model = Model(inputs=inputs, outputs=x, name='Biometric_for_Verification')
 
     return model
 
@@ -659,8 +654,8 @@ def create_model_transformers(remove_last_layer=False):
 # model = create_model()
 # model = create_model_with_inception()
 # model = create_model_with_SE()
-# model = create_model_identification()
-input_ids, mask, model = create_model_transformers()
+model = create_model_identification()
+# input_ids, mask, model = create_model_transformers()
 model.summary()
 
 # Loading the data
@@ -677,19 +672,18 @@ print(f'y_val: {y_val.shape}')
 print(f'y_test: {y_test.shape}\n')
 
 # Tokenization for Model using Transformers
-tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
+# tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
 
-def tokenize(data):
-    tokens = tokenizer.encode_plus(data, max_length=window_size, truncation=True,
-                        pad_to_max_length=True, add_special_tokens=True,
-                        return_attention_mask=True, return_token_type_ids=False,
-                        return_tensors='tf')
-    return tokens['input_ids'], tokens['attention_mask']
+# def tokenize(data):
+#     tokens = tokenizer.encode_plus(data, max_length=window_size, truncation=True,
+#                         pad_to_max_length=True, add_special_tokens=True,
+#                         return_attention_mask=True, return_token_type_ids=False,
+#                         return_tensors='tf')
+#     return tokens['input_ids'], tokens['attention_mask']
 
-tokenize(x_train)
-tokenize(x_val)
-tokenize(x_test)
-
+# tokenize(x_train)
+# tokenize(x_val)
+# tokenize(x_test)
 
 # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
@@ -702,15 +696,16 @@ results = model.fit(x_train,
                     callbacks = [callback],
                     validation_data = (x_val, y_val)
                     )
-results = model.fit(
-                    {"input_ids": input_ids,
-                    "attention_mask": mask},
-                    y_train,
-                    batch_size = batch_size,
-                    epochs = training_epochs,
-                    callbacks = [callback],
-                    validation_data = (x_val, y_val)
-                    )
+
+# results = model.fit(
+#                     {"input_ids": input_ids,
+#                     "attention_mask": mask},
+#                     y_train,
+#                     batch_size = batch_size,
+#                     epochs = training_epochs,
+#                     callbacks = [callback],
+#                     validation_data = (x_val, y_val)
+#                     )
 
 # Saving model weights
 model.save('model_weights.h5')
@@ -756,13 +751,13 @@ print("Minimum Loss : {:.4f}".format(min_loss))
 print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
 # Removing the last 2 layers of the model and getting the features array
-# model_for_verification = Sequential(name='Biometric_for_Verification')
-# for layer in model.layers[:-2]:
-#     model_for_verification.add(layer)
-# model_for_verification.summary()
-# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-# model_for_verification.load_weights('model_weights.h5', by_name=True)
-# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+model_for_verification = Sequential(name='Biometric_for_Verification')
+for layer in model.layers[:-2]:
+    model_for_verification.add(layer)
+model_for_verification.summary()
+model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+model_for_verification.load_weights('model_weights.h5', by_name=True)
+x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 # Removing the last layer of the model with inception blocks and getting the features array
 # model_for_verification = create_model_with_inception(True)
@@ -786,11 +781,11 @@ print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 # x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 # Removing the last layer of the model using transformers and getting the features array
-model_for_verification = create_model_transformers(True)
-model_for_verification.summary()
-model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-model_for_verification.load_weights('model_weights.h5', by_name=True)
-x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+# model_for_verification = create_model_transformers(True)
+# model_for_verification.summary()
+# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+# model_for_verification.load_weights('model_weights.h5', by_name=True)
+# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 def one_hot_encoding_to_classes(y_data):
     """
