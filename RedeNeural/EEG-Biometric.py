@@ -629,8 +629,7 @@ def create_model_transformers(remove_last_layer=False):
         softmax activation function.
     """
 
-    # bert = TFAutoModel.from_pretrained("bert-base-cased")
-    bert = AutoTokenizer.from_pretrained("bert-base-cased")
+    bert = TFAutoModel.from_pretrained("bert-base-cased")
 
     input_ids = Input(shape=(window_size, num_channels), name = 'input_ids', dtype = 'int32')
     mask = Input(shape=(window_size, num_channels), name = 'attention_mask', dtype = 'int32')
