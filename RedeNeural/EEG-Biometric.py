@@ -581,33 +581,33 @@ def create_model_identification(remove_last_layer=False):
     inputs = Input(shape=(window_size, num_channels))
     # x = SEBlock(inputs)
 
-    # x = Conv1D(96, (11), activation='relu') (inputs)
-    # x = BatchNormalization() (x)
-    # x = MaxPooling1D(strides=4) (x)
+    x = Conv1D(96, (11), activation='relu') (inputs)
+    x = BatchNormalization() (x)
+    x = MaxPooling1D(strides=4) (x)
 
-    x = InceptionBlock(inputs, 1)
+    x = InceptionBlock(x, 1)
 
-    # x = Conv1D(128, (9), activation='relu') (x)
-    # x = BatchNormalization() (x)
-    # x = MaxPooling1D(strides=2) (x)
+    x = Conv1D(128, (9), activation='relu') (x)
+    x = BatchNormalization() (x)
+    x = MaxPooling1D(strides=2) (x)
 
     x = InceptionBlock(x, 2)
 
-    # x = Conv1D(256, (9), activation='relu') (x)
-    # x = BatchNormalization() (x)
-    # x = MaxPooling1D(strides=2) (x)
+    x = Conv1D(256, (9), activation='relu') (x)
+    x = BatchNormalization() (x)
+    x = MaxPooling1D(strides=2) (x)
 
     # x = InceptionBlock(x, 3)
 
     x = Flatten() (x)
-    # x = Dense(4096)(x)
-    # x = Dense(4096)(x)
+    x = Dense(4096)(x)
+    x = Dense(4096)(x)
     x = Dense(256)(x)
     
     # Model used for Identification
     if(remove_last_layer == False):
-        # x = BatchNormalization()(x)
-        # x = Dropout(0.1) (x)
+        x = BatchNormalization()(x)
+        x = Dropout(0.1) (x)
         x = Dense(num_classes, activation='softmax') (x)
         model = Model(inputs=inputs, outputs=x, name='Biometric_for_Identification')
         
