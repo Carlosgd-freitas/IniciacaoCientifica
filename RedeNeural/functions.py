@@ -273,7 +273,7 @@ def load_data(folder_path, train_tasks, test_tasks, num_classes, filter, sample_
 
         for i in range(1, num_classes + 1):
             if(verbose):
-                print(f'  > Loading data from subject {i}:')
+                print(f'  > Loading data from subject {i}.')
 
             train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task))
             # print(f'train_content = {train_content}') ###
@@ -292,7 +292,7 @@ def load_data(folder_path, train_tasks, test_tasks, num_classes, filter, sample_
 
     # Processing x_test and y_test
     if(verbose):
-        print('Testing data is being processed...')
+        print('\nTesting data is being processed...')
 
     x_testL = list()
     y_testL = list()
@@ -303,7 +303,7 @@ def load_data(folder_path, train_tasks, test_tasks, num_classes, filter, sample_
 
         for i in range(1, num_classes + 1):
             if(verbose):
-                print(f'  > Loading data from subject {i}:')
+                print(f'  > Loading data from subject {i}.')
 
             test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task))
             test_content = pre_processing(test_content, filter[0], filter[1], sample_frequency)

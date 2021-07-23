@@ -140,7 +140,7 @@ def create_model(window_size, num_channels, num_classes, remove_last_layer=False
     model.add(Dense(256, name='FC3'))
     model.add(BatchNormalization(name='Norm4'))
 
-    if(remove_last_layer == True):
+    if(remove_last_layer == False):
         # Dropout
         model.add(Dropout(0.1, name='Drop'))
         # FC4
