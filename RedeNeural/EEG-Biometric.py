@@ -5,9 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.optimizers import SGD
-# from transformers import TFAutoModel, AutoTokenizer, BertTokenizer
-import tensorflow as tf ##
-import time ##
 
 np.random.seed()
 
@@ -26,7 +23,7 @@ band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 train = [1]                    # Tasks used for training and validation
 test = [2]                     # Tasks used for testing
 window_size = 1920             # Sliding window size, used when composing the dataset
-offset = 200                   # Sliding window offset (deslocation), used when composing the dataset
+offset = 40 #200                   # Sliding window offset (deslocation), used when composing the dataset
 train_val_ratio = 0.9          # 90% for training | 10% for validation
 
 # Channels for some lobes of the brain
@@ -42,7 +39,7 @@ occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
 
 # Other Parameters
-num_classes = 10#9              # Total number of classes (individuals)
+num_classes = 109              # Total number of classes (individuals)
 num_channels = 64              # Number of channels in an EEG signal
 
 # Tasks:
@@ -327,12 +324,6 @@ num_channels = 64              # Number of channels in an EEG signal
 
 #     return final_output, attention_weights
 
-model = models.create_model(window_size, num_channels, num_classes)
-# model = models.create_model_with_inception(window_size, num_channels, num_classes)
-# model = models.create_model_with_SE(window_size, num_channels, num_classes)
-# model = models.create_model_identification(window_size, num_channels, num_classes)
-model.summary()
-
 # d_model = 512
 # transformer = Transformer(
 #     num_layers=2, d_model=512, num_heads=8, dff=2048,
@@ -479,6 +470,13 @@ model.summary()
 #     print(f'Epoch {epoch + 1} Loss {train_loss.result():.4f} Accuracy {train_accuracy.result():.4f}')
 
 #     print(f'Time taken for 1 epoch: {time.time() - start:.2f} secs\n')
+
+# Creating the model
+model = models.create_model(window_size, num_channels, num_classes)
+# model = models.create_model_with_inception(window_size, num_channels, num_classes)
+# model = models.create_model_with_SE(window_size, num_channels, num_classes)
+# model = models.create_model_identification(window_size, num_channels, num_classes)
+model.summary()
 
 # Loading the data
 x_train, x_val, x_test, y_train, y_val, y_test = functions.load_data('./Dataset/', train, test, num_classes, 

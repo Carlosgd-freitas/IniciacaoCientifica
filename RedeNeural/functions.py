@@ -2,7 +2,7 @@ import os
 import pyedflib
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.signal import butter, sosfilt, filtfilt, sosfiltfilt
+from scipy.signal import butter, sosfilt, firwin, filtfilt
 from sklearn.metrics.pairwise import euclidean_distances
 
 def read_EDF(path, channels=None):
@@ -43,52 +43,59 @@ def read_EDF(path, channels=None):
     del reader
     return signals
 
-def butter_bandpass_filter(data, lowcut, highcut, fs, order=12):
+def bandpass_filter(signal, lowcut, highcut, fs, order, mode):
     """
-    Band-pass filters some data and returns it.
+    Band-pass filters a signal and returns it.
 
     Parameters:
-        - data: data that will be band-pass filtered;
+        - signal: signal that will be band-pass filtered;
         - lowcut: lowcut of the filter;
         - highcut: highcut of the filter;
-        - fs: frequency of the data (sampling).
-    
-    Optional Parameters:
-        - order: order of the signal. This parameter is equal to 12 by default.
+        - fs: frequency of the signal;
+        - order: order of the filter;
+        - mode: how the signal will be filtered:
+            * 'sosfilt': using the sosfilt() function from the scipy library;
+            * 'filtfilt': using the firwin() and filtfilt() functions from the scipy library.
     """
 
     nyq = 0.5 * fs
     low = lowcut / nyq
     high = highcut / nyq
-    sos = butter(order, [low, high], btype='band', output='sos')
-    y = sosfilt(sos, data)
 
-    # trocar por b, a ao invés de sos?
-    # nyq = 0.5 * fs
-    # low = lowcut / nyq
-    # high = highcut / nyq
-    # sos = butter(order, [low, high], btype='band', analog=False, output='sos') # parameter: fs=fs?; order = 6 or 12?
-    # y = sosfiltfilt(sos, data)
+    if(mode == 'sosfilt'):
+        sos = butter(order, [low, high], btype='band', output='sos')
+        y = sosfilt(sos, signal)
+    elif(mode == 'filtfilt'):
+        fir_coeff = firwin(order+1,[low,high], pass_zero=False)
+        y = filtfilt(fir_coeff, 1.0, signal)
 
     return y
 
-def pre_processing(content, lowcut, highcut, frequency):
+def pre_processing(content, lowcut, highcut, frequency, order, mode):
     """
     Pre-processess each channel of an EEG signal using band-pass filters.
 
     Parameters:
-        - content: the EEG signal that will be band-pass filtered;
+        - signal: signal that will be band-pass filtered;
         - lowcut: lowcut of the filter;
         - highcut: highcut of the filter;
-        - frequency: frequency of the data (sampling).
+        - fs: frequency of the signal;
+        - order: order of the filter;
+        - mode: how the signal will be filtered:
+            * 'sosfilt': using the sosfilt() function from the scipy library.
+            * 'filtfilt': using the firwin() and filtfilt() functions from the scipy library.
     """
 
     channels = content.shape[0]
     c = 0
 
+    if(mode != 'sosfilt' and mode != 'filtfilt'):
+        print('ERROR: Invalid mode parameter. Signal will not be filtered.')
+        return content
+
     while c < channels:
         signal = content[c, :]
-        content[c] = butter_bandpass_filter(signal, lowcut, highcut, frequency)
+        content[c] = bandpass_filter(signal, lowcut, highcut, frequency, order, mode)
         c += 1
 
     return content
@@ -104,8 +111,6 @@ def normalize_signal(content, mode):
             minimum and maximum values, which will be applied only to themselves in order to normalize them.
             * 'all_channels': all channels of the EEG signal will be used to compute the mean, standard deviation,
             minimum and maximum values, which will be applied to each signal in order to normalize them.
-            * 'all_classes': all EEG signals of every individual will be used to compute the mean, standard
-            deviation, minimum and maximum values, which will be applied to each signal in order to normalize them.
     """
 
     channels = content.shape[0]
@@ -113,8 +118,6 @@ def normalize_signal(content, mode):
     
     if(mode == 'each_channel'):
         while c < channels:
-            print(f'mean {c} = {np.mean(content[c])}') #
-
             content[c] -= np.mean(content[c])
             content[c] += np.absolute(np.amin(content[c]))
             content[c] /= np.std(content[c])
@@ -123,8 +126,6 @@ def normalize_signal(content, mode):
             c += 1
     elif(mode == 'all_channels'):
         content -= np.mean(content)
-
-        print(f'mean = {np.mean(content)}') #
 
         min_value = np.amin(content)
         while c < channels:
@@ -143,20 +144,6 @@ def normalize_signal(content, mode):
             content[c] /= max_value
             c += 1
         c = 0
-    elif(mode == 'all_classes'):
-        print(f'mean of everyone: {np.mean(content)}') ##########
-
-        mean = np.mean(content)
-        content -= mean
-
-        min_value = np.amin(content)
-        content += np.absolute(min_value)
-
-        standard_deviation = np.std(content)
-        content /= standard_deviation
-
-        max_value = np.amax(content)
-        content /= max_value
     else:
         print('ERROR: Invalid mode parameter.')
 
@@ -276,19 +263,14 @@ def load_data(folder_path, train_tasks, test_tasks, num_classes, filter, sample_
                 print(f'  > Loading data from subject {i}.')
 
             train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task))
-            # print(f'train_content = {train_content}') ###
-            train_content = pre_processing(train_content, filter[0], filter[1], sample_frequency)
-            # print(f'train_content.shape = {train_content.shape}') ###
-            # train_content = normalize_signal(train_content, 'each_channel')
+            train_content = pre_processing(train_content, filter[0], filter[1], sample_frequency, 12, 'filtfilt')
+            train_content = normalize_signal(train_content, 'each_channel')
             x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content, window_size, offset, i, num_classes, train_val_ratio, x_valL, y_valL)
     
     x_train = np.asarray(x_trainL, dtype = object).astype('float32')
     x_val = np.asarray(x_valL, dtype = object).astype('float32')
     y_train = np.asarray(y_trainL, dtype = object).astype('float32')
     y_val = np.asarray(y_valL, dtype = object).astype('float32')
-
-    # x_train = normalize_signal(x_train, 'all_classes')
-    # x_val = normalize_signal(x_val, 'all_classes')
 
     # Processing x_test and y_test
     if(verbose):
@@ -306,14 +288,12 @@ def load_data(folder_path, train_tasks, test_tasks, num_classes, filter, sample_
                 print(f'  > Loading data from subject {i}.')
 
             test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task))
-            test_content = pre_processing(test_content, filter[0], filter[1], sample_frequency)
-            # test_content = normalize_signal(test_content, 'each_channel')
+            test_content = pre_processing(test_content, filter[0], filter[1], sample_frequency, 12, 'filtfilt')
+            test_content = normalize_signal(test_content, 'each_channel')
             x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content, window_size, window_size, i, num_classes)
 
     x_test = np.asarray(x_testL, dtype = object).astype('float32')
     y_test = np.asarray(y_testL, dtype = object).astype('float32')
-
-    # x_test = normalize_signal(x_test, 'all_classes')
 
     # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
     # input shape of the CNN is "a x window_size x num_channels".
