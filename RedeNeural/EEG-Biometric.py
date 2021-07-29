@@ -23,7 +23,7 @@ band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 train = [1]                    # Tasks used for training and validation
 test = [2]                     # Tasks used for testing
 window_size = 1920             # Sliding window size, used when composing the dataset
-offset = 40 #200                   # Sliding window offset (deslocation), used when composing the dataset
+offset = 20 #40 #200                   # Sliding window offset (deslocation), used when composing the dataset
 train_val_ratio = 0.9          # 90% for training | 10% for validation
 
 # Channels for some lobes of the brain
@@ -39,7 +39,7 @@ occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
 
 # Other Parameters
-num_classes = 109              # Total number of classes (individuals)
+num_classes = 108 #9              # Total number of classes (individuals)
 num_channels = 64              # Number of channels in an EEG signal
 
 # Tasks:
@@ -57,6 +57,12 @@ num_channels = 64              # Number of channels in an EEG signal
 # Task 12 - T2R3
 # Task 13 - T3R3
 # Task 14 - T4R3
+
+# Valores utilizando modo 'filtfilt':
+# acurácia / EER / Decidibilidade
+# band_pass_1 = 0.0000% / 0.0000% / 0.0000
+# band_pass_2 = 0.0000% / 0.0000% / 0.0000
+# band_pass_3 = 3.4862% / 0.8253% / 6.5402
 
 # def get_angles(pos, i, d_model):
 #   angle_rates = 1 / np.power(10000, (2 * (i//2)) / np.float32(d_model))
@@ -480,11 +486,11 @@ model.summary()
 
 # Loading the data
 x_train, x_val, x_test, y_train, y_val, y_test = functions.load_data('./Dataset/', train, test, num_classes, 
-                                                                     band_pass_3, sample_frequency, window_size, 
+                                                                     band_pass_2, sample_frequency, window_size, 
                                                                      offset, train_val_ratio, 1)
 
 # x_train, x_val, x_test, y_train, y_val, y_test = functions.load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', 
-#                                                                      train, test, num_classes, band_pass_3, sample_frequency,
+#                                                                      train, test, num_classes, band_pass_2, sample_frequency,
 #                                                                      window_size, offset, train_val_ratio)                                                            
 
 # Printing data formats
