@@ -62,7 +62,7 @@ num_channels = 64              # Number of channels in an EEG signal
 # offset: 20, num_classes: 108
 # acurácia / EER / Decidibilidade
 # band_pass_1 = 0.0000% / 0.0000% / 0.0000
-# band_pass_2 = 0.0000% / 0.0000% / 0.0000
+# band_pass_2 = 4.2593% / 3.6131% / 4.1049
 # band_pass_3 = 3.4862% / 0.8253% / 6.5402
 
 # def get_angles(pos, i, d_model):
@@ -487,11 +487,11 @@ model.summary()
 
 # Loading the data
 # x_train, x_val, x_test, y_train, y_val, y_test = functions.load_data('./Dataset/', train, test, num_classes, 
-#                                                                      band_pass_2, sample_frequency, window_size, 
+#                                                                      band_pass_3, sample_frequency, window_size, 
 #                                                                      offset, train_val_ratio, 1)
 
 x_train, x_val, x_test, y_train, y_val, y_test = functions.load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', 
-                                                                     train, test, num_classes, band_pass_2, sample_frequency,
+                                                                     train, test, num_classes, band_pass_1, sample_frequency,
                                                                      window_size, offset, train_val_ratio)                                                            
 
 # Printing data formats
