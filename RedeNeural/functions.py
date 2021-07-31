@@ -264,7 +264,7 @@ def load_data(folder_path, train_tasks, test_tasks, num_classes, filter, sample_
 
             train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task))
             train_content = pre_processing(train_content, filter[0], filter[1], sample_frequency, 12, 'filtfilt')
-            train_content = normalize_signal(train_content, 'each_channel')
+            # train_content = normalize_signal(train_content, 'each_channel')
             x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content, window_size, offset, i, num_classes, train_val_ratio, x_valL, y_valL)
     
     x_train = np.asarray(x_trainL, dtype = object).astype('float32')
@@ -289,7 +289,7 @@ def load_data(folder_path, train_tasks, test_tasks, num_classes, filter, sample_
 
             test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task))
             test_content = pre_processing(test_content, filter[0], filter[1], sample_frequency, 12, 'filtfilt')
-            test_content = normalize_signal(test_content, 'each_channel')
+            # test_content = normalize_signal(test_content, 'each_channel')
             x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content, window_size, window_size, i, num_classes)
 
     x_test = np.asarray(x_testL, dtype = object).astype('float32')
