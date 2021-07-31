@@ -491,7 +491,7 @@ model.summary()
 #                                                                      offset, train_val_ratio, 1)
 
 x_train, x_val, x_test, y_train, y_val, y_test = functions.load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', 
-                                                                     train, test, num_classes, band_pass_1, sample_frequency,
+                                                                     train, test, num_classes, band_pass_2, sample_frequency,
                                                                      window_size, offset, train_val_ratio)                                                            
 
 # Printing data formats
