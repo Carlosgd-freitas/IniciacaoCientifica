@@ -277,8 +277,8 @@ def create_model_transformers(window_size, num_channels, num_classes, remove_las
     # inputs = Input(shape=(window_size, num_channels))
     # x = MultiHeadAttention(num_heads=num_channels, key_dim=num_channels, value_dim=num_channels)(inputs)
 
-    x = MultiHeadAttention(num_heads=num_channels, key_dim=num_channels)
-    input_tensor  = Input(shape=(window_size, num_channels))
+    x = MultiHeadAttention(num_heads=2, key_dim=num_channels)
+    input_tensor = Input(shape=(window_size, num_channels))
     output_tensor = x(input_tensor, input_tensor)
 
     x = Conv1D(96, (11), activation='relu') (output_tensor)
