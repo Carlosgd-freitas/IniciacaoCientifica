@@ -10,7 +10,7 @@ np.random.seed()
 
 # Hyperparameters
 batch_size = 100               # Batch Size
-training_epochs = 60           # Total number of training epochs
+training_epochs = 5 #60           # Total number of training epochs
 initial_learning_rate = 0.01   # Initial learning rate
 
 # Pre-processing Parameters
@@ -23,7 +23,7 @@ band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 train = [1]                    # Tasks used for training and validation
 test = [2]                     # Tasks used for testing
 window_size = 1920             # Sliding window size, used when composing the dataset
-offset = 35 #200                   # Sliding window offset (deslocation), used when composing the dataset
+offset = 200 #35               # Sliding window offset (deslocation), used when composing the dataset
 train_val_ratio = 0.9          # 90% for training | 10% for validation
 
 # Channels for some lobes of the brain
@@ -39,7 +39,7 @@ occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
 
 # Other Parameters
-num_classes = 109              # Total number of classes (individuals)
+num_classes = 10#9              # Total number of classes (individuals)
 num_channels = 64              # Number of channels in an EEG signal
 
 # Tasks:
@@ -479,20 +479,21 @@ num_channels = 64              # Number of channels in an EEG signal
 #     print(f'Time taken for 1 epoch: {time.time() - start:.2f} secs\n')
 
 # Creating the model
-model = models.create_model(window_size, num_channels, num_classes)
-# model = models.create_model_with_inception(window_size, num_channels, num_classes)
-# model = models.create_model_with_SE(window_size, num_channels, num_classes)
+# model = models.create_model(window_size, num_channels, num_classes)
+# model = models.create_model_inception(window_size, num_channels, num_classes)
+# model = models.create_model_SE(window_size, num_channels, num_classes)
 # model = models.create_model_identification(window_size, num_channels, num_classes)
+model = models.create_model_transformers(window_size, num_channels, num_classes)
 model.summary()
 
 # Loading the data
-# x_train, x_val, x_test, y_train, y_val, y_test = functions.load_data('./Dataset/', train, test, num_classes, 
-#                                                                      band_pass_3, sample_frequency, window_size, 
-#                                                                      offset, train_val_ratio, 1)
+x_train, x_val, x_test, y_train, y_val, y_test = functions.load_data('./Dataset/', train, test, num_classes, 
+                                                                     band_pass_3, sample_frequency, window_size, 
+                                                                     offset, train_val_ratio, 1)
 
-x_train, x_val, x_test, y_train, y_val, y_test = functions.load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', 
-                                                                     train, test, num_classes, band_pass_3, sample_frequency,
-                                                                     window_size, offset, train_val_ratio)                                                            
+# x_train, x_val, x_test, y_train, y_val, y_test = functions.load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', 
+#                                                                      train, test, num_classes, band_pass_3, sample_frequency,
+#                                                                      window_size, offset, train_val_ratio)                                                            
 
 # Printing data formats
 print('\nData formats:')
@@ -569,11 +570,11 @@ print("Minimum Loss : {:.4f}".format(min_loss))
 print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
 # Removing the last 2 layers of the model and getting the features array
-model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
-model_for_verification.summary()
-model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-model_for_verification.load_weights('model_weights.h5', by_name=True)
-x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+# model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
+# model_for_verification.summary()
+# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+# model_for_verification.load_weights('model_weights.h5', by_name=True)
+# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 # Removing the last layer of the model with inception blocks and getting the features array
 # model_for_verification = models.create_model_with_inception(window_size, num_channels, num_classes, True)
@@ -597,7 +598,7 @@ x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 # x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 # Calculating EER and Decidability
-y_test_classes = functions.one_hot_encoding_to_classes(y_test)
-d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
-print(f'EER: {eer*100.0} %')
-print(f'Decidability: {d}')
+# y_test_classes = functions.one_hot_encoding_to_classes(y_test)
+# d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
+# print(f'EER: {eer*100.0} %')
+# print(f'Decidability: {d}')

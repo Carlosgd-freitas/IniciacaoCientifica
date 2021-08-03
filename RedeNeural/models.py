@@ -1,7 +1,9 @@
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Flatten, Conv1D, MaxPooling1D, BatchNormalization
 from tensorflow.keras.layers import Concatenate, GlobalAveragePooling1D, Reshape, Activation, Permute, Multiply
+from tensorflow.keras.layers import MultiHeadAttention
 from tensorflow.keras import Input, Model
+from tensorflow.python.keras.engine import input_spec
 
 def scheduler(current_epoch, learning_rate):
     """
@@ -148,7 +150,7 @@ def create_model(window_size, num_channels, num_classes, remove_last_layer=False
 
     return model
 
-def create_model_with_inception(window_size, num_channels, num_classes, remove_last_layer=False):
+def create_model_inception(window_size, num_channels, num_classes, remove_last_layer=False):
     """
     Creates and returns the CNN model using inception blocks.
 
@@ -177,7 +179,7 @@ def create_model_with_inception(window_size, num_channels, num_classes, remove_l
 
     return model
 
-def create_model_with_SE(window_size, num_channels, num_classes, remove_last_layer=False):
+def create_model_SE(window_size, num_channels, num_classes, remove_last_layer=False):
     """
     Creates and returns the CNN model using squeeze & excitation blocks.
 
@@ -259,3 +261,47 @@ def create_model_identification(window_size, num_channels, num_classes, remove_l
 
     return model
 
+def create_model_transformers(window_size, num_channels, num_classes, remove_last_layer=False):
+    """
+    Creates and returns the CNN model using transformers.
+
+    Parameters:
+        - window_size: sliding window size, used when composing the dataset;
+        - num_channels: number of channels in an EEG signal;
+        - num_classes: total number of classes (individuals).
+    Optional Parameters:
+        - remove_last_layer: if True, the model created won't have the fully connected block at the end with a
+        softmax activation function.
+    """
+
+    # inputs = Input(shape=(window_size, num_channels))
+    # x = MultiHeadAttention(num_heads=num_channels, key_dim=num_channels, value_dim=num_channels)(inputs)
+
+    x = MultiHeadAttention(num_heads=num_channels, key_dim=num_channels)
+    input_tensor  = Input(shape=(window_size, num_channels))
+    output_tensor = x(input_tensor, input_tensor)
+
+    x = Conv1D(96, (11), activation='relu') (output_tensor)
+    x = BatchNormalization() (x)
+    x = MaxPooling1D(strides=4) (x)
+
+    # x = Conv1D(128, (9), activation='relu') (x)
+    # x = BatchNormalization() (x)
+    # x = MaxPooling1D(strides=2) (x)
+
+    # x = Conv1D(256, (9), activation='relu') (x)
+    # x = BatchNormalization() (x)
+    # x = MaxPooling1D(strides=2) (x)
+
+    x = Flatten() (x)
+    # x = Dense(4096)(x)
+    # x = Dense(4096)(x)
+    x = Dense(256)(x)
+
+    # x = BatchNormalization()(x)
+    # x = Dropout(0.1) (x)
+    x = Dense(num_classes, activation='softmax') (x)
+
+    model = Model(inputs=input_tensor, outputs=x, name='Biometric_for_Identification')
+
+    return model
