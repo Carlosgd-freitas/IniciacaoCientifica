@@ -3,7 +3,6 @@ from tensorflow.keras.layers import Dense, Dropout, Flatten, Conv1D, MaxPooling1
 from tensorflow.keras.layers import Concatenate, GlobalAveragePooling1D, Reshape, Activation, Permute, Multiply
 from tensorflow.keras.layers import MultiHeadAttention
 from tensorflow.keras import Input, Model
-from tensorflow.python.keras.engine import input_spec
 
 def scheduler(current_epoch, learning_rate):
     """
@@ -285,21 +284,21 @@ def create_model_transformers(window_size, num_channels, num_classes, remove_las
     x = BatchNormalization() (x)
     x = MaxPooling1D(strides=4) (x)
 
-    x = Conv1D(128, (9), activation='relu') (x)
-    x = BatchNormalization() (x)
-    x = MaxPooling1D(strides=2) (x)
+    # x = Conv1D(128, (9), activation='relu') (x)
+    # x = BatchNormalization() (x)
+    # x = MaxPooling1D(strides=2) (x)
 
-    x = Conv1D(256, (9), activation='relu') (x)
-    x = BatchNormalization() (x)
-    x = MaxPooling1D(strides=2) (x)
+    # x = Conv1D(256, (9), activation='relu') (x)
+    # x = BatchNormalization() (x)
+    # x = MaxPooling1D(strides=2) (x)
 
     x = Flatten() (x)
-    x = Dense(4096)(x)
-    x = Dense(4096)(x)
+    # x = Dense(4096)(x)
+    # x = Dense(4096)(x)
     x = Dense(256)(x)
 
-    x = BatchNormalization()(x)
-    x = Dropout(0.1) (x)
+    # x = BatchNormalization()(x)
+    # x = Dropout(0.1) (x)
     x = Dense(num_classes, activation='softmax') (x)
 
     model = Model(inputs=input_tensor, outputs=x, name='Biometric_for_Identification')

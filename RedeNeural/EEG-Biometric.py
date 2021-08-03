@@ -22,8 +22,8 @@ band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 # Parameters used in functions.load_data()
 train = [1]                    # Tasks used for training and validation
 test = [2]                     # Tasks used for testing
-window_size = 1920             # Sliding window size, used when composing the dataset
-offset = 200 #35               # Sliding window offset (deslocation), used when composing the dataset
+window_size = 20 #1920             # Sliding window size, used when composing the dataset
+offset = 20 #200 #35               # Sliding window offset (deslocation), used when composing the dataset
 train_val_ratio = 0.9          # 90% for training | 10% for validation
 
 # Channels for some lobes of the brain
@@ -40,7 +40,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 
 # Other Parameters
 num_classes = 10#9              # Total number of classes (individuals)
-num_channels = 64              # Number of channels in an EEG signal
+num_channels = 9 #64              # Number of channels in an EEG signal
 
 # Tasks:
 # Task 1 - EO
