@@ -22,8 +22,8 @@ band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 # Parameters used in functions.load_data()
 train = [1]                    # Tasks used for training and validation
 test = [2]                     # Tasks used for testing
-window_size = 20 #1920             # Sliding window size, used when composing the dataset
-offset = 20 #200 #35               # Sliding window offset (deslocation), used when composing the dataset
+window_size = 200 #1920             # Sliding window size, used when composing the dataset
+offset = 200 #35               # Sliding window offset (deslocation), used when composing the dataset
 train_val_ratio = 0.9          # 90% for training | 10% for validation
 
 # Channels for some lobes of the brain

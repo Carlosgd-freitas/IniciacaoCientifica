@@ -273,34 +273,36 @@ def create_model_transformers(window_size, num_channels, num_classes, remove_las
         softmax activation function.
     """
 
-    # inputs = Input(shape=(window_size, num_channels))
-    # x = MultiHeadAttention(num_heads=num_channels, key_dim=num_channels, value_dim=num_channels)(inputs)
-
-    x = MultiHeadAttention(num_heads=2, key_dim=2)
-    input_tensor = Input(shape=(window_size, num_channels))
-    output_tensor = x(input_tensor, input_tensor)
+    inputs = Input(shape=(window_size, num_channels))
+    x = MultiHeadAttention(num_heads=5, key_dim=num_channels)
+    output_tensor = x(inputs, inputs)
 
     x = Conv1D(96, (11), activation='relu') (output_tensor)
     x = BatchNormalization() (x)
     x = MaxPooling1D(strides=4) (x)
 
-    # x = Conv1D(128, (9), activation='relu') (x)
-    # x = BatchNormalization() (x)
-    # x = MaxPooling1D(strides=2) (x)
+    x = Conv1D(128, (9), activation='relu') (x)
+    x = BatchNormalization() (x)
+    x = MaxPooling1D(strides=2) (x)
 
-    # x = Conv1D(256, (9), activation='relu') (x)
-    # x = BatchNormalization() (x)
-    # x = MaxPooling1D(strides=2) (x)
+    x = Conv1D(256, (9), activation='relu') (x)
+    x = BatchNormalization() (x)
+    x = MaxPooling1D(strides=2) (x)
 
     x = Flatten() (x)
-    # x = Dense(4096)(x)
-    # x = Dense(4096)(x)
+    x = Dense(4096)(x)
+    x = Dense(4096)(x)
     x = Dense(256)(x)
 
-    # x = BatchNormalization()(x)
-    # x = Dropout(0.1) (x)
-    x = Dense(num_classes, activation='softmax') (x)
-
-    model = Model(inputs=input_tensor, outputs=x, name='Biometric_for_Identification')
+    # Model used for Identification
+    if(remove_last_layer == False):
+        x = BatchNormalization()(x)
+        x = Dropout(0.1) (x)
+        x = Dense(num_classes, activation='softmax') (x)
+        model = Model(inputs=inputs, outputs=x, name='Biometric_for_Identification')
+        
+    # Model used for Verification
+    else:
+        model = Model(inputs=inputs, outputs=x, name='Biometric_for_Verification')
 
     return model
