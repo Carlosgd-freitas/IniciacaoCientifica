@@ -276,11 +276,11 @@ def create_model_transformers(window_size, num_channels, num_classes, remove_las
     inputs = Input(shape=(window_size, num_channels))
     x = MultiHeadAttention(num_heads=10, key_dim=num_channels)
     output_tensor = x(inputs, inputs)
-    x = LayerNormalization(axis=-1) (output_tensor) # Add & Norm
+    x = LayerNormalization() (output_tensor) # Add & Norm
 
-    x = Conv1D(96, (11), activation='relu') (x)
-    x = BatchNormalization() (x)
-    x = MaxPooling1D(strides=4) (x)
+    # x = Conv1D(96, (11), activation='relu') (x)
+    # x = BatchNormalization() (x)
+    # x = MaxPooling1D(strides=4) (x)
 
     x = Conv1D(128, (9), activation='relu') (x)
     x = BatchNormalization() (x)
