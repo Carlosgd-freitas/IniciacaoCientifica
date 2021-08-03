@@ -22,7 +22,7 @@ band_pass_3 = [30, 50]         # Third filter option, 30~50Hz
 # Parameters used in functions.load_data()
 train = [1]                    # Tasks used for training and validation
 test = [2]                     # Tasks used for testing
-window_size = 200 #1920             # Sliding window size, used when composing the dataset
+window_size = 500 #1920             # Sliding window size, used when composing the dataset
 offset = 200 #35               # Sliding window offset (deslocation), used when composing the dataset
 train_val_ratio = 0.9          # 90% for training | 10% for validation
 
@@ -569,36 +569,30 @@ print("Maximum Loss : {:.4f}".format(max_loss))
 print("Minimum Loss : {:.4f}".format(min_loss))
 print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
-# Removing the last 2 layers of the model and getting the features array
-# model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
-# model_for_verification.summary()
-# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-# model_for_verification.load_weights('model_weights.h5', by_name=True)
-# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+# Removing the last layers of the model and getting the features array
 
-# Removing the last layer of the model with inception blocks and getting the features array
+# Using default model
+# model_for_verification = models.create_model(window_size, num_channels, num_classes, True) 
+
+# Model with inception blocks
 # model_for_verification = models.create_model_with_inception(window_size, num_channels, num_classes, True)
-# model_for_verification.summary()
-# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-# model_for_verification.load_weights('model_weights.h5', by_name=True)
-# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
-# Removing the last layer of the model with squeeze & excitation blocks and getting the features array
+# Model with squeeze & excitation blocks
 # model_for_verification = models.create_model_with_SE(window_size, num_channels, num_classes, True)
-# model_for_verification.summary()
-# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-# model_for_verification.load_weights('model_weights.h5', by_name=True)
-# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
-# Removing the last layer of the model with the greatest performance on identification and getting the features array
+# Model with the greatest performance on identification
 # model_for_verification = models.create_model_identification(window_size, num_channels, num_classes, True)
-# model_for_verification.summary()
-# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-# model_for_verification.load_weights('model_weights.h5', by_name=True)
-# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+
+# Model with transformers
+model_for_verification = models.create_model_transformers(window_size, num_channels, num_classes, True)
+
+model_for_verification.summary()
+model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+model_for_verification.load_weights('model_weights.h5', by_name=True)
+x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 # Calculating EER and Decidability
-# y_test_classes = functions.one_hot_encoding_to_classes(y_test)
-# d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
-# print(f'EER: {eer*100.0} %')
-# print(f'Decidability: {d}')
+y_test_classes = functions.one_hot_encoding_to_classes(y_test)
+d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
+print(f'EER: {eer*100.0} %')
+print(f'Decidability: {d}')
