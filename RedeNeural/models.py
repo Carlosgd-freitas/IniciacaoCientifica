@@ -282,6 +282,10 @@ def create_model_transformers(window_size, num_channels, num_classes, remove_las
     # x = BatchNormalization() (x)
     # x = MaxPooling1D(strides=4) (x)
 
+    x = Conv1D(96, (9), activation='relu') (x)
+    x = BatchNormalization() (x)
+    x = MaxPooling1D(strides=2) (x)
+
     x = Conv1D(128, (9), activation='relu') (x)
     x = BatchNormalization() (x)
     x = MaxPooling1D(strides=2) (x)
