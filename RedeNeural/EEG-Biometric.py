@@ -487,13 +487,13 @@ model = models.create_model_transformers(window_size, num_channels, num_classes)
 model.summary()
 
 # Loading the data
-x_train, x_val, x_test, y_train, y_val, y_test = functions.load_data('./Dataset/', train, test, num_classes, 
-                                                                     band_pass_3, sample_frequency, window_size, 
-                                                                     offset, train_val_ratio, 1)
+# x_train, x_val, x_test, y_train, y_val, y_test = functions.load_data('./Dataset/', train, test, num_classes, 
+#                                                                      band_pass_3, sample_frequency, window_size, 
+#                                                                      offset, train_val_ratio, 1)
 
-# x_train, x_val, x_test, y_train, y_val, y_test = functions.load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', 
-#                                                                      train, test, num_classes, band_pass_3, sample_frequency,
-#                                                                      window_size, offset, train_val_ratio)                                                            
+x_train, x_val, x_test, y_train, y_val, y_test = functions.load_data('/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/', 
+                                                                     train, test, num_classes, band_pass_3, sample_frequency,
+                                                                     window_size, offset, train_val_ratio)                                                            
 
 # Printing data formats
 print('\nData formats:')
