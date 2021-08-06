@@ -162,6 +162,41 @@ def pre_processing(content, lowcut, highcut, frequency, filter_order, filter_typ
 
     return content
 
+def verbose_each_10_percent(count, data_amount, flag):
+    """
+    Auxiliar function for optional verbose on other functions.
+    """
+    if count == data_amount and flag != 10:
+        print('100%')
+        flag = 10
+    elif count >= data_amount * 0.9 and flag != 9:
+        print('90%...',end='')
+        flag = 9
+    elif count >= data_amount * 0.8 and flag != 8:
+        print('80%...',end='')
+        flag = 8
+    elif count >= data_amount * 0.7 and flag != 7:
+        print('70%...',end='')
+        flag = 7
+    elif count >= data_amount * 0.6 and flag != 6:
+        print('60%...',end='')
+        flag = 6
+    elif count >= data_amount * 0.5 and flag != 5:
+        print('50%...',end='')
+        flag = 5
+    elif count >= data_amount * 0.4 and flag != 4:
+        print('40%...',end='')
+        flag = 4
+    elif count >= data_amount * 0.3 and flag != 3:
+        print('30%...',end='')
+        flag = 3
+    elif count >= data_amount * 0.2 and flag != 2:
+        print('20%...',end='')
+        flag = 2
+    elif count >= data_amount * 0.1 and flag != 1:
+        print('10%...',end='')
+        flag = 1
+
 def filter_data(data, filter, sample_frequency, filter_order, filter_type, verbose = 0):
     """
     Takes a list of raw signals as input, applies a band-pass filter on each of them and outputs them as a list.
@@ -187,6 +222,7 @@ def filter_data(data, filter, sample_frequency, filter_order, filter_type, verbo
 
     if verbose == 1:
         count = 0
+        flag = 0
         print('Data is being filtered: 0%...',end='')
 
     for signal in data:
@@ -194,26 +230,7 @@ def filter_data(data, filter, sample_frequency, filter_order, filter_type, verbo
 
         if verbose == 1:
             count += 1
-            if count == len(data):
-                print('100%')
-            elif count >= len(data) * 0.9:
-                print('90%...',end='')
-            elif count >= len(data) * 0.8:
-                print('80%...',end='')
-            elif count >= len(data) * 0.7:
-                print('70%...',end='')
-            elif count >= len(data) * 0.6:
-                print('60%...',end='')
-            elif count >= len(data) * 0.5:
-                print('50%...',end='')
-            elif count >= len(data) * 0.4:
-                print('40%...',end='')
-            elif count >= len(data) * 0.3:
-                print('30%...',end='')
-            elif count >= len(data) * 0.2:
-                print('20%...',end='')
-            elif count >= len(data) * 0.1:
-                print('10%...',end='')
+            verbose_each_10_percent(count, len(data), flag)
     
     return filtered_data
 
@@ -289,6 +306,7 @@ def normalize_data(data, normalize_type, verbose = 0):
 
     if verbose == 1:
         count = 0
+        flag = 0
         print('Data is being normalized: 0%...',end='')
 
     for signal in data:
@@ -296,26 +314,7 @@ def normalize_data(data, normalize_type, verbose = 0):
 
         if verbose == 1:
             count += 1
-            if count == len(data):
-                print('100%')
-            elif count >= len(data) * 0.9:
-                print('90%...',end='')
-            elif count >= len(data) * 0.8:
-                print('80%...',end='')
-            elif count >= len(data) * 0.7:
-                print('70%...',end='')
-            elif count >= len(data) * 0.6:
-                print('60%...',end='')
-            elif count >= len(data) * 0.5:
-                print('50%...',end='')
-            elif count >= len(data) * 0.4:
-                print('40%...',end='')
-            elif count >= len(data) * 0.3:
-                print('30%...',end='')
-            elif count >= len(data) * 0.2:
-                print('20%...',end='')
-            elif count >= len(data) * 0.1:
-                print('10%...',end='')
+            verbose_each_10_percent(count, len(data), flag)
 
     return normalized_data
 
@@ -417,6 +416,7 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
     if verbose == 1:
         count = 0
+        flag = 0
         data_amount = len(data_tasks) * num_classes
         print('Data is being cropped: 0%...',end='')
 
@@ -432,26 +432,7 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
                 if verbose == 1:
                     count += 1
-                    if count == data_amount:
-                        print('100%')
-                    elif count >= data_amount * 0.9:
-                        print('90%...',end='')
-                    elif count >= data_amount * 0.8:
-                        print('80%...',end='')
-                    elif count >= data_amount * 0.7:
-                        print('70%...',end='')
-                    elif count >= data_amount * 0.6:
-                        print('60%...',end='')
-                    elif count >= data_amount * 0.5:
-                        print('50%...',end='')
-                    elif count >= data_amount * 0.4:
-                        print('40%...',end='')
-                    elif count >= data_amount * 0.3:
-                        print('30%...',end='')
-                    elif count >= data_amount * 0.2:
-                        print('20%...',end='')
-                    elif count >= data_amount * 0.1:
-                        print('10%...',end='')
+                    verbose_each_10_percent(count, data_amount, flag)
 
         if verbose == 1:
             print('Data is being transformed to an numpy array and being reshaped.')
@@ -477,26 +458,7 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
                 
                 if verbose == 1:
                     count += 1
-                    if count == data_amount:
-                        print('100%')
-                    elif count >= data_amount * 0.9:
-                        print('90%...',end='')
-                    elif count >= data_amount * 0.8:
-                        print('80%...',end='')
-                    elif count >= data_amount * 0.7:
-                        print('70%...',end='')
-                    elif count >= data_amount * 0.6:
-                        print('60%...',end='')
-                    elif count >= data_amount * 0.5:
-                        print('50%...',end='')
-                    elif count >= data_amount * 0.4:
-                        print('40%...',end='')
-                    elif count >= data_amount * 0.3:
-                        print('30%...',end='')
-                    elif count >= data_amount * 0.2:
-                        print('20%...',end='')
-                    elif count >= data_amount * 0.1:
-                        print('10%...',end='')
+                    verbose_each_10_percent(count, data_amount, flag)
 
         if verbose == 1:
             print('Data is being transformed to an numpy array and being reshaped.')
