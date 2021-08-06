@@ -164,7 +164,12 @@ def pre_processing(content, lowcut, highcut, frequency, filter_order, filter_typ
 
 def verbose_each_10_percent(count, data_amount, flag):
     """
-    Auxiliar function for optional verbose on other functions.
+    Auxiliar function for optional verbose on other functions. Returns the flag, possibly modified.
+
+    Parameters:
+        - count: current data index that was processed;
+        - data_amount: length of the list of data;
+        - flag: current state of the flag.
     """
     if count == data_amount and flag < 10:
         print('100%')
@@ -481,98 +486,6 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
         y_data_2 = y_data_2.reshape(y_data_2.shape[0], y_data_2.shape[2])
 
         return x_data, y_data, x_data_2, y_data_2
-
-# def load_data(folder_path, train_tasks, test_tasks, num_classes, filter, sample_frequency, window_size, offset, train_val_ratio, verbose=0):
-#     """
-#     Returns the processed signals and labels for training (x_train and y_train), validation (x_val and y_val) and
-#     testing (x_test and y_test).
-
-#     The return of this function is in the format: x_train, x_val, x_test, y_train, y_val, y_test.
-
-#     Parameters:
-#         - folder_path: path of the folder in which the the EDF files are stored.
-#         E.g. if this python script is in the same folder as the sub-folder used to store the EDF files, and this
-#         sub-folder is called "Dataset", then this parameter should be: './Dataset/';
-#         - train_tasks: list that contains the numbers of the experimental runs that will be used to create train
-#         and validation data;
-#         - test_tasks: list that contains the numbers of the experimental runs that will be used to create testing
-#         data.
-#         - num_classes: total number of classes (individuals);
-#         - filter: a list with size 2, where the first value is the lowcut of the band-pass filter used in
-#         pre-processing, and the second value is the highcut;
-#         - sample_frequency: frequency of the sampling;
-#         - window_size: sliding window size;
-#         - offset: sliding window offset (deslocation);
-#         - train_val_ratio: ratio for composing training and validation data.
-    
-#     Optional Parameters:
-#         - verbose: if set to 1, prints what type of data (training/validation or testing) is currently being
-#         processed. Default value is 0.
-#     """
-
-#     # Processing x_train, y_train, x_val and y_val
-#     if(verbose):
-#         print('Training and Validation data is being processed...')
-
-#     x_trainL = list()
-#     x_valL = list()
-#     y_trainL = list()
-#     y_valL = list()
-
-#     for train_task in train_tasks:
-#         if(verbose):
-#             print(f'* Using task {train_task}:')
-
-#         for i in range(1, num_classes + 1):
-#             if(verbose):
-#                 print(f'  > Loading data from subject {i}.')
-
-#             train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task), ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..'])
-#             train_content = pre_processing(train_content, filter[0], filter[1], sample_frequency, 12, 'sosfilt')
-#             train_content = normalize_signal(train_content, 'all_channels')
-#             x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content, window_size, offset, i, num_classes, train_val_ratio, x_valL, y_valL)
-    
-#     x_train = np.asarray(x_trainL, dtype = object).astype('float32')
-#     x_val = np.asarray(x_valL, dtype = object).astype('float32')
-#     y_train = np.asarray(y_trainL, dtype = object).astype('float32')
-#     y_val = np.asarray(y_valL, dtype = object).astype('float32')
-
-#     # Processing x_test and y_test
-#     if(verbose):
-#         print('\nTesting data is being processed...')
-
-#     x_testL = list()
-#     y_testL = list()
-
-#     for test_task in test_tasks:
-#         if(verbose):
-#             print(f'* Using task {test_task}:')
-
-#         for i in range(1, num_classes + 1):
-#             if(verbose):
-#                 print(f'  > Loading data from subject {i}.')
-
-#             test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task), ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..'])
-#             test_content = pre_processing(test_content, filter[0], filter[1], sample_frequency, 12, 'sosfilt')
-#             test_content = normalize_signal(test_content, 'all_channels')
-#             x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content, window_size, window_size, i, num_classes)
-
-#     x_test = np.asarray(x_testL, dtype = object).astype('float32')
-#     y_test = np.asarray(y_testL, dtype = object).astype('float32')
-
-#     # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
-#     # input shape of the CNN is "a x window_size x num_channels".
-#     x_train = x_train.reshape(x_train.shape[0], x_train.shape[2], x_train.shape[1])
-#     x_val = x_val.reshape(x_val.shape[0], x_val.shape[2], x_val.shape[1])
-#     x_test = x_test.reshape(x_test.shape[0], x_test.shape[2], x_test.shape[1])
-
-#     # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
-#     # is "a x num_classes".
-#     y_train = y_train.reshape(y_train.shape[0], y_train.shape[2])
-#     y_val = y_val.reshape(y_val.shape[0], y_val.shape[2])
-#     y_test = y_test.reshape(y_test.shape[0], y_test.shape[2])
-
-#     return x_train, x_val, x_test, y_train, y_val, y_test
 
 def one_hot_encoding_to_classes(y_data):
     """

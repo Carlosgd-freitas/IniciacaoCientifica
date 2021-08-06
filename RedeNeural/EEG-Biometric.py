@@ -78,25 +78,24 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 model = models.create_model(window_size, num_channels, num_classes)
 # model = models.create_model_inception(window_size, num_channels, num_classes)
 # model = models.create_model_SE(window_size, num_channels, num_classes)
-# model = models.create_model_identification(window_size, num_channels, num_classes)
 # model = models.create_model_transformers(window_size, num_channels, num_classes)
 model.summary()
 
 # Loading the raw data
-train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, num_classes, verbose=1)   
+train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, num_classes)   
 
 # Filtering the raw data
-train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, verbose=1)
-test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, verbose=1)
+train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
+test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
 
 # Normalize the filtered data
-train_content = functions.normalize_data(train_content, normalize_type, verbose=1)
-test_content = functions.normalize_data(test_content, normalize_type, verbose=1)
+# train_content = functions.normalize_data(train_content, normalize_type)
+# test_content = functions.normalize_data(test_content, normalize_type)
 
 # Apply data augmentation (sliding window cropping) on normalized data
 x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
-                                                     window_size, offset, split_ratio, verbose=1)
-x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, window_size, window_size, verbose=1)
+                                                     window_size, offset, split_ratio)
+x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, window_size, window_size)
 
 # Printing data formats
 print('\nData formats:')
@@ -118,16 +117,6 @@ results = model.fit(x_train,
                     callbacks = [callback],
                     validation_data = (x_val, y_val)
                     )
-
-# results = model.fit(
-#                     {"input_ids": input_ids,
-#                     "attention_mask": mask},
-#                     y_train,
-#                     batch_size = batch_size,
-#                     epochs = training_epochs,
-#                     callbacks = [callback],
-#                     validation_data = (x_val, y_val)
-#                     )
 
 # Saving model weights
 model.save('model_weights.h5')
@@ -182,9 +171,6 @@ model_for_verification = models.create_model(window_size, num_channels, num_clas
 
 # Model with squeeze & excitation blocks
 # model_for_verification = models.create_model_with_SE(window_size, num_channels, num_classes, True)
-
-# Model with the greatest performance on identification
-# model_for_verification = models.create_model_identification(window_size, num_channels, num_classes, True)
 
 # Model with transformers
 # model_for_verification = models.create_model_transformers(window_size, num_channels, num_classes, True)
