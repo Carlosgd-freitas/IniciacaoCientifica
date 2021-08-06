@@ -354,7 +354,7 @@ def crop_data(train_tasks, test_tasks, train_content, test_content, num_classes,
 
     for train_task in train_tasks:
         for i in range(1, num_classes + 1):
-            x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content,
+            x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content[i-1],
                                                                  window_size, offset, i, num_classes,
                                                                  train_val_ratio, x_valL, y_valL)
     
@@ -369,7 +369,7 @@ def crop_data(train_tasks, test_tasks, train_content, test_content, num_classes,
 
     for test_task in test_tasks:
         for i in range(1, num_classes + 1):
-            x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content,
+            x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content[i-1],
                                                window_size, window_size, i, num_classes)
 
     x_test = np.asarray(x_testL, dtype = object).astype('float32')
