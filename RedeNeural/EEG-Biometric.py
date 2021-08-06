@@ -95,8 +95,8 @@ test_content = functions.normalize_data(test_content, normalize_type, verbose=1)
 
 # Apply data augmentation (sliding window cropping) on normalized data
 x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
-                                                     window_size, offset, split_ratio)
-x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, window_size, window_size)
+                                                     window_size, offset, split_ratio, verbose=1)
+x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, window_size, window_size, verbose=1)
 
 # Printing data formats
 print('\nData formats:')
