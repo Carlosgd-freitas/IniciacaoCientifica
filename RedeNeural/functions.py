@@ -196,6 +196,8 @@ def verbose_each_10_percent(count, data_amount, flag):
     elif count >= data_amount * 0.1 and flag != 1:
         print('10%...',end='')
         flag = 1
+    
+    return flag
 
 def filter_data(data, filter, sample_frequency, filter_order, filter_type, verbose = 0):
     """
@@ -230,7 +232,7 @@ def filter_data(data, filter, sample_frequency, filter_order, filter_type, verbo
 
         if verbose == 1:
             count += 1
-            verbose_each_10_percent(count, len(data), flag)
+            flag = verbose_each_10_percent(count, len(data), flag)
     
     return filtered_data
 
@@ -314,7 +316,7 @@ def normalize_data(data, normalize_type, verbose = 0):
 
         if verbose == 1:
             count += 1
-            verbose_each_10_percent(count, len(data), flag)
+            flag = verbose_each_10_percent(count, len(data), flag)
 
     return normalized_data
 
@@ -432,7 +434,7 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
                 if verbose == 1:
                     count += 1
-                    verbose_each_10_percent(count, data_amount, flag)
+                    flag = verbose_each_10_percent(count, data_amount, flag)
 
         if verbose == 1:
             print('Data is being transformed to an numpy array and being reshaped.')
@@ -458,7 +460,7 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
                 
                 if verbose == 1:
                     count += 1
-                    verbose_each_10_percent(count, data_amount, flag)
+                    flag = verbose_each_10_percent(count, data_amount, flag)
 
         if verbose == 1:
             print('Data is being transformed to an numpy array and being reshaped.')
