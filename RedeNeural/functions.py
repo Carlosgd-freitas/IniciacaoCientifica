@@ -43,7 +43,69 @@ def read_EDF(path, channels=None):
     del reader
     return signals
 
-def bandpass_filter(signal, lowcut, highcut, fs, order, mode):
+def load_data(folder_path, train_tasks, test_tasks, num_classes, channels=None, verbose=0):
+    """
+    Loads and returns lists containing raw signals used for training (train_content) and testing (test_content).
+
+    The return of this function is in the format: train_content, test_content.
+
+    Parameters:
+        - folder_path: path of the folder in which the the EDF files are stored.
+        E.g. if this python script is in the same folder as the sub-folder used to store the EDF files, and this
+        sub-folder is called "Dataset", then this parameter should be: './Dataset/';
+        - train_tasks: list that contains the numbers of the experimental runs that will be used to create train
+        and validation data;
+        - test_tasks: list that contains the numbers of the experimental runs that will be used to create testing
+        data;
+        - num_classes: total number of classes (individuals).
+    
+    Optional Parameters:
+        - channels: list of channel codes that will be read. By default, this function reads all channels.
+        The list containing all channel codes is: ['Fc5.', 'Fc3.', 'Fc1.', 'Fcz.', 'Fc2.', 'Fc4.', 'Fc6.',
+        'C5..', 'C3..', 'C1..', 'Cz..', 'C2..', 'C4..', 'C6..', 'Cp5.', 'Cp3.', 'Cp1.', 'Cpz.', 'Cp2.',
+        'Cp4.', 'Cp6.', 'Fp1.', 'Fpz.', 'Fp2.', 'Af7.', 'Af3.', 'Afz.', 'Af4.', 'Af8.', 'F7..', 'F5..',
+        'F3..', 'F1..', 'Fz..', 'F2..', 'F4..', 'F6..', 'F8..', 'Ft7.', 'Ft8.', 'T7..', 'T8..', 'T9..',
+        'T10.', 'Tp7.', 'Tp8.', 'P7..', 'P5..', 'P3..', 'P1..', 'Pz..', 'P2..', 'P4..', 'P6..', 'P8..',
+        'Po7.', 'Po3.', 'Poz.', 'Po4.', 'Po8.', 'O1..', 'Oz..', 'O2..', 'Iz..']
+        - verbose: if set to 1, prints what type of data (training/validation or testing) is currently being
+        loaded. Default value is 0.
+    """
+
+    # Processing x_train, y_train, x_val and y_val
+    if(verbose):
+        print('Training and Validation data are being loaded...')
+
+    train_content = list()
+
+    for train_task in train_tasks:
+        if(verbose):
+            print(f'* Using task {train_task}:')
+
+        for i in range(1, num_classes + 1):
+            if(verbose):
+                print(f'  > Loading data from subject {i}.')
+
+            train_content.append(read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task), channels))
+
+    # Processing x_test and y_test
+    if(verbose):
+        print('\nTesting data are being loaded...')
+
+    test_content = list()
+
+    for test_task in test_tasks:
+        if(verbose):
+            print(f'* Using task {test_task}:')
+
+        for i in range(1, num_classes + 1):
+            if(verbose):
+                print(f'  > Loading data from subject {i}.')
+
+            test_content.append(read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task), channels))
+
+    return train_content, test_content
+
+def bandpass_filter(signal, lowcut, highcut, fs, filter_order, filter_type):
     """
     Band-pass filters a signal and returns it.
 
@@ -52,8 +114,8 @@ def bandpass_filter(signal, lowcut, highcut, fs, order, mode):
         - lowcut: lowcut of the filter;
         - highcut: highcut of the filter;
         - fs: frequency of the signal;
-        - order: order of the filter;
-        - mode: how the signal will be filtered:
+        - filter_order: order of the filter;
+        - filter_type: how the signal will be filtered:
             * 'sosfilt': using the sosfilt() function from the scipy library;
             * 'filtfilt': using the firwin() and filtfilt() functions from the scipy library.
     """
@@ -62,16 +124,16 @@ def bandpass_filter(signal, lowcut, highcut, fs, order, mode):
     low = lowcut / nyq
     high = highcut / nyq
 
-    if(mode == 'sosfilt'):
-        sos = butter(order, [low, high], btype='band', output='sos')
+    if(filter_type == 'sosfilt'):
+        sos = butter(filter_order, [low, high], btype='band', output='sos')
         y = sosfilt(sos, signal)
-    elif(mode == 'filtfilt'):
-        fir_coeff = firwin(order+1,[low,high], pass_zero=False)
+    elif(filter_type == 'filtfilt'):
+        fir_coeff = firwin(filter_order+1,[low,high], pass_zero=False)
         y = filtfilt(fir_coeff, 1.0, signal)
 
     return y
 
-def pre_processing(content, lowcut, highcut, frequency, order, mode):
+def pre_processing(content, lowcut, highcut, frequency, filter_order, filter_type):
     """
     Pre-processess each channel of an EEG signal using band-pass filters.
 
@@ -80,8 +142,8 @@ def pre_processing(content, lowcut, highcut, frequency, order, mode):
         - lowcut: lowcut of the filter;
         - highcut: highcut of the filter;
         - fs: frequency of the signal;
-        - order: order of the filter;
-        - mode: how the signal will be filtered:
+        - filter_order: order of the filter;
+        - filter_type: type of the filter used:
             * 'sosfilt': using the sosfilt() function from the scipy library.
             * 'filtfilt': using the firwin() and filtfilt() functions from the scipy library.
     """
@@ -89,24 +151,48 @@ def pre_processing(content, lowcut, highcut, frequency, order, mode):
     channels = content.shape[0]
     c = 0
 
-    if(mode != 'sosfilt' and mode != 'filtfilt'):
-        print('ERROR: Invalid mode parameter. Signal will not be filtered.')
+    if(filter_type != 'sosfilt' and filter_type != 'filtfilt'):
+        print('ERROR: Invalid filter_type parameter. Signal will not be filtered.')
         return content
 
     while c < channels:
         signal = content[c, :]
-        content[c] = bandpass_filter(signal, lowcut, highcut, frequency, order, mode)
+        content[c] = bandpass_filter(signal, lowcut, highcut, frequency, filter_order, filter_type)
         c += 1
 
     return content
 
-def normalize_signal(content, mode):
+def filter_data(data, filter, sample_frequency, filter_order, filter_type):
+    """
+    Takes a list of raw signals as input, applies a band-pass filter on each of them and outputs them as a list.
+
+    The return of this function is in the format: filtered_data.
+
+    Parameters:
+        - data: list of signals that will be band-pass filtered;
+        - filter: a list with length 2, where the first value is the lowcut of the band-pass filter used in
+        pre-processing, and the second value is the highcut;
+        - sample_frequency: frequency of the sampling;
+        - filter_order: order of the filter;
+        - filter_type: type of the filter used:
+            * 'sosfilt': using the sosfilt() function from the scipy library.
+            * 'filtfilt': using the firwin() and filtfilt() functions from the scipy library.
+    """
+
+    filtered_data = list()
+
+    for signal in data:
+        filtered_data.append(pre_processing(signal, filter[0], filter[1], sample_frequency, filter_order, filter_type))
+    
+    return filtered_data
+
+def normalize_signal(content, normalize_type):
     """
     Normalizes an EEG signal.
 
     Parameters:
         - content: the EEG signal that will be normalized.
-        - mode: how the EEG signal will be normalized:
+        - normalize_type: type of normalization used:
             * 'each_channel': each channel of the EEG signal will be used to compute the mean, standard deviation,
             minimum and maximum values, which will be applied only to themselves in order to normalize them.
             * 'all_channels': all channels of the EEG signal will be used to compute the mean, standard deviation,
@@ -116,7 +202,7 @@ def normalize_signal(content, mode):
     channels = content.shape[0]
     c = 0
     
-    if(mode == 'each_channel'):
+    if(normalize_type == 'each_channel'):
         while c < channels:
             content[c] -= np.mean(content[c])
             content[c] += np.absolute(np.amin(content[c]))
@@ -124,7 +210,7 @@ def normalize_signal(content, mode):
             content[c] /= np.amax(content[c])
 
             c += 1
-    elif(mode == 'all_channels'):
+    elif(normalize_type == 'all_channels'):
         content -= np.mean(content)
 
         min_value = np.amin(content)
@@ -145,11 +231,33 @@ def normalize_signal(content, mode):
             c += 1
         c = 0
     else:
-        print('ERROR: Invalid mode parameter.')
+        print('ERROR: Invalid normalize_type parameter.')
 
     return content
 
-def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, num_classes, distribution=1.0, x_data_2=0, y_data_2=0):
+def normalize_data(data, normalize_type):
+    """
+    Takes a list of signals as input, normalizes and outputs them as a list.
+
+    The return of this function is in the format: normalized_data.
+
+    Parameters:
+        - data: list of signals that will be normalized;
+        - normalize_type: type of normalization used:
+            * 'each_channel': each channel of the EEG signal will be used to compute the mean, standard deviation,
+            minimum and maximum values, which will be applied only to themselves in order to normalize them.
+            * 'all_channels': all channels of the EEG signal will be used to compute the mean, standard deviation,
+            minimum and maximum values, which will be applied to each signal in order to normalize them.
+    """
+
+    normalized_data = list()
+
+    for signal in data:
+        normalized_data.append(normalize_signal(signal, normalize_type))
+
+    return normalized_data
+
+def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, num_classes, train_val_ratio=1.0, x_data_2=0, y_data_2=0):
     """
     Crops a content (EEG signal) and returns the processed signal and its' respective label using a sliding
     window.
@@ -169,8 +277,8 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
         - num_classes: total number of classes.
     
     Optional Parameters:
-        - distribution: a number in the interval (0,1]. (distribution * 100)% of the processed signals will be
-        stored in x_data and y_data, and [100 - (distribution * 100)]% will be stored in x_data_2 and y_data_2.
+        - train_val_ratio: a number in the interval (0,1]. (train_val_ratio * 100)% of the processed signals will be
+        stored in x_data and y_data, and [100 - (train_val_ratio * 100)]% will be stored in x_data_2 and y_data_2.
         This number is 1.0 by default, corresponding to 100% of the data being stored in x_data and y_data, and
         x_data_2 and y_data_2 not being used nor returned; 
         - x_data_2: list that stores the processed signals;
@@ -186,13 +294,13 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
     elif offset == 0:
         print('ERROR: An offset equals to 0 would result in "infinite" equal windows.')
         return x_data, y_data
-    # Checking the distribution parameter
-    elif distribution <= 0 or distribution > 1:
-        print('ERROR: The distribution parameter needs to be in the interval (0,1].')
+    # Checking the train_val_ratio parameter
+    elif train_val_ratio <= 0 or train_val_ratio > 1:
+        print('ERROR: The train_val_ratio parameter needs to be in the interval (0,1].')
         return x_data, y_data
     else:
         i = window_size
-        while i <= content.shape[1] * distribution:
+        while i <= content.shape[1] * train_val_ratio:
             arr = content[: , (i-window_size):i]
             x_data.append(arr)
 
@@ -202,7 +310,7 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
 
             i += offset
 
-        if distribution == 1.0:
+        if train_val_ratio == 1.0:
             return x_data, y_data
         
         while i <= content.shape[1]:
@@ -217,55 +325,38 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
 
         return x_data, y_data, x_data_2, y_data_2
 
-def load_data(folder_path, train_tasks, test_tasks, num_classes, filter, sample_frequency, window_size, offset, train_val_ratio, verbose=0):
+def crop_data(train_tasks, test_tasks, train_content, test_content, num_classes, window_size, offset, train_val_ratio):
     """
-    Returns the processed signals and labels for training (x_train and y_train), validation (x_val and y_val) and
-    testing (x_test and y_test).
+    Applies a sliding window cropping for data augmentation of the signals used for training (train_content) and
+    testing (test_content), and returns the processed signals and labels for training (x_train and y_train),
+    validation (x_val and y_val) and testing (x_test and y_test) as numpy arrays.
 
     The return of this function is in the format: x_train, x_val, x_test, y_train, y_val, y_test.
 
     Parameters:
-        - folder_path: path of the folder in which the the EDF files are stored.
-        E.g. if this python script is in the same folder as the sub-folder used to store the EDF files, and this
-        sub-folder is called "Dataset", then this parameter should be: './Dataset/';
-        - train_tasks: list that contains the numbers of the experimental runs that will be used to create train
+        - train_tasks: list containing the numbers of the experimental runs that will be used to create train
         and validation data;
-        - test_tasks: list that contains the numbers of the experimental runs that will be used to create testing
-        data.
+        - test_tasks: list containing the numbers of the experimental runs that will be used to create testing
+        data;
+        - train_content: list containing the EEG signals that will be used to to create train and validation data;
+        - test_content: list containing the EEG signals that will be used to to create testing data;
         - num_classes: total number of classes (individuals);
-        - filter: a list with length 2, where the first value is the lowcut of the band-pass filter used in
-        pre-processing, and the second value is the highcut;
-        - sample_frequency: frequency of the sampling;
         - window_size: sliding window size;
         - offset: sliding window offset (deslocation);
         - train_val_ratio: ratio for composing training and validation data.
-    
-    Optional Parameters:
-        - verbose: if set to 1, prints what type of data (training/validation or testing) is currently being
-        processed. Default value is 0.
     """
 
     # Processing x_train, y_train, x_val and y_val
-    if(verbose):
-        print('Training and Validation data is being processed...')
-
     x_trainL = list()
     x_valL = list()
     y_trainL = list()
     y_valL = list()
 
     for train_task in train_tasks:
-        if(verbose):
-            print(f'* Using task {train_task}:')
-
         for i in range(1, num_classes + 1):
-            if(verbose):
-                print(f'  > Loading data from subject {i}.')
-
-            train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task), ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..'])
-            train_content = pre_processing(train_content, filter[0], filter[1], sample_frequency, 12, 'sosfilt')
-            train_content = normalize_signal(train_content, 'all_channels')
-            x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content, window_size, offset, i, num_classes, train_val_ratio, x_valL, y_valL)
+            x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content,
+                                                                 window_size, offset, i, num_classes,
+                                                                 train_val_ratio, x_valL, y_valL)
     
     x_train = np.asarray(x_trainL, dtype = object).astype('float32')
     x_val = np.asarray(x_valL, dtype = object).astype('float32')
@@ -273,24 +364,13 @@ def load_data(folder_path, train_tasks, test_tasks, num_classes, filter, sample_
     y_val = np.asarray(y_valL, dtype = object).astype('float32')
 
     # Processing x_test and y_test
-    if(verbose):
-        print('\nTesting data is being processed...')
-
     x_testL = list()
     y_testL = list()
 
     for test_task in test_tasks:
-        if(verbose):
-            print(f'* Using task {test_task}:')
-
         for i in range(1, num_classes + 1):
-            if(verbose):
-                print(f'  > Loading data from subject {i}.')
-
-            test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task), ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..'])
-            test_content = pre_processing(test_content, filter[0], filter[1], sample_frequency, 12, 'sosfilt')
-            test_content = normalize_signal(test_content, 'all_channels')
-            x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content, window_size, window_size, i, num_classes)
+            x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content,
+                                               window_size, window_size, i, num_classes)
 
     x_test = np.asarray(x_testL, dtype = object).astype('float32')
     y_test = np.asarray(y_testL, dtype = object).astype('float32')
@@ -308,6 +388,98 @@ def load_data(folder_path, train_tasks, test_tasks, num_classes, filter, sample_
     y_test = y_test.reshape(y_test.shape[0], y_test.shape[2])
 
     return x_train, x_val, x_test, y_train, y_val, y_test
+
+# def load_data(folder_path, train_tasks, test_tasks, num_classes, filter, sample_frequency, window_size, offset, train_val_ratio, verbose=0):
+#     """
+#     Returns the processed signals and labels for training (x_train and y_train), validation (x_val and y_val) and
+#     testing (x_test and y_test).
+
+#     The return of this function is in the format: x_train, x_val, x_test, y_train, y_val, y_test.
+
+#     Parameters:
+#         - folder_path: path of the folder in which the the EDF files are stored.
+#         E.g. if this python script is in the same folder as the sub-folder used to store the EDF files, and this
+#         sub-folder is called "Dataset", then this parameter should be: './Dataset/';
+#         - train_tasks: list that contains the numbers of the experimental runs that will be used to create train
+#         and validation data;
+#         - test_tasks: list that contains the numbers of the experimental runs that will be used to create testing
+#         data.
+#         - num_classes: total number of classes (individuals);
+#         - filter: a list with length 2, where the first value is the lowcut of the band-pass filter used in
+#         pre-processing, and the second value is the highcut;
+#         - sample_frequency: frequency of the sampling;
+#         - window_size: sliding window size;
+#         - offset: sliding window offset (deslocation);
+#         - train_val_ratio: ratio for composing training and validation data.
+    
+#     Optional Parameters:
+#         - verbose: if set to 1, prints what type of data (training/validation or testing) is currently being
+#         processed. Default value is 0.
+#     """
+
+#     # Processing x_train, y_train, x_val and y_val
+#     if(verbose):
+#         print('Training and Validation data is being processed...')
+
+#     x_trainL = list()
+#     x_valL = list()
+#     y_trainL = list()
+#     y_valL = list()
+
+#     for train_task in train_tasks:
+#         if(verbose):
+#             print(f'* Using task {train_task}:')
+
+#         for i in range(1, num_classes + 1):
+#             if(verbose):
+#                 print(f'  > Loading data from subject {i}.')
+
+#             train_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task), ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..'])
+#             train_content = pre_processing(train_content, filter[0], filter[1], sample_frequency, 12, 'sosfilt')
+#             train_content = normalize_signal(train_content, 'all_channels')
+#             x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content, window_size, offset, i, num_classes, train_val_ratio, x_valL, y_valL)
+    
+#     x_train = np.asarray(x_trainL, dtype = object).astype('float32')
+#     x_val = np.asarray(x_valL, dtype = object).astype('float32')
+#     y_train = np.asarray(y_trainL, dtype = object).astype('float32')
+#     y_val = np.asarray(y_valL, dtype = object).astype('float32')
+
+#     # Processing x_test and y_test
+#     if(verbose):
+#         print('\nTesting data is being processed...')
+
+#     x_testL = list()
+#     y_testL = list()
+
+#     for test_task in test_tasks:
+#         if(verbose):
+#             print(f'* Using task {test_task}:')
+
+#         for i in range(1, num_classes + 1):
+#             if(verbose):
+#                 print(f'  > Loading data from subject {i}.')
+
+#             test_content = read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task), ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..'])
+#             test_content = pre_processing(test_content, filter[0], filter[1], sample_frequency, 12, 'sosfilt')
+#             test_content = normalize_signal(test_content, 'all_channels')
+#             x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content, window_size, window_size, i, num_classes)
+
+#     x_test = np.asarray(x_testL, dtype = object).astype('float32')
+#     y_test = np.asarray(y_testL, dtype = object).astype('float32')
+
+#     # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
+#     # input shape of the CNN is "a x window_size x num_channels".
+#     x_train = x_train.reshape(x_train.shape[0], x_train.shape[2], x_train.shape[1])
+#     x_val = x_val.reshape(x_val.shape[0], x_val.shape[2], x_val.shape[1])
+#     x_test = x_test.reshape(x_test.shape[0], x_test.shape[2], x_test.shape[1])
+
+#     # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
+#     # is "a x num_classes".
+#     y_train = y_train.reshape(y_train.shape[0], y_train.shape[2])
+#     y_val = y_val.reshape(y_val.shape[0], y_val.shape[2])
+#     y_test = y_test.reshape(y_test.shape[0], y_test.shape[2])
+
+#     return x_train, x_val, x_test, y_train, y_val, y_test
 
 def one_hot_encoding_to_classes(y_data):
     """
