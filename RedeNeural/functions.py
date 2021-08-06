@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import butter, sosfilt, firwin, filtfilt
 from sklearn.metrics.pairwise import euclidean_distances
 
-def read_EDF(path, channels=None):
+def read_EDF(path, channels = None):
     """
     Reads data from an EDF file and returns it in a numpy array format.
 
@@ -43,7 +43,7 @@ def read_EDF(path, channels=None):
     del reader
     return signals
 
-def load_data(folder_path, train_tasks, test_tasks, num_classes, channels=None, verbose=0):
+def load_data(folder_path, train_tasks, test_tasks, num_classes, channels = None, verbose = 0):
     """
     Loads and returns lists containing raw signals used for training (train_content) and testing (test_content).
 
@@ -162,7 +162,7 @@ def pre_processing(content, lowcut, highcut, frequency, filter_order, filter_typ
 
     return content
 
-def filter_data(data, filter, sample_frequency, filter_order, filter_type, verbose=0):
+def filter_data(data, filter, sample_frequency, filter_order, filter_type, verbose = 0):
     """
     Takes a list of raw signals as input, applies a band-pass filter on each of them and outputs them as a list.
 
@@ -194,25 +194,25 @@ def filter_data(data, filter, sample_frequency, filter_order, filter_type, verbo
 
         if verbose == 1:
             count += 1
-            if count == data.length():
+            if count == data.size():
                 print('100%')
-            elif count >= data.length() * 0.9:
+            elif count >= data.size() * 0.9:
                 print('90%...',end='')
-            elif count >= data.length() * 0.8:
+            elif count >= data.size() * 0.8:
                 print('80%...',end='')
-            elif count >= data.length() * 0.7:
+            elif count >= data.size() * 0.7:
                 print('70%...',end='')
-            elif count >= data.length() * 0.6:
+            elif count >= data.size() * 0.6:
                 print('60%...',end='')
-            elif count >= data.length() * 0.5:
+            elif count >= data.size() * 0.5:
                 print('50%...',end='')
-            elif count >= data.length() * 0.4:
+            elif count >= data.size() * 0.4:
                 print('40%...',end='')
-            elif count >= data.length() * 0.3:
+            elif count >= data.size() * 0.3:
                 print('30%...',end='')
-            elif count >= data.length() * 0.2:
+            elif count >= data.size() * 0.2:
                 print('20%...',end='')
-            elif count >= data.length() * 0.1:
+            elif count >= data.size() * 0.1:
                 print('10%...',end='')
     
     return filtered_data
@@ -266,7 +266,7 @@ def normalize_signal(content, normalize_type):
 
     return content
 
-def normalize_data(data, normalize_type, verbose=0):
+def normalize_data(data, normalize_type, verbose = 0):
     """
     Takes a list of signals as input, normalizes and outputs them as a list.
 
@@ -296,25 +296,25 @@ def normalize_data(data, normalize_type, verbose=0):
 
         if verbose == 1:
             count += 1
-            if count == data.length():
+            if count == data.size():
                 print('100%')
-            elif count >= data.length() * 0.9:
+            elif count >= data.size() * 0.9:
                 print('90%...',end='')
-            elif count >= data.length() * 0.8:
+            elif count >= data.size() * 0.8:
                 print('80%...',end='')
-            elif count >= data.length() * 0.7:
+            elif count >= data.size() * 0.7:
                 print('70%...',end='')
-            elif count >= data.length() * 0.6:
+            elif count >= data.size() * 0.6:
                 print('60%...',end='')
-            elif count >= data.length() * 0.5:
+            elif count >= data.size() * 0.5:
                 print('50%...',end='')
-            elif count >= data.length() * 0.4:
+            elif count >= data.size() * 0.4:
                 print('40%...',end='')
-            elif count >= data.length() * 0.3:
+            elif count >= data.size() * 0.3:
                 print('30%...',end='')
-            elif count >= data.length() * 0.2:
+            elif count >= data.size() * 0.2:
                 print('20%...',end='')
-            elif count >= data.length() * 0.1:
+            elif count >= data.size() * 0.1:
                 print('10%...',end='')
 
     return normalized_data
@@ -387,7 +387,7 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
 
         return x_data, y_data, x_data_2, y_data_2
 
-def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.0):
+def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.0, verbose=0):
     """
     Applies a sliding window cropping for data augmentation of the signals recieved as input and outputs them
     as numpy arrays.
@@ -403,15 +403,22 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
         - offset: sliding window offset (deslocation);
     
     Optional Paramters:
-        - split_ratio: ratio for spliting the data into 2 subsets. Default value is 1.0. If the value is different
-        than 1.0, then the data will be splited into 2 subsets and the return of the function will change its'
-        format to: x_data, y_data, x_data_2, y_data_2.
+        - split_ratio: if set to a value in the interval (0,1), then the data will be splited into 2 subsets and
+        the return of the function will change its' format to: x_data, y_data, x_data_2, y_data_2. Default value
+        is 1.0.
+        - verbose: if set to 1, prints how many % of data is currently cropped (for each interval of 10%).
+        Default value is 0.
     """
 
     x_dataL = list()
     x_dataL_2 = list()
     y_dataL = list()
     y_dataL_2 = list()
+
+    if verbose == 1:
+        count = 0
+        data_amount = data_tasks.size() * num_classes
+        print('Data is being cropped: 0%...',end='')
 
     # Checking the split_ratio parameter
     if split_ratio <= 0 or split_ratio > 1:
@@ -422,6 +429,32 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
             for i in range(1, num_classes + 1):
                 x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, data[i-1],
                                                    window_size, offset, i, num_classes)
+
+                if verbose == 1:
+                    count += 1
+                    if count == data_amount:
+                        print('100%')
+                    elif count >= data_amount * 0.9:
+                        print('90%...',end='')
+                    elif count >= data_amount * 0.8:
+                        print('80%...',end='')
+                    elif count >= data_amount * 0.7:
+                        print('70%...',end='')
+                    elif count >= data_amount * 0.6:
+                        print('60%...',end='')
+                    elif count >= data_amount * 0.5:
+                        print('50%...',end='')
+                    elif count >= data_amount * 0.4:
+                        print('40%...',end='')
+                    elif count >= data_amount * 0.3:
+                        print('30%...',end='')
+                    elif count >= data_amount * 0.2:
+                        print('20%...',end='')
+                    elif count >= data_amount * 0.1:
+                        print('10%...',end='')
+
+        if verbose == 1:
+            print('Data is being transformed to an numpy array and being reshaped.')
 
         x_data = np.asarray(x_dataL, dtype = object).astype('float32')
         y_data = np.asarray(y_dataL, dtype = object).astype('float32')
@@ -441,6 +474,32 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
                 x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, data[i-1],
                                                                          window_size, offset, i, num_classes,
                                                                          split_ratio, x_dataL_2, y_dataL_2)
+                
+                if verbose == 1:
+                    count += 1
+                    if count == data_amount:
+                        print('100%')
+                    elif count >= data_amount * 0.9:
+                        print('90%...',end='')
+                    elif count >= data_amount * 0.8:
+                        print('80%...',end='')
+                    elif count >= data_amount * 0.7:
+                        print('70%...',end='')
+                    elif count >= data_amount * 0.6:
+                        print('60%...',end='')
+                    elif count >= data_amount * 0.5:
+                        print('50%...',end='')
+                    elif count >= data_amount * 0.4:
+                        print('40%...',end='')
+                    elif count >= data_amount * 0.3:
+                        print('30%...',end='')
+                    elif count >= data_amount * 0.2:
+                        print('20%...',end='')
+                    elif count >= data_amount * 0.1:
+                        print('10%...',end='')
+
+        if verbose == 1:
+            print('Data is being transformed to an numpy array and being reshaped.')
 
         x_data = np.asarray(x_dataL, dtype = object).astype('float32')
         x_data_2 = np.asarray(x_dataL_2, dtype = object).astype('float32')
@@ -475,7 +534,7 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 #         - test_tasks: list that contains the numbers of the experimental runs that will be used to create testing
 #         data.
 #         - num_classes: total number of classes (individuals);
-#         - filter: a list with length 2, where the first value is the lowcut of the band-pass filter used in
+#         - filter: a list with size 2, where the first value is the lowcut of the band-pass filter used in
 #         pre-processing, and the second value is the highcut;
 #         - sample_frequency: frequency of the sampling;
 #         - window_size: sliding window size;
