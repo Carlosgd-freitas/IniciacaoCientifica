@@ -194,25 +194,25 @@ def filter_data(data, filter, sample_frequency, filter_order, filter_type, verbo
 
         if verbose == 1:
             count += 1
-            if count == data.size():
+            if count == len(data):
                 print('100%')
-            elif count >= data.size() * 0.9:
+            elif count >= len(data) * 0.9:
                 print('90%...',end='')
-            elif count >= data.size() * 0.8:
+            elif count >= len(data) * 0.8:
                 print('80%...',end='')
-            elif count >= data.size() * 0.7:
+            elif count >= len(data) * 0.7:
                 print('70%...',end='')
-            elif count >= data.size() * 0.6:
+            elif count >= len(data) * 0.6:
                 print('60%...',end='')
-            elif count >= data.size() * 0.5:
+            elif count >= len(data) * 0.5:
                 print('50%...',end='')
-            elif count >= data.size() * 0.4:
+            elif count >= len(data) * 0.4:
                 print('40%...',end='')
-            elif count >= data.size() * 0.3:
+            elif count >= len(data) * 0.3:
                 print('30%...',end='')
-            elif count >= data.size() * 0.2:
+            elif count >= len(data) * 0.2:
                 print('20%...',end='')
-            elif count >= data.size() * 0.1:
+            elif count >= len(data) * 0.1:
                 print('10%...',end='')
     
     return filtered_data
@@ -296,25 +296,25 @@ def normalize_data(data, normalize_type, verbose = 0):
 
         if verbose == 1:
             count += 1
-            if count == data.size():
+            if count == len(data):
                 print('100%')
-            elif count >= data.size() * 0.9:
+            elif count >= len(data) * 0.9:
                 print('90%...',end='')
-            elif count >= data.size() * 0.8:
+            elif count >= len(data) * 0.8:
                 print('80%...',end='')
-            elif count >= data.size() * 0.7:
+            elif count >= len(data) * 0.7:
                 print('70%...',end='')
-            elif count >= data.size() * 0.6:
+            elif count >= len(data) * 0.6:
                 print('60%...',end='')
-            elif count >= data.size() * 0.5:
+            elif count >= len(data) * 0.5:
                 print('50%...',end='')
-            elif count >= data.size() * 0.4:
+            elif count >= len(data) * 0.4:
                 print('40%...',end='')
-            elif count >= data.size() * 0.3:
+            elif count >= len(data) * 0.3:
                 print('30%...',end='')
-            elif count >= data.size() * 0.2:
+            elif count >= len(data) * 0.2:
                 print('20%...',end='')
-            elif count >= data.size() * 0.1:
+            elif count >= len(data) * 0.1:
                 print('10%...',end='')
 
     return normalized_data
@@ -417,7 +417,7 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
     if verbose == 1:
         count = 0
-        data_amount = data_tasks.size() * num_classes
+        data_amount = len(data_tasks) * num_classes
         print('Data is being cropped: 0%...',end='')
 
     # Checking the split_ratio parameter
