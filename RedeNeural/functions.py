@@ -162,7 +162,7 @@ def pre_processing(content, lowcut, highcut, frequency, filter_order, filter_typ
 
     return content
 
-def filter_data(data, filter, sample_frequency, filter_order, filter_type):
+def filter_data(data, filter, sample_frequency, filter_order, filter_type, verbose=0):
     """
     Takes a list of raw signals as input, applies a band-pass filter on each of them and outputs them as a list.
 
@@ -177,12 +177,43 @@ def filter_data(data, filter, sample_frequency, filter_order, filter_type):
         - filter_type: type of the filter used:
             * 'sosfilt': using the sosfilt() function from the scipy library.
             * 'filtfilt': using the firwin() and filtfilt() functions from the scipy library.
+    
+    Optional Parameters:
+        - verbose: if set to 1, prints how many % of data is currently filtered (for each interval of 10%).
+        Default value is 0.
     """
 
     filtered_data = list()
 
+    if verbose == 1:
+        count = 0
+        print('Data is being filtered: 0%...',end='')
+
     for signal in data:
         filtered_data.append(pre_processing(signal, filter[0], filter[1], sample_frequency, filter_order, filter_type))
+
+        if verbose == 1:
+            count += 1
+            if count == data.length():
+                print('100%')
+            elif count >= data.length() * 0.9:
+                print('90%...',end='')
+            elif count >= data.length() * 0.8:
+                print('80%...',end='')
+            elif count >= data.length() * 0.7:
+                print('70%...',end='')
+            elif count >= data.length() * 0.6:
+                print('60%...',end='')
+            elif count >= data.length() * 0.5:
+                print('50%...',end='')
+            elif count >= data.length() * 0.4:
+                print('40%...',end='')
+            elif count >= data.length() * 0.3:
+                print('30%...',end='')
+            elif count >= data.length() * 0.2:
+                print('20%...',end='')
+            elif count >= data.length() * 0.1:
+                print('10%...',end='')
     
     return filtered_data
 
@@ -235,7 +266,7 @@ def normalize_signal(content, normalize_type):
 
     return content
 
-def normalize_data(data, normalize_type):
+def normalize_data(data, normalize_type, verbose=0):
     """
     Takes a list of signals as input, normalizes and outputs them as a list.
 
@@ -248,16 +279,47 @@ def normalize_data(data, normalize_type):
             minimum and maximum values, which will be applied only to themselves in order to normalize them.
             * 'all_channels': all channels of the EEG signal will be used to compute the mean, standard deviation,
             minimum and maximum values, which will be applied to each signal in order to normalize them.
+    
+    Optional Parameters:
+        - verbose: if set to 1, prints how many % of data is currently filtered (for each interval of 10%).
+        Default value is 0.
     """
 
     normalized_data = list()
 
+    if verbose == 1:
+        count = 0
+        print('Data is being normalized: 0%...',end='')
+
     for signal in data:
         normalized_data.append(normalize_signal(signal, normalize_type))
 
+        if verbose == 1:
+            count += 1
+            if count == data.length():
+                print('100%')
+            elif count >= data.length() * 0.9:
+                print('90%...',end='')
+            elif count >= data.length() * 0.8:
+                print('80%...',end='')
+            elif count >= data.length() * 0.7:
+                print('70%...',end='')
+            elif count >= data.length() * 0.6:
+                print('60%...',end='')
+            elif count >= data.length() * 0.5:
+                print('50%...',end='')
+            elif count >= data.length() * 0.4:
+                print('40%...',end='')
+            elif count >= data.length() * 0.3:
+                print('30%...',end='')
+            elif count >= data.length() * 0.2:
+                print('20%...',end='')
+            elif count >= data.length() * 0.1:
+                print('10%...',end='')
+
     return normalized_data
 
-def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, num_classes, train_val_ratio=1.0, x_data_2=0, y_data_2=0):
+def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, num_classes, split_ratio=1.0, x_data_2=0, y_data_2=0):
     """
     Crops a content (EEG signal) and returns the processed signal and its' respective label using a sliding
     window.
@@ -277,8 +339,8 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
         - num_classes: total number of classes.
     
     Optional Parameters:
-        - train_val_ratio: a number in the interval (0,1]. (train_val_ratio * 100)% of the processed signals will be
-        stored in x_data and y_data, and [100 - (train_val_ratio * 100)]% will be stored in x_data_2 and y_data_2.
+        - split_ratio: a number in the interval (0,1]. (split_ratio * 100)% of the processed signals will be
+        stored in x_data and y_data, and [100 - (split_ratio * 100)]% will be stored in x_data_2 and y_data_2.
         This number is 1.0 by default, corresponding to 100% of the data being stored in x_data and y_data, and
         x_data_2 and y_data_2 not being used nor returned; 
         - x_data_2: list that stores the processed signals;
@@ -294,13 +356,13 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
     elif offset == 0:
         print('ERROR: An offset equals to 0 would result in "infinite" equal windows.')
         return x_data, y_data
-    # Checking the train_val_ratio parameter
-    elif train_val_ratio <= 0 or train_val_ratio > 1:
-        print('ERROR: The train_val_ratio parameter needs to be in the interval (0,1].')
+    # Checking the split_ratio parameter
+    elif split_ratio <= 0 or split_ratio > 1:
+        print('ERROR: The split_ratio parameter needs to be in the interval (0,1].')
         return x_data, y_data
     else:
         i = window_size
-        while i <= content.shape[1] * train_val_ratio:
+        while i <= content.shape[1] * split_ratio:
             arr = content[: , (i-window_size):i]
             x_data.append(arr)
 
@@ -310,7 +372,7 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
 
             i += offset
 
-        if train_val_ratio == 1.0:
+        if split_ratio == 1.0:
             return x_data, y_data
         
         while i <= content.shape[1]:
@@ -325,69 +387,77 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
 
         return x_data, y_data, x_data_2, y_data_2
 
-def crop_data(train_tasks, test_tasks, train_content, test_content, num_classes, window_size, offset, train_val_ratio):
+def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.0):
     """
-    Applies a sliding window cropping for data augmentation of the signals used for training (train_content) and
-    testing (test_content), and returns the processed signals and labels for training (x_train and y_train),
-    validation (x_val and y_val) and testing (x_test and y_test) as numpy arrays.
+    Applies a sliding window cropping for data augmentation of the signals recieved as input and outputs them
+    as numpy arrays.
 
-    The return of this function is in the format: x_train, x_val, x_test, y_train, y_val, y_test.
+    The default return of this function is in the format: x_data, y_data.
 
     Parameters:
-        - train_tasks: list containing the numbers of the experimental runs that will be used to create train
-        and validation data;
-        - test_tasks: list containing the numbers of the experimental runs that will be used to create testing
-        data;
-        - train_content: list containing the EEG signals that will be used to to create train and validation data;
-        - test_content: list containing the EEG signals that will be used to to create testing data;
+        - data: list of signals that will be processed;
+        - data_tasks: list containing the numbers of the experimental runs that were used to compose the data
+        in load_data();
         - num_classes: total number of classes (individuals);
         - window_size: sliding window size;
         - offset: sliding window offset (deslocation);
-        - train_val_ratio: ratio for composing training and validation data.
+    
+    Optional Paramters:
+        - split_ratio: ratio for spliting the data into 2 subsets. Default value is 1.0. If the value is different
+        than 1.0, then the data will be splited into 2 subsets and the return of the function will change its'
+        format to: x_data, y_data, x_data_2, y_data_2.
     """
 
-    # Processing x_train, y_train, x_val and y_val
-    x_trainL = list()
-    x_valL = list()
-    y_trainL = list()
-    y_valL = list()
+    x_dataL = list()
+    x_dataL_2 = list()
+    y_dataL = list()
+    y_dataL_2 = list()
 
-    for train_task in train_tasks:
-        for i in range(1, num_classes + 1):
-            x_trainL, y_trainL, x_valL, y_valL = signal_cropping(x_trainL, y_trainL, train_content[i-1],
-                                                                 window_size, offset, i, num_classes,
-                                                                 train_val_ratio, x_valL, y_valL)
-    
-    x_train = np.asarray(x_trainL, dtype = object).astype('float32')
-    x_val = np.asarray(x_valL, dtype = object).astype('float32')
-    y_train = np.asarray(y_trainL, dtype = object).astype('float32')
-    y_val = np.asarray(y_valL, dtype = object).astype('float32')
+    # Checking the split_ratio parameter
+    if split_ratio <= 0 or split_ratio > 1:
+        print('ERROR: The split_ratio parameter needs to be in the interval (0,1].')
+        return None
+    elif split_ratio == 1:
+        for task in data_tasks:
+            for i in range(1, num_classes + 1):
+                x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, data[i-1],
+                                                   window_size, offset, i, num_classes)
 
-    # Processing x_test and y_test
-    x_testL = list()
-    y_testL = list()
+        x_data = np.asarray(x_dataL, dtype = object).astype('float32')
+        y_data = np.asarray(y_dataL, dtype = object).astype('float32')
 
-    for test_task in test_tasks:
-        for i in range(1, num_classes + 1):
-            x_testL, y_testL = signal_cropping(x_testL, y_testL, test_content[i-1],
-                                               window_size, window_size, i, num_classes)
+        # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
+        # input shape of the CNN is "a x window_size x num_channels".
+        x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
 
-    x_test = np.asarray(x_testL, dtype = object).astype('float32')
-    y_test = np.asarray(y_testL, dtype = object).astype('float32')
+        # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
+        # is "a x num_classes".
+        y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
 
-    # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
-    # input shape of the CNN is "a x window_size x num_channels".
-    x_train = x_train.reshape(x_train.shape[0], x_train.shape[2], x_train.shape[1])
-    x_val = x_val.reshape(x_val.shape[0], x_val.shape[2], x_val.shape[1])
-    x_test = x_test.reshape(x_test.shape[0], x_test.shape[2], x_test.shape[1])
+        return x_data, y_data
+    else:
+        for task in data_tasks:
+            for i in range(1, num_classes + 1):
+                x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, data[i-1],
+                                                                         window_size, offset, i, num_classes,
+                                                                         split_ratio, x_dataL_2, y_dataL_2)
 
-    # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
-    # is "a x num_classes".
-    y_train = y_train.reshape(y_train.shape[0], y_train.shape[2])
-    y_val = y_val.reshape(y_val.shape[0], y_val.shape[2])
-    y_test = y_test.reshape(y_test.shape[0], y_test.shape[2])
+        x_data = np.asarray(x_dataL, dtype = object).astype('float32')
+        x_data_2 = np.asarray(x_dataL_2, dtype = object).astype('float32')
+        y_data = np.asarray(y_dataL, dtype = object).astype('float32')
+        y_data_2 = np.asarray(y_dataL_2, dtype = object).astype('float32')
 
-    return x_train, x_val, x_test, y_train, y_val, y_test
+        # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
+        # input shape of the CNN is "a x window_size x num_channels".
+        x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
+        x_data_2 = x_data_2.reshape(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
+
+        # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
+        # is "a x num_classes".
+        y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
+        y_data_2 = y_data_2.reshape(y_data_2.shape[0], y_data_2.shape[2])
+
+        return x_data, y_data, x_data_2, y_data_2
 
 # def load_data(folder_path, train_tasks, test_tasks, num_classes, filter, sample_frequency, window_size, offset, train_val_ratio, verbose=0):
 #     """

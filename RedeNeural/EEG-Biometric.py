@@ -34,7 +34,7 @@ normalize_type = 'each_channel' # Type of the normalization that will be applied
 # Parameters used in functions.crop_data()
 window_size = 1920              # Sliding window size, used when composing the dataset
 offset = 35                     # Sliding window offset (deslocation), used when composing the dataset
-train_val_ratio = 0.9           # 90% for training | 10% for validation
+split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
 num_channels = 64               # Number of channels in an EEG signal
@@ -83,19 +83,20 @@ model = models.create_model(window_size, num_channels, num_classes)
 model.summary()
 
 # Loading the raw data
-train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, num_classes)   
+train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, num_classes, verbose=1)   
 
 # Filtering the raw data
-train_content = functions.filter_data(train_content, band_pass_1, sample_frequency, filter_order, filter_type)
-test_content = functions.filter_data(test_content, band_pass_1, sample_frequency, filter_order, filter_type)
+train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, verbose=1)
+test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, verbose=1)
 
 # Normalize the filtered data
-train_content = functions.normalize_data(train_content, normalize_type)
-test_content = functions.normalize_data(test_content, normalize_type)
+train_content = functions.normalize_data(train_content, normalize_type, verbose=1)
+test_content = functions.normalize_data(test_content, normalize_type, verbose=1)
 
 # Apply data augmentation (sliding window cropping) on normalized data
-x_train, x_val, x_test, y_train, y_val, y_test = functions.crop_data(train_tasks, test_tasks, train_content, test_content,
-                                                                     num_classes, window_size, offset, train_val_ratio)
+x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
+                                                     window_size, offset, split_ratio)
+x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, window_size, window_size)
 
 # Printing data formats
 print('\nData formats:')
