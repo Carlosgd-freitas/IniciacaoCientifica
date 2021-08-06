@@ -166,34 +166,34 @@ def verbose_each_10_percent(count, data_amount, flag):
     """
     Auxiliar function for optional verbose on other functions.
     """
-    if count == data_amount and flag != 10:
+    if count == data_amount and flag < 10:
         print('100%')
         flag = 10
-    elif count >= data_amount * 0.9 and flag != 9:
+    elif count >= data_amount * 0.9 and flag < 9:
         print('90%...',end='')
         flag = 9
-    elif count >= data_amount * 0.8 and flag != 8:
+    elif count >= data_amount * 0.8 and flag < 8:
         print('80%...',end='')
         flag = 8
-    elif count >= data_amount * 0.7 and flag != 7:
+    elif count >= data_amount * 0.7 and flag < 7:
         print('70%...',end='')
         flag = 7
-    elif count >= data_amount * 0.6 and flag != 6:
+    elif count >= data_amount * 0.6 and flag < 6:
         print('60%...',end='')
         flag = 6
-    elif count >= data_amount * 0.5 and flag != 5:
+    elif count >= data_amount * 0.5 and flag < 5:
         print('50%...',end='')
         flag = 5
-    elif count >= data_amount * 0.4 and flag != 4:
+    elif count >= data_amount * 0.4 and flag < 4:
         print('40%...',end='')
         flag = 4
-    elif count >= data_amount * 0.3 and flag != 3:
+    elif count >= data_amount * 0.3 and flag < 3:
         print('30%...',end='')
         flag = 3
-    elif count >= data_amount * 0.2 and flag != 2:
+    elif count >= data_amount * 0.2 and flag < 2:
         print('20%...',end='')
         flag = 2
-    elif count >= data_amount * 0.1 and flag != 1:
+    elif count >= data_amount * 0.1 and flag < 1:
         print('10%...',end='')
         flag = 1
     
