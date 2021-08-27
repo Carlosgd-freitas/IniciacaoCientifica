@@ -3,6 +3,7 @@ from tensorflow.keras.layers import Dense, Dropout, Flatten, Conv1D, MaxPooling1
 from tensorflow.keras.layers import Concatenate, GlobalAveragePooling1D, Reshape, Activation, Permute, Multiply
 from tensorflow.keras.layers import MultiHeadAttention, LayerNormalization, Bidirectional, LSTM, GRU
 from tensorflow.keras import Input, Model
+import tensorflow.keras.backend as K
 
 def scheduler(current_epoch, learning_rate):
     """
@@ -281,7 +282,8 @@ def create_model_LSTM(window_size, num_channels, num_classes, remove_last_layer=
     #x = LSTM(128, return_sequences=True) (x)
     #x = LSTM(128, return_sequences=True) (x)
     #x = LSTM(128, return_sequences=True) (x)
-    x = Bidirectional(LSTM(128)) (inputs)
+    x = K.constant(inputs)
+    x = Bidirectional(LSTM(128)) (x)
 
     x = Flatten() (x)
     x = Dense(4096)(x)
