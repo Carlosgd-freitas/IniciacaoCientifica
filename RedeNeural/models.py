@@ -264,7 +264,7 @@ def create_model_transformers(window_size, num_channels, num_classes, remove_las
 
 def create_model_LSTM(window_size, num_channels, num_classes, remove_last_layer=False):
     """
-    Creates and returns the CNN model using LSTM and GRU Blocks.
+    Creates and returns the CNN model using LSTM layers.
 
     Parameters:
         - window_size: sliding window size, used when composing the dataset;
@@ -277,10 +277,50 @@ def create_model_LSTM(window_size, num_channels, num_classes, remove_last_layer=
 
     inputs = Input(shape=(window_size, num_channels))
     
-    x = Bidirectional(LSTM(96, return_sequences=True)) (inputs)
-    x = Bidirectional(LSTM(96, return_sequences=True)) (x)
-    x = Bidirectional(LSTM(96, return_sequences=True)) (x)
-    x = Bidirectional(LSTM(96)) (x)
+    x = Bidirectional(LSTM(128, return_sequences=True)) (inputs)
+    x = Bidirectional(LSTM(128, return_sequences=True)) (x)
+    x = Bidirectional(LSTM(128, return_sequences=True)) (x)
+    x = Bidirectional(LSTM(128, return_sequences=True)) (x)
+    x = Bidirectional(LSTM(128)) (x)
+
+    x = Flatten() (x)
+    x = Dense(4096)(x)
+    x = Dense(4096)(x)
+    x = Dense(256)(x)
+
+    # Model used for Identification
+    if(remove_last_layer == False):
+        x = BatchNormalization()(x)
+        x = Dropout(0.1) (x)
+        x = Dense(num_classes, activation='softmax') (x)
+        model = Model(inputs=inputs, outputs=x, name='Biometric_for_Identification')
+        
+    # Model used for Verification
+    else:
+        model = Model(inputs=inputs, outputs=x, name='Biometric_for_Verification')
+
+    return model
+
+def create_model_GRU(window_size, num_channels, num_classes, remove_last_layer=False):
+    """
+    Creates and returns the CNN model using GRU layers.
+
+    Parameters:
+        - window_size: sliding window size, used when composing the dataset;
+        - num_channels: number of channels in an EEG signal;
+        - num_classes: total number of classes (individuals).
+    Optional Parameters:
+        - remove_last_layer: if True, the model created won't have the fully connected block at the end with a
+        softmax activation function.
+    """
+
+    inputs = Input(shape=(window_size, num_channels))
+    
+    x = Bidirectional(GRU(128, return_sequences=True)) (inputs)
+    x = Bidirectional(GRU(128, return_sequences=True)) (x)
+    x = Bidirectional(GRU(128, return_sequences=True)) (x)
+    x = Bidirectional(GRU(128, return_sequences=True)) (x)
+    x = Bidirectional(GRU(128)) (x)
 
     x = Flatten() (x)
     x = Dense(4096)(x)

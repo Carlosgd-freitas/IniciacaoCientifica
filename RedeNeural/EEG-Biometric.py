@@ -76,10 +76,12 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # band_pass_3 = 3.4862% / 0.8253% / 6.5402
 
 # Creating the model
-model = models.create_model(window_size, num_channels, num_classes)
+# model = models.create_model(window_size, num_channels, num_classes)
 # model = models.create_model_inception(window_size, num_channels, num_classes)
 # model = models.create_model_SE(window_size, num_channels, num_classes)
 # model = models.create_model_transformers(window_size, num_channels, num_classes)
+model = models.create_model_LSTM(window_size, num_channels, num_classes)
+# model = models.create_model_GRU(window_size, num_channels, num_classes)
 model.summary()
 
 # Loading the raw data
@@ -181,6 +183,9 @@ print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
 # Model with LSTM
 model_for_verification = models.create_model_LSTM(window_size, num_channels, num_classes, True)
+
+# Model with GRU
+# model_for_verification = models.create_model_GRU(window_size, num_channels, num_classes, True)
 
 model_for_verification.summary()
 model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
