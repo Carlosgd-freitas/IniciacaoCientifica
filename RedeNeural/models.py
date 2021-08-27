@@ -283,7 +283,6 @@ def create_model_LSTM(window_size, num_channels, num_classes, remove_last_layer=
     #x = LSTM(128, return_sequences=True) (x)
     #x = LSTM(128, return_sequences=True) (x)
     x = convert_to_tensor(inputs)
-    x = Bidirectional(LSTM(128), return_sequences=True) (x)
     x = Bidirectional(LSTM(128)) (x)
 
     x = Flatten() (x)
