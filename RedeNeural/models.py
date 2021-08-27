@@ -276,30 +276,22 @@ def create_model_LSTM(window_size, num_channels, num_classes, remove_last_layer=
         softmax activation function.
     """
 
-    # inputs = Input(shape=(window_size, num_channels))
-    
-    #x = LSTM(128, return_sequences=True) (inputs)
-    #x = LSTM(128, return_sequences=True) (x)
-    #x = LSTM(128, return_sequences=True) (x)
-    #x = LSTM(128, return_sequences=True) (x)
-    #x = convert_to_tensor(inputs)
-    inputs = Bidirectional(LSTM(128), input_shape=(window_size, num_channels))
+    model = None
 
-    x = Flatten() (inputs)
-    x = Dense(4096)(x)
-    x = Dense(4096)(x)
-    x = Dense(256)(x)
+    if(remove_last_layer == False):
+        model = Sequential(name='Biometric_for_Identification')
+    else:
+        model = Sequential(name='Biometric_for_Verification')
+
+    model.add(Bidirectional(LSTM(10, return_sequences=True), input_shape=(window_size, num_channels)))
+    model.add(Bidirectional(LSTM(10)))
+    model.add(Dense(5))
 
     # Model used for Identification
     if(remove_last_layer == False):
-        x = BatchNormalization()(x)
-        x = Dropout(0.1) (x)
-        x = Dense(num_classes, activation='softmax') (x)
-        model = Model(inputs=inputs, outputs=x, name='Biometric_for_Identification')
-        
-    # Model used for Verification
-    else:
-        model = Model(inputs=inputs, outputs=x, name='Biometric_for_Verification')
+        model.add(BatchNormalization())
+        model.add(Dropout(0.1))
+        model.add(Dense(num_classes, activation='softmax'))
 
     return model
 
