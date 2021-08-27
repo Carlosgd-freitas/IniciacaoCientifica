@@ -1,6 +1,6 @@
 import models
 import functions
-import genetic_algorithm as ga
+# import genetic_algorithm as ga
 
 import numpy as np
 import matplotlib.pyplot as plt
