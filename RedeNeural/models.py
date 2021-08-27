@@ -1,7 +1,7 @@
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Flatten, Conv1D, MaxPooling1D, BatchNormalization
 from tensorflow.keras.layers import Concatenate, GlobalAveragePooling1D, Reshape, Activation, Permute, Multiply
-from tensorflow.keras.layers import MultiHeadAttention, LayerNormalization
+from tensorflow.keras.layers import MultiHeadAttention, LayerNormalization, Bidirectional, LSTM, GRU
 from tensorflow.keras import Input, Model
 
 def scheduler(current_epoch, learning_rate):
@@ -243,6 +243,44 @@ def create_model_transformers(window_size, num_channels, num_classes, remove_las
     x = Conv1D(256, (9), activation='relu') (x)
     x = BatchNormalization() (x)
     x = MaxPooling1D(strides=2) (x)
+
+    x = Flatten() (x)
+    x = Dense(4096)(x)
+    x = Dense(4096)(x)
+    x = Dense(256)(x)
+
+    # Model used for Identification
+    if(remove_last_layer == False):
+        x = BatchNormalization()(x)
+        x = Dropout(0.1) (x)
+        x = Dense(num_classes, activation='softmax') (x)
+        model = Model(inputs=inputs, outputs=x, name='Biometric_for_Identification')
+        
+    # Model used for Verification
+    else:
+        model = Model(inputs=inputs, outputs=x, name='Biometric_for_Verification')
+
+    return model
+
+def create_model_LSTM(window_size, num_channels, num_classes, remove_last_layer=False):
+    """
+    Creates and returns the CNN model using LSTM and GRU Blocks.
+
+    Parameters:
+        - window_size: sliding window size, used when composing the dataset;
+        - num_channels: number of channels in an EEG signal;
+        - num_classes: total number of classes (individuals).
+    Optional Parameters:
+        - remove_last_layer: if True, the model created won't have the fully connected block at the end with a
+        softmax activation function.
+    """
+
+    inputs = Input(shape=(window_size, num_channels))
+    
+    x = Bidirectional(LSTM(96, return_sequences=True)) (inputs)
+    x = Bidirectional(LSTM(96, return_sequences=True)) (x)
+    x = Bidirectional(LSTM(96, return_sequences=True)) (x)
+    x = Bidirectional(LSTM(96)) (x)
 
     x = Flatten() (x)
     x = Dense(4096)(x)

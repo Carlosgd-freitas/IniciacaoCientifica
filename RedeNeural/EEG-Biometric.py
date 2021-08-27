@@ -1,5 +1,6 @@
 import models
 import functions
+import genetic_algorithm as ga
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -106,6 +107,9 @@ print(f'y_train: {y_train.shape}')
 print(f'y_val: {y_val.shape}')
 print(f'y_test: {y_test.shape}\n')
 
+# Running the genetic algorithm
+# ga.genetic_run()
+
 # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
 model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
@@ -164,7 +168,7 @@ print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 # Removing the last layers of the model and getting the features array
 
 # Using default model
-model_for_verification = models.create_model(window_size, num_channels, num_classes, True) 
+# model_for_verification = models.create_model(window_size, num_channels, num_classes, True) 
 
 # Model with inception blocks
 # model_for_verification = models.create_model_with_inception(window_size, num_channels, num_classes, True)
@@ -174,6 +178,9 @@ model_for_verification = models.create_model(window_size, num_channels, num_clas
 
 # Model with transformers
 # model_for_verification = models.create_model_transformers(window_size, num_channels, num_classes, True)
+
+# Model with LSTM
+model_for_verification = models.create_model_LSTM(window_size, num_channels, num_classes, True)
 
 model_for_verification.summary()
 model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
