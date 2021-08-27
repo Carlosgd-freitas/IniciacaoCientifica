@@ -276,16 +276,16 @@ def create_model_LSTM(window_size, num_channels, num_classes, remove_last_layer=
         softmax activation function.
     """
 
-    inputs = Input(shape=(window_size, num_channels))
+    # inputs = Input(shape=(window_size, num_channels))
     
     #x = LSTM(128, return_sequences=True) (inputs)
     #x = LSTM(128, return_sequences=True) (x)
     #x = LSTM(128, return_sequences=True) (x)
     #x = LSTM(128, return_sequences=True) (x)
-    x = convert_to_tensor(inputs)
-    x = Bidirectional(LSTM(128)) (x)
+    #x = convert_to_tensor(inputs)
+    inputs = Bidirectional(LSTM(128), input_shape=(window_size, num_channels))
 
-    x = Flatten() (x)
+    x = Flatten() (inputs)
     x = Dense(4096)(x)
     x = Dense(4096)(x)
     x = Dense(256)(x)
