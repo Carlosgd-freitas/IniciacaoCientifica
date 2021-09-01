@@ -363,8 +363,9 @@ def genetic_run():
     num_generations = 5 # num of time we generate new population
 
     # creator.create("FitnessMax1", base.Fitness, weights=(-1.0,) * 1)
-    creator.create("FitnessMax1", base.Fitness, weights=[0.01])
-    creator.create("Individual1", array.array, typecode='d', fitness=creator.FitnessMax1)
+    creator.create("FitnessMax1", base.Fitness, weights=(1.0,))
+    # creator.create("Individual1", array.array, typecode='d', fitness=creator.FitnessMax1)
+    creator.create("Individual1", list, fitness=creator.FitnessMax1)
 
     number_of_variables = max_dense_layers*5 + 1 # convlayers, GAPlayer, denselayers, optimizer
 
