@@ -6,10 +6,10 @@ from deap import algorithms, base, tools, creator
 from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.utils import get_custom_objects
-from keras.backend import sigmoid
-from keras.layers import Activation
-from keras.layers import Dense
-from keras.models import Model
+from tensorflow.keras.backend import sigmoid
+from tensorflow.keras.layers import Activation
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.models import Model
 import array, random
 
 np.random.seed(42)

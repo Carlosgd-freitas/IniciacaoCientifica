@@ -15,11 +15,11 @@ training_epochs = 60            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
-folder_path = './Dataset/'
-# folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/'
+# folder_path = './Dataset/'
+folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/'
 train_tasks = [1]               # Tasks used for training and validation
 test_tasks = [2]                # Tasks used for testing
-num_classes = 10#9               # Total number of classes (individuals)
+num_classes = 109               # Total number of classes (individuals)
 
 # Parameters used in functions.filter_data()
 band_pass_1 = [1, 50]           # First filter option, 1~50Hz
@@ -34,7 +34,7 @@ normalize_type = 'each_channel' # Type of the normalization that will be applied
 
 # Parameters used in functions.crop_data()
 window_size = 1920              # Sliding window size, used when composing the dataset
-offset = 200 #35                     # Sliding window offset (deslocation), used when composing the dataset
+offset = 35                     # Sliding window offset (deslocation), used when composing the dataset
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
