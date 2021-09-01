@@ -1,6 +1,6 @@
 import models
 import functions
-# import genetic_algorithm as ga
+import genetic_algorithm as ga
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,11 +15,11 @@ training_epochs = 60            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
-# folder_path = './Dataset/'
-folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/'
+folder_path = './Dataset/'
+# folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/'
 train_tasks = [1]               # Tasks used for training and validation
 test_tasks = [2]                # Tasks used for testing
-num_classes = 109               # Total number of classes (individuals)
+num_classes = 10#9               # Total number of classes (individuals)
 
 # Parameters used in functions.filter_data()
 band_pass_1 = [1, 50]           # First filter option, 1~50Hz
@@ -34,7 +34,7 @@ normalize_type = 'each_channel' # Type of the normalization that will be applied
 
 # Parameters used in functions.crop_data()
 window_size = 1920              # Sliding window size, used when composing the dataset
-offset = 35                     # Sliding window offset (deslocation), used when composing the dataset
+offset = 200 #35                     # Sliding window offset (deslocation), used when composing the dataset
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
@@ -76,11 +76,11 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # band_pass_3 = 3.4862% / 0.8253% / 6.5402
 
 # Creating the model
-# model = models.create_model(window_size, num_channels, num_classes)
+model = models.create_model(window_size, num_channels, num_classes)
 # model = models.create_model_inception(window_size, num_channels, num_classes)
 # model = models.create_model_SE(window_size, num_channels, num_classes)
 # model = models.create_model_transformers(window_size, num_channels, num_classes)
-model = models.create_model_LSTM(window_size, num_channels, num_classes)
+# model = models.create_model_LSTM(window_size, num_channels, num_classes)
 # model = models.create_model_GRU(window_size, num_channels, num_classes)
 model.summary()
 
@@ -110,62 +110,62 @@ print(f'y_val: {y_val.shape}')
 print(f'y_test: {y_test.shape}\n')
 
 # Running the genetic algorithm
-# ga.genetic_run()
+ga.genetic_run()
 
 # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
-opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
-model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-callback = LearningRateScheduler(models.scheduler, verbose=0)
-results = model.fit(x_train,
-                    y_train,
-                    batch_size = batch_size,
-                    epochs = training_epochs,
-                    callbacks = [callback],
-                    validation_data = (x_val, y_val)
-                    )
+# opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
+# model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+# callback = LearningRateScheduler(models.scheduler, verbose=0)
+# results = model.fit(x_train,
+#                     y_train,
+#                     batch_size = batch_size,
+#                     epochs = training_epochs,
+#                     callbacks = [callback],
+#                     validation_data = (x_val, y_val)
+#                     )
 
 # Saving model weights
-model.save('model_weights.h5')
+# model.save('model_weights.h5')
 
 # Evaluate the model to see the accuracy
-print('\nEvaluating on training set...')
-(loss, accuracy) = model.evaluate(x_train, y_train, verbose = 0)
-print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+# print('\nEvaluating on training set...')
+# (loss, accuracy) = model.evaluate(x_train, y_train, verbose = 0)
+# print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
 
-print('Evaluating on validation set...')
-(loss, accuracy) = model.evaluate(x_val, y_val, verbose = 0)
-print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+# print('Evaluating on validation set...')
+# (loss, accuracy) = model.evaluate(x_val, y_val, verbose = 0)
+# print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
 
-print('Evaluating on testing set...')
-(loss, accuracy) = model.evaluate(x_test, y_test, verbose = 0)
-print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+# print('Evaluating on testing set...')
+# (loss, accuracy) = model.evaluate(x_test, y_test, verbose = 0)
+# print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
 
 # Summarize history for accuracy
-plt.subplot(211)
-plt.plot(results.history['accuracy'])
-plt.plot(results.history['val_accuracy'])
-plt.title('model accuracy')
-plt.ylabel('accuracy')
-plt.xlabel('epoch')
-plt.legend(['train', 'test'])
+# plt.subplot(211)
+# plt.plot(results.history['accuracy'])
+# plt.plot(results.history['val_accuracy'])
+# plt.title('model accuracy')
+# plt.ylabel('accuracy')
+# plt.xlabel('epoch')
+# plt.legend(['train', 'test'])
 
 # Summarize history for loss
-plt.subplot(212)
-plt.plot(results.history['loss'])
-plt.plot(results.history['val_loss'])
-plt.title('model loss')
-plt.ylabel('loss')
-plt.xlabel('epoch')
-plt.legend(['train', 'test'])
-plt.tight_layout()
-plt.savefig(r'accuracy-loss.png', format='png')
-plt.show()
+# plt.subplot(212)
+# plt.plot(results.history['loss'])
+# plt.plot(results.history['val_loss'])
+# plt.title('model loss')
+# plt.ylabel('loss')
+# plt.xlabel('epoch')
+# plt.legend(['train', 'test'])
+# plt.tight_layout()
+# plt.savefig(r'accuracy-loss.png', format='png')
+# plt.show()
 
-max_loss = np.max(results.history['loss'])
-min_loss = np.min(results.history['loss'])
-print("Maximum Loss : {:.4f}".format(max_loss))
-print("Minimum Loss : {:.4f}".format(min_loss))
-print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
+# max_loss = np.max(results.history['loss'])
+# min_loss = np.min(results.history['loss'])
+# print("Maximum Loss : {:.4f}".format(max_loss))
+# print("Minimum Loss : {:.4f}".format(min_loss))
+# print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
 # Removing the last layers of the model and getting the features array
 
@@ -182,18 +182,18 @@ print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 # model_for_verification = models.create_model_transformers(window_size, num_channels, num_classes, True)
 
 # Model with LSTM
-model_for_verification = models.create_model_LSTM(window_size, num_channels, num_classes, True)
+# model_for_verification = models.create_model_LSTM(window_size, num_channels, num_classes, True)
 
 # Model with GRU
 # model_for_verification = models.create_model_GRU(window_size, num_channels, num_classes, True)
 
-model_for_verification.summary()
-model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-model_for_verification.load_weights('model_weights.h5', by_name=True)
-x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+# model_for_verification.summary()
+# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+# model_for_verification.load_weights('model_weights.h5', by_name=True)
+# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 # Calculating EER and Decidability
-y_test_classes = functions.one_hot_encoding_to_classes(y_test)
-d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
-print(f'EER: {eer*100.0} %')
-print(f'Decidability: {d}')
+# y_test_classes = functions.one_hot_encoding_to_classes(y_test)
+# d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
+# print(f'EER: {eer*100.0} %')
+# print(f'Decidability: {d}')
