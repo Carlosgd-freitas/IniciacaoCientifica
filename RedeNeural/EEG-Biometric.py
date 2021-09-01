@@ -191,7 +191,7 @@ def decode(genome, verbose=False):
     dense_layers = max_dense_layers # excluindo a softmax layer
     dense_layer_size = len(dense_layer_shape)
 
-    model = models.create_model()
+    model = models.create_model(window_size, num_channels, num_classes)
     x = model.output
 
     offset = 0
