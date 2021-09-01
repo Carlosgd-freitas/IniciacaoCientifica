@@ -241,7 +241,7 @@ def decode(genome, verbose=False):
 
     return model
 
-def evaluate_individual(genome, x_train, y_train, x_val, y_val): 
+def evaluate_individual(genome): 
     n_epochs = 8
     model = decode(genome, True)
     loss, accuracy, num_parameters = None, None, None
