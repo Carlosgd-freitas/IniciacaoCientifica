@@ -260,7 +260,7 @@ def evaluate_individual(genome):
     fit_params['validation_data'] = (x_val, y_val)
 
     model.fit(**fit_params)
-    loss, accuracy = model.evaluate(x_val, y_val, verbose=0)
+    (loss, accuracy) = model.evaluate(x_val, y_val, verbose=0)
     num_parameters = model.count_params()
 
     return loss
