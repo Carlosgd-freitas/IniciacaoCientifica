@@ -184,7 +184,7 @@ def prepare_toolbox(problem_instance, number_of_variables, bounds_low, bounds_up
     
     return toolbox
 
-def ga(toolbox, tools, pop_size, num_generations, recover_last_run, checkpoint=None):
+def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpoint=None):
     if recover_last_run and checkpoint:
         print("\nRetomando ultima execucao.. ]")
         # A file name has been given, then load the data from the file
