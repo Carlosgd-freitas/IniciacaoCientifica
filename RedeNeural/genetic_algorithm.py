@@ -33,7 +33,7 @@ max_dense_nodes = 512
 
 # fixado para A AD100
 input_shape = (1920, 64) # input_shape = (window_size, num_channels)
-n_classes = 10#9
+n_classes = 109
 
 def decode(genome, verbose=False):
     batch_normalization=True
