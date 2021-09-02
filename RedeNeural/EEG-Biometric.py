@@ -330,6 +330,8 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
         invalid_ind = [ind for ind in population if not ind.fitness.valid]
         fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
+            print(f'ind = {ind}')
+            print(f'fit = {fit}')
             ind.fitness.values = fit
 
         halloffame.update(population)
