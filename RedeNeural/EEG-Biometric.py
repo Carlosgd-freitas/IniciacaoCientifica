@@ -335,7 +335,7 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
             print(f'ind.fitness.values = {ind.fitness.values}')
             print(f'type(ind.fitness.values) = {type(ind.fitness.values)}')
             print(f'fit = {fit}')
-            ind.fitness.values = fit
+            ind.fitness.values = (fit,)
 
         halloffame.update(population)
         record = stats.compile(population)
