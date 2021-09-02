@@ -212,7 +212,6 @@ def decode(genome, verbose=False):
             dense = None
             dense = Dense(round(map_range(genome[offset + 1],0,1,4,max_dense_nodes)))
             x = Dense(round(map_range(genome[offset + 1],0,1,4,max_dense_nodes))) (x)
-            #model.add(dense)
             if round(genome[offset + 2]) == 1:
                 x = BatchNormalization()(x)
         
@@ -290,7 +289,7 @@ def prepare_toolbox(problem_instance, number_of_variables, bounds_low, bounds_up
 
     # default
     toolbox.pop_size = 10   # population size
-    toolbox.max_gen = 5    # max number of iteration
+    toolbox.max_gen = 5     # max number of iteration
     toolbox.mut_prob = 1/number_of_variables
     toolbox.cross_prob = 0.3
     
@@ -330,11 +329,6 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
         invalid_ind = [ind for ind in population if not ind.fitness.valid]
         fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
-            print(f'ind = {ind}')
-            print(f'type(ind) = {type(ind)}')
-            print(f'ind.fitness.values = {ind.fitness.values}')
-            print(f'type(ind.fitness.values) = {type(ind.fitness.values)}')
-            print(f'fit = {fit}')
             ind.fitness.values = (fit,)
 
         halloffame.update(population)
@@ -348,8 +342,9 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
         cp = dict(population=population, generation=gen, halloffame=halloffame,
                   logbook=logbook, rndstate=random.getstate())
 
-        with open(checkpoint, "wb") as cp_file:
-            pickle.dump(cp, cp_file)
+        if checkpoint:
+            with open(checkpoint, "wb") as cp_file:
+                pickle.dump(cp, cp_file)
 
     # Print top N solutions 
     best_individuals = tools.selBest(halloffame,k = 3)
@@ -364,13 +359,11 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
 
 def genetic_run():
 
-    population_size = 10    # num of solutions in the population
-    num_generations = 5 # num of time we generate new population
+    population_size = 1#10    # num of solutions in the population
+    num_generations = 1#5     # num of time we generate new population
 
     creator.create("FitnessMax1", base.Fitness, weights=(-1.0,) * 1)
-    # creator.create("FitnessMax1", base.Fitness, weights=(1.0,))
     creator.create("Individual1", array.array, typecode='d', fitness=creator.FitnessMax1)
-    # creator.create("Individual1", list, fitness=creator.FitnessMax1)
 
     number_of_variables = max_dense_layers*5 + 1 # convlayers, GAPlayer, denselayers, optimizer
 
