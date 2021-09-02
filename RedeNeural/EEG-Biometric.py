@@ -3,9 +3,9 @@ import functions
 # import genetic_algorithm as ga
 
 # import numpy as np
-# import matplotlib.pyplot as plt
-# from tensorflow.keras.callbacks import LearningRateScheduler
-# from tensorflow.keras.optimizers import SGD
+import matplotlib.pyplot as plt
+from tensorflow.keras.callbacks import LearningRateScheduler
+from tensorflow.keras.optimizers import SGD
 
 # np.random.seed()
 
@@ -375,64 +375,69 @@ def genetic_run():
 
     # chama o metodo genetico
     best_individuals = ga(toolbox, tools, population_size, num_generations)
+    return best_individuals
 
 # Running the genetic algorithm
-genetic_run()
+best_individuals = genetic_run()
+
+print(f'type(best_individuals) = {type(best_individuals)}') #
+print(f'len(best_individuals) = {len(best_individuals)}') #
+model = best_individuals[0] # teste
 
 # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
-# opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
-# model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-# callback = LearningRateScheduler(models.scheduler, verbose=0)
-# results = model.fit(x_train,
-#                     y_train,
-#                     batch_size = batch_size,
-#                     epochs = training_epochs,
-#                     callbacks = [callback],
-#                     validation_data = (x_val, y_val)
-#                     )
+opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
+model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+callback = LearningRateScheduler(models.scheduler, verbose=0)
+results = model.fit(x_train,
+                    y_train,
+                    batch_size = batch_size,
+                    epochs = training_epochs,
+                    callbacks = [callback],
+                    validation_data = (x_val, y_val)
+                    )
 
 # Saving model weights
-# model.save('model_weights.h5')
+model.save('model_weights.h5')
 
 # Evaluate the model to see the accuracy
-# print('\nEvaluating on training set...')
-# (loss, accuracy) = model.evaluate(x_train, y_train, verbose = 0)
-# print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+print('\nEvaluating on training set...')
+(loss, accuracy) = model.evaluate(x_train, y_train, verbose = 0)
+print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
 
-# print('Evaluating on validation set...')
-# (loss, accuracy) = model.evaluate(x_val, y_val, verbose = 0)
-# print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+print('Evaluating on validation set...')
+(loss, accuracy) = model.evaluate(x_val, y_val, verbose = 0)
+print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
 
-# print('Evaluating on testing set...')
-# (loss, accuracy) = model.evaluate(x_test, y_test, verbose = 0)
-# print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+print('Evaluating on testing set...')
+(loss, accuracy) = model.evaluate(x_test, y_test, verbose = 0)
+print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
 
 # Summarize history for accuracy
-# plt.subplot(211)
-# plt.plot(results.history['accuracy'])
-# plt.plot(results.history['val_accuracy'])
-# plt.title('model accuracy')
-# plt.ylabel('accuracy')
-# plt.xlabel('epoch')
-# plt.legend(['train', 'test'])
+plt.subplot(211)
+plt.plot(results.history['accuracy'])
+plt.plot(results.history['val_accuracy'])
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'])
 
 # Summarize history for loss
-# plt.subplot(212)
-# plt.plot(results.history['loss'])
-# plt.plot(results.history['val_loss'])
-# plt.title('model loss')
-# plt.ylabel('loss')
-# plt.xlabel('epoch')
-# plt.legend(['train', 'test'])
-# plt.tight_layout()
-# plt.savefig(r'accuracy-loss.png', format='png')
-# plt.show()
+plt.subplot(212)
+plt.plot(results.history['loss'])
+plt.plot(results.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'])
+plt.tight_layout()
+plt.savefig(r'accuracy-loss.png', format='png')
+plt.show()
 
-# max_loss = np.max(results.history['loss'])
-# min_loss = np.min(results.history['loss'])
-# print("Maximum Loss : {:.4f}".format(max_loss))
-# print("Minimum Loss : {:.4f}".format(min_loss))
-# print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
+max_loss = np.max(results.history['loss'])
+min_loss = np.min(results.history['loss'])
+print("Maximum Loss : {:.4f}".format(max_loss))
+print("Minimum Loss : {:.4f}".format(min_loss))
+print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
 # Removing the last layers of the model and getting the features array
 
