@@ -331,6 +331,7 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = (fit,)
 
+
         halloffame.update(population)
         record = stats.compile(population)
         logbook.record(gen=gen, evals=len(invalid_ind), **record)
@@ -383,7 +384,8 @@ best_individuals = genetic_run()
 print(f'type(best_individuals) = {type(best_individuals)}') #
 print(f'len(best_individuals) = {len(best_individuals)}') #
 print(f'best_individuals[0] = {best_individuals[0]}') #
-model = best_individuals[0] # teste
+model = decode(best_individuals[0], True) # teste
+print(f'model = {model}') #
 
 # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
