@@ -27,7 +27,7 @@ np.random.seed(42)
 
 # Hyperparameters
 batch_size = 100                # Batch Size
-training_epochs = 60            # Total number of training epochs
+training_epochs = 5#60            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
@@ -331,7 +331,6 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = (fit,)
 
-
         halloffame.update(population)
         record = stats.compile(population)
         logbook.record(gen=gen, evals=len(invalid_ind), **record)
@@ -360,7 +359,7 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
 
 def genetic_run():
 
-    population_size = 1#10    # num of solutions in the population
+    population_size = 5#10    # num of solutions in the population
     num_generations = 1#5     # num of time we generate new population
 
     creator.create("FitnessMax1", base.Fitness, weights=(-1.0,) * 1)
@@ -380,6 +379,9 @@ def genetic_run():
 
 # Running the genetic algorithm
 best_individuals = genetic_run()
+
+for ind in best_individuals: #
+    print(f'ind.fitness.values = {ind.fitness.values}') #
 
 print(f'type(best_individuals) = {type(best_individuals)}') #
 print(f'len(best_individuals) = {len(best_individuals)}') #
