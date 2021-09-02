@@ -382,6 +382,7 @@ best_individuals = genetic_run()
 
 print(f'type(best_individuals) = {type(best_individuals)}') #
 print(f'len(best_individuals) = {len(best_individuals)}') #
+print(f'best_individuals[0] = {best_individuals[0]}') #
 model = best_individuals[0] # teste
 
 # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
