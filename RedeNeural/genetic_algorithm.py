@@ -35,7 +35,7 @@ max_dense_nodes = 512
 input_shape = (1920, 64) # input_shape = (window_size, num_channels)
 n_classes = 109
 
-def decode(genome, verbose=False):
+def decode(genome, window_size, num_channels, num_classes, verbose=False):
     batch_normalization=True
     dropout=True
     max_pooling=True
@@ -79,7 +79,7 @@ def decode(genome, verbose=False):
     dense_layers = max_dense_layers # excluindo a softmax layer
     dense_layer_size = len(dense_layer_shape)
 
-    model = models.create_model()
+    model = models.create_model(window_size, num_channels, num_classes)
     x = model.output
 
     offset = 0
@@ -100,7 +100,6 @@ def decode(genome, verbose=False):
             dense = None
             dense = Dense(round(map_range(genome[offset + 1],0,1,4,max_dense_nodes)))
             x = Dense(round(map_range(genome[offset + 1],0,1,4,max_dense_nodes))) (x)
-            #model.add(dense)
             if round(genome[offset + 2]) == 1:
                 x = BatchNormalization()(x)
         
@@ -148,7 +147,7 @@ def evaluate_individual(genome, x_train, y_train, x_val, y_val):
     fit_params['validation_data'] = (x_val, y_val)
 
     model.fit(**fit_params)
-    loss, accuracy = model.evaluate(x_val, y_val, verbose=0)
+    (loss, accuracy) = model.evaluate(x_val, y_val, verbose=0)
     num_parameters = model.count_params()
 
     return loss
@@ -178,7 +177,7 @@ def prepare_toolbox(problem_instance, number_of_variables, bounds_low, bounds_up
 
     # default
     toolbox.pop_size = 10   # population size
-    toolbox.max_gen = 5    # max number of iteration
+    toolbox.max_gen = 5     # max number of iteration
     toolbox.mut_prob = 1/number_of_variables
     toolbox.cross_prob = 0.3
     
@@ -218,7 +217,7 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
         invalid_ind = [ind for ind in population if not ind.fitness.valid]
         fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values = fit
+            ind.fitness.values = (fit,)
 
         halloffame.update(population)
         record = stats.compile(population)
@@ -231,8 +230,9 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
         cp = dict(population=population, generation=gen, halloffame=halloffame,
                   logbook=logbook, rndstate=random.getstate())
 
-        with open(checkpoint, "wb") as cp_file:
-            pickle.dump(cp, cp_file)
+        if checkpoint:
+            with open(checkpoint, "wb") as cp_file:
+                pickle.dump(cp, cp_file)
 
     # Print top N solutions 
     best_individuals = tools.selBest(halloffame,k = 3)
@@ -245,10 +245,10 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
     print("\n")
     return best_individuals
 
-def genetic_run():
+def genetic_run(x_train, y_train, x_val, y_val):
 
-    population_size = 10    # num of solutions in the population
-    num_generations = 5 # num of time we generate new population
+    population_size = 5#10    # num of solutions in the population
+    num_generations = 1#5     # num of time we generate new population
 
     creator.create("FitnessMax1", base.Fitness, weights=(-1.0,) * 1)
     creator.create("Individual1", array.array, typecode='d', fitness=creator.FitnessMax1)
@@ -263,3 +263,4 @@ def genetic_run():
 
     # chama o metodo genetico
     best_individuals = ga(toolbox, tools, population_size, num_generations)
+    return best_individuals
