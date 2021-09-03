@@ -110,15 +110,9 @@ print(f'y_val: {y_val.shape}')
 print(f'y_test: {y_test.shape}\n')
 
 # Genetic algorithm
-def load_parameters_on_ga():
-    """
-    Returns the parameters used by the genetic algorithm: x_train, y_train, x_val, y_val, window_size,
-    num_channels and num_classes.
-    """
-    return x_train, y_train, x_val, y_val, window_size, num_channels, num_classes
-
+functions.save_ga_parameters(x_train, y_train, x_val, y_val, window_size, num_channels, num_classes)
 best_individuals = ga.genetic_run()
-model = ga.decode(best_individuals[0], True) # teste
+model = ga.decode(best_individuals[0], True)
 
 # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)

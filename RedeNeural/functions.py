@@ -605,3 +605,31 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
     thresholds = t[min_index]
 
     return d, eer, thresholds
+
+x_train = None
+y_train = None
+x_val = None
+y_val = None
+window_size = None
+num_channels = None
+num_classes = None
+
+def save_ga_parameters(x_train_p, y_train_p, x_val_p, y_val_p, window_size_p, num_channels_p, num_classes_p):
+    """
+    Saves the parameters that will be used by the genetic algorithm: x_train, y_train, x_val, y_val, window_size,
+    num_channels and num_classes.
+    """
+    x_train = x_train_p
+    y_train = y_train_p
+    x_val = x_val_p
+    y_val = y_val_p
+    window_size = window_size_p
+    num_channels = num_channels_p
+    num_classes = num_classes_p
+
+def load_ga_parameters():
+    """
+    Returns the parameters used by the genetic algorithm: x_train, y_train, x_val, y_val, window_size,
+    num_channels and num_classes.
+    """
+    return x_train, y_train, x_val, y_val, window_size, num_channels, num_classes

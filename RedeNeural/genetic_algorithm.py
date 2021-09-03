@@ -1,5 +1,5 @@
 import models
-import EEG_biometric
+import functions
 
 import pickle
 import numpy as np
@@ -16,7 +16,7 @@ import array, random
 # np.random.seed(42)
 
 # Parameters from EEG_biometric.py
-x_train, y_train, x_val, y_val, window_size, num_channels, num_classes = EEG_biometric.load_parameters_on_ga()
+x_train, y_train, x_val, y_val, window_size, num_channels, num_classes = functions.load_ga_parameters()
 
 # Genetic algorithm
 class SwishActivation(Activation):
