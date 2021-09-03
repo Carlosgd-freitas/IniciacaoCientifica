@@ -13,7 +13,10 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.models import Model
 import array, random
 
-np.random.seed(42)
+# np.random.seed(42)
+
+# Parameters from EEG_biometric.py
+x_train, y_train, x_val, y_val, window_size, num_channels, num_classes = EEG_biometric.load_parameters_on_ga()
 
 # Genetic algorithm
 class SwishActivation(Activation):
