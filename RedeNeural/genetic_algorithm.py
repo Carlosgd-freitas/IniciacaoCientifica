@@ -257,7 +257,7 @@ def genetic_run(x_train, y_train, x_val, y_val):
 
     bounds_low, bounds_up = 0, 1 # valores sao remapeados em decode
 
-    toolbox = prepare_toolbox(evaluate_individual, 
+    toolbox = prepare_toolbox(evaluate_individual(x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val), 
                               number_of_variables,
                               bounds_low, bounds_up)
 
