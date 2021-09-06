@@ -22,7 +22,7 @@ np.random.seed()
 
 # Hyperparameters
 batch_size = 100                # Batch Size
-training_epochs = 5#60            # Total number of training epochs
+training_epochs = 60            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
@@ -354,8 +354,8 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
 
 def genetic_run():
 
-    population_size = 5#10    # num of solutions in the population
-    num_generations = 1#5     # num of time we generate new population
+    population_size = 10    # num of solutions in the population
+    num_generations = 5     # num of time we generate new population
 
     creator.create("FitnessMax1", base.Fitness, weights=(-1.0,) * 1)
     creator.create("Individual1", array.array, typecode='d', fitness=creator.FitnessMax1)
@@ -374,6 +374,7 @@ def genetic_run():
 
 best_individuals = genetic_run()
 model = decode(best_individuals[0], True)
+model.summary()
 ####################################################################################################
 
 # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
