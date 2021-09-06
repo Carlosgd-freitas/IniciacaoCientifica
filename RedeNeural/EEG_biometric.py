@@ -186,7 +186,7 @@ def decode(genome, verbose=False):
     dense_layers = max_dense_layers # excluindo a softmax layer
     dense_layer_size = len(dense_layer_shape)
 
-    model = models.create_model(window_size, num_channels, num_classes)
+    model = models.create_model_mixed(window_size, num_channels, num_classes)
     x = model.output
 
     offset = 0
@@ -257,7 +257,8 @@ def evaluate_individual(genome):
     (loss, accuracy) = model.evaluate(x_val, y_val, verbose=0)
     num_parameters = model.count_params()
 
-    return loss
+    # return loss
+    return accuracy
 
 def prepare_toolbox(problem_instance, number_of_variables, bounds_low, bounds_up):
     
@@ -373,6 +374,11 @@ def genetic_run():
     return best_individuals
 
 best_individuals = genetic_run()
+
+i = 1
+for ind in best_individuals:
+    print(f'accuracy do individuo #{i}: {ind.fitness.values}')
+
 model = decode(best_individuals[0], True)
 model.summary()
 ####################################################################################################

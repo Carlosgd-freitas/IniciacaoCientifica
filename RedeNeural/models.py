@@ -4,6 +4,7 @@ from tensorflow.keras.layers import Concatenate, GlobalAveragePooling1D, Reshape
 from tensorflow.keras.layers import MultiHeadAttention, LayerNormalization, Bidirectional, LSTM, GRU
 from tensorflow.keras import Input, Model
 from tensorflow import convert_to_tensor
+from tensorflow.python.ops.gen_math_ops import xlog1py_eager_fallback
 
 def scheduler(current_epoch, learning_rate):
     """
@@ -316,6 +317,56 @@ def create_model_GRU(window_size, num_channels, num_classes, remove_last_layer=F
     x = Bidirectional(GRU(128, return_sequences=True)) (x)
     x = Bidirectional(GRU(128, return_sequences=True)) (x)
     x = Bidirectional(GRU(128)) (x)
+
+    x = Flatten() (x)
+    x = Dense(4096)(x)
+    x = Dense(4096)(x)
+    x = Dense(256)(x)
+
+    # Model used for Identification
+    if(remove_last_layer == False):
+        x = BatchNormalization()(x)
+        x = Dropout(0.1) (x)
+        x = Dense(num_classes, activation='softmax') (x)
+        model = Model(inputs=inputs, outputs=x, name='Biometric_for_Identification')
+        
+    # Model used for Verification
+    else:
+        model = Model(inputs=inputs, outputs=x, name='Biometric_for_Verification')
+
+    return model
+
+def create_model_mixed(window_size, num_channels, num_classes, remove_last_layer=False):
+    """
+    Creates and returns the CNN model that has multi-head attention, inception and sequeeze & excitation
+    blocks mixed within.
+
+    Parameters:
+        - window_size: sliding window size, used when composing the dataset;
+        - num_channels: number of channels in an EEG signal;
+        - num_classes: total number of classes (individuals).
+    Optional Parameters:
+        - remove_last_layer: if True, the model created won't have the fully connected block at the end with a
+        softmax activation function.
+    """
+    inputs = Input(shape=(window_size, num_channels))
+    x = SEBlock(inputs)
+
+    x = Conv1D(96, (11), activation='relu') (x)
+    x = BatchNormalization() (x)
+    x = MaxPooling1D(strides=4) (x)
+
+    x = InceptionBlock(x, 1)
+
+    x = Conv1D(128, (9), activation='relu') (x)
+    x = BatchNormalization() (x)
+    x = MaxPooling1D(strides=2) (x)
+
+    x = InceptionBlock(x, 2)
+
+    x = Conv1D(256, (9), activation='relu') (x)
+    x = BatchNormalization() (x)
+    x = MaxPooling1D(strides=2) (x)
 
     x = Flatten() (x)
     x = Dense(4096)(x)
