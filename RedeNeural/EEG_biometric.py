@@ -343,7 +343,8 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
                 pickle.dump(cp, cp_file)
 
     # Print top N solutions 
-    best_individuals = tools.selBest(halloffame,k = 3)
+    # best_individuals = tools.selBest(halloffame,k = 3)
+    best_individuals = tools.selWorst(halloffame,k = 3) # teste
     
     print("\n\n ******* Best solution is: *******\n")
     for bi in best_individuals:
@@ -355,7 +356,7 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
 
 def genetic_run():
 
-    population_size = 10    # num of solutions in the population
+    population_size = 3     # num of solutions in the population
     num_generations = 5     # num of time we generate new population
 
     creator.create("FitnessMax1", base.Fitness, weights=(-1.0,) * 1)
@@ -379,7 +380,8 @@ i = 1
 for ind in best_individuals:
     print(f'accuracy do individuo #{i}: {ind.fitness.values}')
 
-model = decode(best_individuals[0], True)
+# model = decode(best_individuals[0], True) # if evaluate_individual returns loss
+model = decode(best_individuals[2], True) # if evaluate_individual returns accuracy
 model.summary()
 ####################################################################################################
 
