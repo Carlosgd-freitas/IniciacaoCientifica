@@ -9,13 +9,11 @@ from tensorflow.keras.optimizers import SGD
 
 import pickle
 from deap import algorithms, base, tools, creator
-from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
+from tensorflow.keras.layers import Dense, Dropout, BatchNormalization, Activation
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.utils import get_custom_objects
 from tensorflow.keras.backend import sigmoid
-from tensorflow.keras.layers import Activation
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.models import Model
+from tensorflow.keras.models import Model, Sequential
 import array, random
 
 np.random.seed()
@@ -343,8 +341,8 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
                 pickle.dump(cp, cp_file)
 
     # Print top N solutions 
-    # best_individuals = tools.selBest(halloffame,k = 3)
-    best_individuals = tools.selWorst(halloffame,k = 3) # teste
+    # best_individuals = tools.selBest(halloffame, k = 3) # if evaluate_individual returns loss
+    best_individuals = tools.selWorst(halloffame, k = 3)  # if evaluate_individual returns accuracy
     
     print("\n\n ******* Best solution is: *******\n")
     for bi in best_individuals:
@@ -379,9 +377,9 @@ best_individuals = genetic_run()
 i = 1
 for ind in best_individuals:
     print(f'accuracy do individuo #{i}: {ind.fitness.values}')
+    i += 1
 
-# model = decode(best_individuals[0], True) # if evaluate_individual returns loss
-model = decode(best_individuals[2], True) # if evaluate_individual returns accuracy
+model = decode(best_individuals[0], True)
 model.summary()
 ####################################################################################################
 
@@ -460,13 +458,18 @@ print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 # Model with GRU
 # model_for_verification = models.create_model_GRU(window_size, num_channels, num_classes, True)
 
-# model_for_verification.summary()
-# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-# model_for_verification.load_weights('model_weights.h5', by_name=True)
-# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+# Mixed model from Genetic Algorithm
+model_for_verification = Sequential(name='Biometric_for_Verification')
+for layer in model.layers[:-2]:
+    model_for_verification.add(layer)
+
+model_for_verification.summary()
+model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+model_for_verification.load_weights('model_weights.h5', by_name=True)
+x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 # Calculating EER and Decidability
-# y_test_classes = functions.one_hot_encoding_to_classes(y_test)
-# d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
-# print(f'EER: {eer*100.0} %')
-# print(f'Decidability: {d}')
+y_test_classes = functions.one_hot_encoding_to_classes(y_test)
+d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
+print(f'EER: {eer*100.0} %')
+print(f'Decidability: {d}')
