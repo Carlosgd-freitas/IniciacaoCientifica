@@ -3,8 +3,6 @@ from tensorflow.keras.layers import Dense, Dropout, Flatten, Conv1D, MaxPooling1
 from tensorflow.keras.layers import Concatenate, GlobalAveragePooling1D, Reshape, Activation, Permute, Multiply
 from tensorflow.keras.layers import MultiHeadAttention, LayerNormalization, Bidirectional, LSTM, GRU
 from tensorflow.keras import Input, Model
-from tensorflow import convert_to_tensor
-from tensorflow.python.ops.gen_math_ops import xlog1py_eager_fallback
 
 def scheduler(current_epoch, learning_rate):
     """
@@ -21,8 +19,13 @@ def scheduler(current_epoch, learning_rate):
         return learning_rate
 
 def get_lr_metric(optimizer):
+    """
+    Returns the current learning rate.
+    """
+
     def lr(y_true, y_pred):
         return optimizer.lr
+
     return lr
 
 def InceptionBlock(input_img, block_index, block_type='basic', filters_sizes=(64, 96, 128, 16, 32, 128, 32), factor=1):

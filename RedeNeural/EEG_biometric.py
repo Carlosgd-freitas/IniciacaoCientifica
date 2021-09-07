@@ -85,7 +85,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # band_pass_3 = 3.4862% / 0.8253% / 6.5402
 
 # Creating the model
-model = models.create_model(window_size, num_channels, num_classes)
+# model = models.create_model(window_size, num_channels, num_classes)
 # model = models.create_model_inception(window_size, num_channels, num_classes)
 # model = models.create_model_SE(window_size, num_channels, num_classes)
 # model = models.create_model_transformers(window_size, num_channels, num_classes)
@@ -372,20 +372,20 @@ def genetic_run():
     best_individuals = ga(toolbox, tools, population_size, num_generations)
     return best_individuals
 
-# best_individuals = genetic_run()
+best_individuals = genetic_run()
 
-# i = 1
-# for ind in best_individuals:
-#     print(f'accuracy do individuo #{i}: {ind.fitness.values}')
-#     i += 1
+i = 1
+for ind in best_individuals:
+    print(f'accuracy do individuo #{i}: {ind.fitness.values}')
+    i += 1
 
-# model = decode(best_individuals[0], True)
-# model.summary()
+model = decode(best_individuals[0], True)
+model.summary()
 ####################################################################################################
 
 # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
-current_learning_rate = models.get_lr_metric(opt) #
+current_learning_rate = models.get_lr_metric(opt)
 model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy', current_learning_rate])
 callback = LearningRateScheduler(models.scheduler, verbose=0)
 results = model.fit(x_train,
