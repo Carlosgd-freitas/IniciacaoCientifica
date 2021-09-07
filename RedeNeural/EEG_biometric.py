@@ -385,8 +385,7 @@ model.summary()
 
 # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
-current_learning_rate = models.get_lr_metric(opt)
-model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy', current_learning_rate])
+model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
 callback = LearningRateScheduler(models.scheduler, verbose=0)
 results = model.fit(x_train,
                     y_train,
