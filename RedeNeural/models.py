@@ -363,18 +363,11 @@ def create_model_mixed(window_size, num_channels, num_classes, remove_last_layer
 
     x = InceptionBlock(x, 1)
 
-    x = Conv1D(128, (9), activation='relu') (x)
-    x = BatchNormalization() (x)
-    x = MaxPooling1D(strides=2) (x)
-
-    x = InceptionBlock(x, 2)
-
     x = Conv1D(256, (9), activation='relu') (x)
     x = BatchNormalization() (x)
     x = MaxPooling1D(strides=2) (x)
 
     x = Flatten() (x)
-    x = Dense(4096)(x)
     x = Dense(4096)(x)
     x = Dense(256)(x)
 
