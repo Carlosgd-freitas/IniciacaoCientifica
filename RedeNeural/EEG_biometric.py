@@ -458,18 +458,13 @@ print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 # Model with GRU
 # model_for_verification = models.create_model_GRU(window_size, num_channels, num_classes, True)
 
-# Mixed model from Genetic Algorithm
-model_for_verification = Sequential(name='Biometric_for_Verification')
-for layer in model.layers[:-2]:
-    model_for_verification.add(layer)
-
-model_for_verification.summary()
-model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-model_for_verification.load_weights('model_weights.h5', by_name=True)
-x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+# model_for_verification.summary()
+# model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+# model_for_verification.load_weights('model_weights.h5', by_name=True)
+# x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
 # Calculating EER and Decidability
-y_test_classes = functions.one_hot_encoding_to_classes(y_test)
-d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
-print(f'EER: {eer*100.0} %')
-print(f'Decidability: {d}')
+# y_test_classes = functions.one_hot_encoding_to_classes(y_test)
+# d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
+# print(f'EER: {eer*100.0} %')
+# print(f'Decidability: {d}')

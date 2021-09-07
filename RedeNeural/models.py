@@ -350,7 +350,12 @@ def create_model_mixed(window_size, num_channels, num_classes, remove_last_layer
         softmax activation function.
     """
     inputs = Input(shape=(window_size, num_channels))
-    x = SEBlock(inputs)
+
+    x = MultiHeadAttention(num_heads=10, key_dim=num_channels)
+    output_tensor = x(inputs, inputs)
+    x = LayerNormalization() (output_tensor) # Add & Norm
+
+    x = SEBlock(x)
 
     x = Conv1D(96, (11), activation='relu') (x)
     x = BatchNormalization() (x)
