@@ -351,11 +351,11 @@ def create_model_mixed(window_size, num_channels, num_classes, remove_last_layer
     """
     inputs = Input(shape=(window_size, num_channels))
 
-    x = MultiHeadAttention(num_heads=10, key_dim=num_channels)
-    output_tensor = x(inputs, inputs)
-    x = LayerNormalization() (output_tensor) # Add & Norm
+    # x = MultiHeadAttention(num_heads=10, key_dim=num_channels)
+    # output_tensor = x(inputs, inputs)
+    # x = LayerNormalization() (output_tensor) # Add & Norm
 
-    x = SEBlock(x)
+    x = SEBlock(inputs)
 
     x = Conv1D(96, (11), activation='relu') (x)
     x = BatchNormalization() (x)
@@ -363,11 +363,18 @@ def create_model_mixed(window_size, num_channels, num_classes, remove_last_layer
 
     x = InceptionBlock(x, 1)
 
+    x = Conv1D(128, (9), activation='relu') (x)
+    x = BatchNormalization() (x)
+    x = MaxPooling1D(strides=2) (x)
+
+    x = InceptionBlock(x, 2)
+
     x = Conv1D(256, (9), activation='relu') (x)
     x = BatchNormalization() (x)
     x = MaxPooling1D(strides=2) (x)
 
     x = Flatten() (x)
+    x = Dense(4096)(x)
     x = Dense(4096)(x)
     x = Dense(256)(x)
 
