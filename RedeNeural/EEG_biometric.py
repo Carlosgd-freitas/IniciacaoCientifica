@@ -354,8 +354,8 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
 
 def genetic_run():
 
-    population_size = 5     # num of solutions in the population
-    num_generations = 5     # num of time we generate new population
+    population_size = 10     # num of solutions in the population
+    num_generations = 10     # num of time we generate new population
 
     creator.create("FitnessMax1", base.Fitness, weights=(-1.0,) * 1)
     creator.create("Individual1", array.array, typecode='d', fitness=creator.FitnessMax1)
