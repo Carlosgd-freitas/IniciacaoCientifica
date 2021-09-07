@@ -20,6 +20,11 @@ def scheduler(current_epoch, learning_rate):
         learning_rate = 0.0001
         return learning_rate
 
+def get_lr_metric(optimizer):
+    def lr(y_true, y_pred):
+        return optimizer.lr
+    return lr
+
 def InceptionBlock(input_img, block_index, block_type='basic', filters_sizes=(64, 96, 128, 16, 32, 128, 32), factor=1):
     """
     Creates and returns an inception block for a CNN.
