@@ -11,8 +11,14 @@ def scheduler(current_epoch, learning_rate):
     if current_epoch < 5:
         learning_rate = 0.01
         return learning_rate
-    elif current_epoch < 40:
+    elif current_epoch < 10:
+        learning_rate = 0.005
+        return learning_rate
+    elif current_epoch < 25:
         learning_rate = 0.001
+        return learning_rate
+    elif current_epoch < 40:
+        learning_rate = 0.0005
         return learning_rate
     else:
         learning_rate = 0.0001
