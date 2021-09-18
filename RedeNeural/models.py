@@ -8,11 +8,8 @@ def scheduler(current_epoch, learning_rate):
     """
     Lowers the learning rate hyperparameter relative to the number of epochs.
     """
-    if current_epoch < 5:
+    if current_epoch < 3:
         learning_rate = 0.01
-        return learning_rate
-    elif current_epoch < 10:
-        learning_rate = 0.005
         return learning_rate
     elif current_epoch < 25:
         learning_rate = 0.001
