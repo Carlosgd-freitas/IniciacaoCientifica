@@ -181,12 +181,12 @@ def create_model(window_size, num_channels, num_classes, remove_last_layer=False
     model.add(Dense(4096, activation='relu', name='FC1'))
     model.add(Dense(4096, activation='relu', name='FC2'))
     model.add(Dense(1024, activation='relu', name='FC3'))
-    model.add(Dropout(0.1, name='Drop3'))
+    model.add(Dropout(0.1, name='Drop5'))
     model.add(Dense(256, name='FC4'))
     model.add(BatchNormalization(name='Norm5'))
 
     if(remove_last_layer == False):
-        model.add(Dropout(0.1, name='Drop5'))
+        model.add(Dropout(0.1, name='Drop6'))
         model.add(Dense(num_classes, activation='softmax', name='FC5'))
 
     return model
