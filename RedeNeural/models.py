@@ -158,44 +158,38 @@ def create_model(window_size, num_channels, num_classes, remove_last_layer=False
     #     model.add(Dense(num_classes, activation='softmax', name='FC4'))
 
     # Conv1
-    model.add(Conv1D(64, (12), input_shape=(window_size, num_channels), activation='relu', name='Conv1'))
+    model.add(Conv1D(100, (11), input_shape=(window_size, num_channels), activation='relu', name='Conv1'))
     model.add(BatchNormalization(name='Norm1'))
     # Pool1
     model.add(MaxPooling1D(strides=2, name='Pool1'))
     # Conv2
-    model.add(Conv1D(128, (12), activation='relu', name='Conv2'))
+    model.add(Conv1D(200, (11), activation='relu', name='Conv2'))
     model.add(BatchNormalization(name='Norm2'))
     # Pool2
     model.add(MaxPooling1D(strides=2, name='Pool2'))
     # Conv3
-    model.add(Conv1D(256, (10), activation='relu', name='Conv3')) 
+    model.add(Conv1D(400, (9), activation='relu', name='Conv3')) 
     model.add(BatchNormalization(name='Norm3'))
     # Pool3
     model.add(MaxPooling1D(strides=2, name='Pool3'))
     # Conv4
-    model.add(Conv1D(512, (10), activation='relu', name='Conv4')) 
+    model.add(Conv1D(800, (9), activation='relu', name='Conv4')) 
     model.add(BatchNormalization(name='Norm4'))
     # Pool4
     model.add(MaxPooling1D(strides=2, name='Pool4'))
-    # Drop1
-    model.add(Dropout(0.1, name='Drop1'))
     # FC1
     model.add(Flatten())
     model.add(Dense(4096, name='FC1'))
     # FC2
     model.add(Dense(2048, name='FC2'))
     # FC3
-    model.add(Dense(1024, name='FC3'))
-    # Drop2
-    model.add(Dropout(0.1, name='Drop2'))
-    # FC4
-    model.add(Dense(512, name='FC4'))
-    # FC5
-    model.add(Dense(256, name='FC5'))
+    model.add(Dense(256, name='FC3'))
 
     if(remove_last_layer == False):
-        # FC6
-        model.add(Dense(num_classes, activation='softmax', name='FC6'))
+        # Dropout
+        model.add(Dropout(0.1, name='Drop'))
+        # FC4
+        model.add(Dense(num_classes, activation='softmax', name='FC4'))
 
     return model
 
