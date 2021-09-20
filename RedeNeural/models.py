@@ -176,7 +176,7 @@ def create_model(window_size, num_channels, num_classes, remove_last_layer=False
     model.add(MaxPooling1D(strides=2, name='Pool3'))
     # Conv4
     model.add(Conv1D(1024, (2), activation='relu', name='Conv4')) 
-    model.add(BatchNormalization(name='Norm3'))
+    model.add(BatchNormalization(name='Norm4'))
     # Pool4
     model.add(MaxPooling1D(strides=2, name='Pool4'))
     # Drop2
