@@ -161,22 +161,22 @@ def create_model(window_size, num_channels, num_classes, remove_last_layer=False
     model.add(Conv1D(96, (11), input_shape=(window_size, num_channels), activation='relu', name='Conv1'))
     model.add(BatchNormalization(name='Norm1'))
     # Pool1
-    model.add(MaxPooling1D(strides=4, name='Pool1'))
+    model.add(MaxPooling1D(strides=3, name='Pool1'))
     # Conv2
     model.add(Conv1D(128, (9), activation='relu', name='Conv2'))
     model.add(BatchNormalization(name='Norm2'))
     # Pool2
-    model.add(MaxPooling1D(strides=2, name='Pool2'))
+    model.add(MaxPooling1D(strides=3, name='Pool2'))
     # Conv3
     model.add(Conv1D(256, (9), activation='relu', name='Conv3')) 
     model.add(BatchNormalization(name='Norm3'))
     # Pool3
-    model.add(MaxPooling1D(strides=2, name='Pool3'))
+    model.add(MaxPooling1D(strides=3, name='Pool3'))
     # Conv4
-    model.add(Conv1D(512, (9), activation='relu', name='Conv4')) 
+    model.add(Conv1D(512, (7), activation='relu', name='Conv4')) 
     model.add(BatchNormalization(name='Norm4'))
     # Pool4
-    model.add(MaxPooling1D(strides=2, name='Pool4'))
+    model.add(MaxPooling1D(strides=3, name='Pool4'))
     # FC1
     model.add(Flatten())
     model.add(Dense(4096, activation='relu', name='FC1'))
@@ -184,7 +184,7 @@ def create_model(window_size, num_channels, num_classes, remove_last_layer=False
     model.add(Dense(4096, activation='relu', name='FC2'))
     # FC3
     model.add(Dense(256, name='FC3'))
-    model.add(BatchNormalization(name='Norm4'))
+    model.add(BatchNormalization(name='Norm5'))
 
     if(remove_last_layer == False):
         # Dropout
