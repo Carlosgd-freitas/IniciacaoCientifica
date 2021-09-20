@@ -3,6 +3,7 @@ from tensorflow.keras.layers import Dense, Dropout, Flatten, Conv1D, MaxPooling1
 from tensorflow.keras.layers import Concatenate, GlobalAveragePooling1D, Reshape, Activation, Permute, Multiply
 from tensorflow.keras.layers import MultiHeadAttention, LayerNormalization, Bidirectional, LSTM, GRU
 from tensorflow.keras import Input, Model
+from tensorflow.keras.regularizers import l1_l2
 
 def scheduler(current_epoch, learning_rate):
     """
@@ -144,11 +145,14 @@ def create_model(window_size, num_channels, num_classes, remove_last_layer=False
     model.add(MaxPooling1D(strides=2, name='Pool3'))
     # FC1
     model.add(Flatten())
-    model.add(Dense(4096, activation='relu', name='FC1'))
+    model.add(Dense(4096, activation='relu', name='FC1', kernel_regularizer=l1_l2(l1=0.005, l2=0.001),
+                    bias_regularizer=l1_l2(l1=0.005, l2=0.001)))
     # FC2
-    model.add(Dense(4096, activation='relu', name='FC2'))
+    model.add(Dense(4096, activation='relu', name='FC2', kernel_regularizer=l1_l2(l1=0.005, l2=0.001),
+              bias_regularizer=l1_l2(l1=0.005, l2=0.001)))
     # FC3
-    model.add(Dense(256, name='FC3'))
+    model.add(Dense(256, name='FC3', kernel_regularizer=l1_l2(l1=0.005, l2=0.001),
+              bias_regularizer=l1_l2(l1=0.005, l2=0.001)))
     model.add(BatchNormalization(name='Norm4'))
 
     if(remove_last_layer == False):
