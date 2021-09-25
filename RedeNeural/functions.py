@@ -67,7 +67,7 @@ def create_csv_database_from_edf(edf_folder_path, csv_folder_path, num_classes, 
     if(os.path.exists(csv_folder_path) == False):
         os.mkdir(csv_folder_path)
 
-    subject = 11
+    subject = 1
     while(subject <= num_classes):
         if(os.path.exists(csv_folder_path+'/S{:03d}'.format(subject)) == False):
             os.mkdir(csv_folder_path+'/S{:03d}'.format(subject))
@@ -75,7 +75,8 @@ def create_csv_database_from_edf(edf_folder_path, csv_folder_path, num_classes, 
         task = 1
         while(task <= 14):
             data = read_EDF(edf_folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(subject, subject, task), channels)
-            savetxt(csv_folder_path+'/S{:03d}/S{:03d}R{:02d}.csv'.format(subject, subject, task), data, delimiter=',')
+            savetxt(csv_folder_path+'/S{:03d}/S{:03d}R{:02d}.csv'.format(subject, subject, task), data,
+                    fmt='%d', delimiter=',')
             task += 1
 
         subject += 1

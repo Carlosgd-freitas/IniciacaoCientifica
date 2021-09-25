@@ -86,6 +86,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 
 # criando o dataset em csv
 functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
+
 input("Beleza, agora quita.")
 
 # Creating the model
