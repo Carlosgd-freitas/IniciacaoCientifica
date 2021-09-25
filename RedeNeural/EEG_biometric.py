@@ -432,7 +432,7 @@ print("Minimum Loss : {:.4f}".format(min_loss))
 print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
 # Removing the last layers of the model and getting the features array
-model_for_verification = models.create_model_sun(window_size, num_channels, num_classes, True)
+model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
 
 model_for_verification.summary()
 model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
