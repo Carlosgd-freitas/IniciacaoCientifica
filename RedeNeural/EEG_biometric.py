@@ -80,7 +80,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
 
 # Creating the model
-model = models.create_model_sun(window_size, num_channels, num_classes)
+model = models.create_model(window_size, num_channels, num_classes)
 model.summary()
 
 # Loading the raw data
