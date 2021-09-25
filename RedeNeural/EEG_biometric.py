@@ -5,7 +5,7 @@ import functions
 import numpy as np
 import matplotlib.pyplot as plt
 from tensorflow.keras.callbacks import LearningRateScheduler
-from tensorflow.keras.optimizers import SGD
+from tensorflow.keras.optimizers import SGD, Adam
 
 # import pickle
 # from deap import algorithms, base, tools, creator
@@ -19,13 +19,13 @@ from tensorflow.keras.optimizers import SGD
 np.random.seed()
 
 # Hyperparameters
-batch_size = 100                # Batch Size
-training_epochs = 60            # Total number of training epochs
+batch_size = 100 #80                # Batch Size
+training_epochs = 60 #1000            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
-folder_path = './Dataset_CSV/'
-# folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset/'
+# folder_path = './Dataset_CSV/'
+folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
 train_tasks = [1]               # Tasks used for training and validation
 test_tasks = [2]                # Tasks used for testing
 num_classes = 109               # Total number of classes (individuals)
@@ -42,8 +42,8 @@ filter_type = 'filtfilt'        # Type of the filter used: 'sosfilt' or 'filtfil
 normalize_type = 'each_channel' # Type of the normalization that will be applied: 'each_channel' or 'all_channels'
 
 # Parameters used in functions.crop_data()
-window_size = 1920              # Sliding window size, used when composing the dataset
-offset = 35                     # Sliding window offset (deslocation), used when composing the dataset
+window_size = 1920 #160              # Sliding window size, used when composing the dataset
+offset = 35 #160                     # Sliding window offset (deslocation), used when composing the dataset
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
@@ -77,26 +77,11 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # Task 13 - T3R3
 # Task 14 - T4R3
 
-# Valores utilizando modo 'filtfilt':
-# offset: 20, num_classes: 108
-# acurácia / EER / Decidibilidade
-# band_pass_1 = 5.1852% / 7.5671% / 3.0792
-# band_pass_2 = 4.2593% / 3.6131% / 4.1049
-# band_pass_3 = 3.4862% / 0.8253% / 6.5402
-
-# criando o dataset em csv
-functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
-
-input("Beleza, agora quita.")
+# functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
 
 # Creating the model
-model = models.create_model(window_size, num_channels, num_classes)
-# model = models.create_model_inception(window_size, num_channels, num_classes)
-# model = models.create_model_SE(window_size, num_channels, num_classes)
-# model = models.create_model_transformers(window_size, num_channels, num_classes)
-# model = models.create_model_LSTM(window_size, num_channels, num_classes)
-# model = models.create_model_GRU(window_size, num_channels, num_classes)
-# model.summary()
+model = models.create_model_sun(window_size, num_channels, num_classes)
+model.summary()
 
 # Loading the raw data
 train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes)   
@@ -106,8 +91,8 @@ train_content = functions.filter_data(train_content, band_pass_3, sample_frequen
 test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
 
 # Normalize the filtered data
-# train_content = functions.normalize_data(train_content, normalize_type)
-# test_content = functions.normalize_data(test_content, normalize_type)
+# train_content = functions.normalize_data(train_content, 'sun')
+# test_content = functions.normalize_data(test_content, 'sun')
 
 # Apply data augmentation (sliding window cropping) on normalized data
 x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
@@ -390,7 +375,10 @@ print(f'y_test: {y_test.shape}\n')
 
 # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
+# opt = Adam(learning_rate=0.0001)
+
 model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+
 callback = LearningRateScheduler(models.scheduler, verbose=0)
 results = model.fit(x_train,
                     y_train,
@@ -444,24 +432,7 @@ print("Minimum Loss : {:.4f}".format(min_loss))
 print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
 # Removing the last layers of the model and getting the features array
-
-# Using default model
-model_for_verification = models.create_model(window_size, num_channels, num_classes, True) 
-
-# Model with inception blocks
-# model_for_verification = models.create_model_with_inception(window_size, num_channels, num_classes, True)
-
-# Model with squeeze & excitation blocks
-# model_for_verification = models.create_model_with_SE(window_size, num_channels, num_classes, True)
-
-# Model with transformers
-# model_for_verification = models.create_model_transformers(window_size, num_channels, num_classes, True)
-
-# Model with LSTM
-# model_for_verification = models.create_model_LSTM(window_size, num_channels, num_classes, True)
-
-# Model with GRU
-# model_for_verification = models.create_model_GRU(window_size, num_channels, num_classes, True)
+model_for_verification = models.create_model_sun(window_size, num_channels, num_classes, True)
 
 model_for_verification.summary()
 model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])

@@ -1,85 +1,85 @@
 import os
-import pyedflib
 import numpy as np
 import matplotlib.pyplot as plt
+# from pyedflib import EdfReader
 from numpy import savetxt, loadtxt
 from scipy.signal import butter, sosfilt, firwin, filtfilt
 from sklearn.metrics.pairwise import euclidean_distances
 
-def read_EDF(path, channels = None):
-    """
-    Reads data from an EDF file and returns it in a numpy array format.
+# def read_EDF(path, channels = None):
+#     """
+#     Reads data from an EDF file and returns it in a numpy array format.
 
-    Parameters:
-        - path: path of the file that will be read.
+#     Parameters:
+#         - path: path of the file that will be read.
     
-    Optional Parameters:
-        - channels: list of channel codes that will be read. By default, this function reads all channels.
-        The list containing all channel codes is: ['Fc5.', 'Fc3.', 'Fc1.', 'Fcz.', 'Fc2.', 'Fc4.', 'Fc6.',
-        'C5..', 'C3..', 'C1..', 'Cz..', 'C2..', 'C4..', 'C6..', 'Cp5.', 'Cp3.', 'Cp1.', 'Cpz.', 'Cp2.',
-        'Cp4.', 'Cp6.', 'Fp1.', 'Fpz.', 'Fp2.', 'Af7.', 'Af3.', 'Afz.', 'Af4.', 'Af8.', 'F7..', 'F5..',
-        'F3..', 'F1..', 'Fz..', 'F2..', 'F4..', 'F6..', 'F8..', 'Ft7.', 'Ft8.', 'T7..', 'T8..', 'T9..',
-        'T10.', 'Tp7.', 'Tp8.', 'P7..', 'P5..', 'P3..', 'P1..', 'Pz..', 'P2..', 'P4..', 'P6..', 'P8..',
-        'Po7.', 'Po3.', 'Poz.', 'Po4.', 'Po8.', 'O1..', 'Oz..', 'O2..', 'Iz..']
-    """
+#     Optional Parameters:
+#         - channels: list of channel codes that will be read. By default, this function reads all channels.
+#         The list containing all channel codes is: ['Fc5.', 'Fc3.', 'Fc1.', 'Fcz.', 'Fc2.', 'Fc4.', 'Fc6.',
+#         'C5..', 'C3..', 'C1..', 'Cz..', 'C2..', 'C4..', 'C6..', 'Cp5.', 'Cp3.', 'Cp1.', 'Cpz.', 'Cp2.',
+#         'Cp4.', 'Cp6.', 'Fp1.', 'Fpz.', 'Fp2.', 'Af7.', 'Af3.', 'Afz.', 'Af4.', 'Af8.', 'F7..', 'F5..',
+#         'F3..', 'F1..', 'Fz..', 'F2..', 'F4..', 'F6..', 'F8..', 'Ft7.', 'Ft8.', 'T7..', 'T8..', 'T9..',
+#         'T10.', 'Tp7.', 'Tp8.', 'P7..', 'P5..', 'P3..', 'P1..', 'Pz..', 'P2..', 'P4..', 'P6..', 'P8..',
+#         'Po7.', 'Po3.', 'Poz.', 'Po4.', 'Po8.', 'O1..', 'Oz..', 'O2..', 'Iz..']
+#     """
     
-    file_folder = os.path.dirname(os.path.abspath(__file__))
-    new_path = os.path.join(file_folder, path)
-    reader = pyedflib.EdfReader(new_path)
+#     file_folder = os.path.dirname(os.path.abspath(__file__))
+#     new_path = os.path.join(file_folder, path)
+#     reader = EdfReader(new_path)
 
-    if channels:
-        signals = []
-        signal_labels = reader.getSignalLabels()
-        for c in channels:
-            index = signal_labels.index(c)
-            signals.append(reader.readSignal(index))
-        signals = np.array(signals)
-    else:
-        n = reader.signals_in_file
-        signals = np.zeros((n, reader.getNSamples()[0]))
-        for i in np.arange(n):
-            signals[i, :] = reader.readSignal(i)
+#     if channels:
+#         signals = []
+#         signal_labels = reader.getSignalLabels()
+#         for c in channels:
+#             index = signal_labels.index(c)
+#             signals.append(reader.readSignal(index))
+#         signals = np.array(signals)
+#     else:
+#         n = reader.signals_in_file
+#         signals = np.zeros((n, reader.getNSamples()[0]))
+#         for i in np.arange(n):
+#             signals[i, :] = reader.readSignal(i)
 
-    reader._close()
-    del reader
-    return signals
+#     reader._close()
+#     del reader
+#     return signals
 
-def create_csv_database_from_edf(edf_folder_path, csv_folder_path, num_classes, channels = None):
-    """
-    Creates a database with CSV files from the original Physionet database, that contains EEG Signals stored
-    in EDF files.
+# def create_csv_database_from_edf(edf_folder_path, csv_folder_path, num_classes, channels = None):
+#     """
+#     Creates a database with CSV files from the original Physionet database, that contains EEG Signals stored
+#     in EDF files.
 
-    Parameters:
-        - edf_folder_path: path of the folder in which the the EDF files are stored;
-        - csv_folder_path: path of the folder in which the the CSV files will be stored;
-        - num_classes: total number of classes (individuals).
+#     Parameters:
+#         - edf_folder_path: path of the folder in which the the EDF files are stored;
+#         - csv_folder_path: path of the folder in which the the CSV files will be stored;
+#         - num_classes: total number of classes (individuals).
     
-    Optional Parameters:
-        - channels: list of channel codes that will be read from the edf files. By default,
-        this function reads all channels. The list containing all channel codes is:
-        ['Fc5.', 'Fc3.', 'Fc1.', 'Fcz.', 'Fc2.', 'Fc4.', 'Fc6.', 'C5..', 'C3..', 'C1..', 'Cz..', 'C2..',
-        'C4..', 'C6..', 'Cp5.', 'Cp3.', 'Cp1.', 'Cpz.', 'Cp2.', 'Cp4.', 'Cp6.', 'Fp1.', 'Fpz.', 'Fp2.',
-        'Af7.', 'Af3.', 'Afz.', 'Af4.', 'Af8.', 'F7..', 'F5..', 'F3..', 'F1..', 'Fz..', 'F2..', 'F4..',
-        'F6..', 'F8..', 'Ft7.', 'Ft8.', 'T7..', 'T8..', 'T9..', 'T10.', 'Tp7.', 'Tp8.', 'P7..', 'P5..',
-        'P3..', 'P1..', 'Pz..', 'P2..', 'P4..', 'P6..', 'P8..', 'Po7.', 'Po3.', 'Poz.', 'Po4.', 'Po8.',
-        'O1..', 'Oz..', 'O2..', 'Iz..']
-    """
-    if(os.path.exists(csv_folder_path) == False):
-        os.mkdir(csv_folder_path)
+#     Optional Parameters:
+#         - channels: list of channel codes that will be read from the edf files. By default,
+#         this function reads all channels. The list containing all channel codes is:
+#         ['Fc5.', 'Fc3.', 'Fc1.', 'Fcz.', 'Fc2.', 'Fc4.', 'Fc6.', 'C5..', 'C3..', 'C1..', 'Cz..', 'C2..',
+#         'C4..', 'C6..', 'Cp5.', 'Cp3.', 'Cp1.', 'Cpz.', 'Cp2.', 'Cp4.', 'Cp6.', 'Fp1.', 'Fpz.', 'Fp2.',
+#         'Af7.', 'Af3.', 'Afz.', 'Af4.', 'Af8.', 'F7..', 'F5..', 'F3..', 'F1..', 'Fz..', 'F2..', 'F4..',
+#         'F6..', 'F8..', 'Ft7.', 'Ft8.', 'T7..', 'T8..', 'T9..', 'T10.', 'Tp7.', 'Tp8.', 'P7..', 'P5..',
+#         'P3..', 'P1..', 'Pz..', 'P2..', 'P4..', 'P6..', 'P8..', 'Po7.', 'Po3.', 'Poz.', 'Po4.', 'Po8.',
+#         'O1..', 'Oz..', 'O2..', 'Iz..']
+#     """
+#     if(os.path.exists(csv_folder_path) == False):
+#         os.mkdir(csv_folder_path)
 
-    subject = 1
-    while(subject <= num_classes):
-        if(os.path.exists(csv_folder_path+'/S{:03d}'.format(subject)) == False):
-            os.mkdir(csv_folder_path+'/S{:03d}'.format(subject))
+#     subject = 1
+#     while(subject <= num_classes):
+#         if(os.path.exists(csv_folder_path+'/S{:03d}'.format(subject)) == False):
+#             os.mkdir(csv_folder_path+'/S{:03d}'.format(subject))
 
-        task = 1
-        while(task <= 14):
-            data = read_EDF(edf_folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(subject, subject, task), channels)
-            savetxt(csv_folder_path+'/S{:03d}/S{:03d}R{:02d}.csv'.format(subject, subject, task), data,
-                    fmt='%d', delimiter=',')
-            task += 1
+#         task = 1
+#         while(task <= 14):
+#             data = read_EDF(edf_folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(subject, subject, task), channels)
+#             savetxt(csv_folder_path+'/S{:03d}/S{:03d}R{:02d}.csv'.format(subject, subject, task), data,
+#                     fmt='%d', delimiter=',')
+#             task += 1
 
-        subject += 1
+#         subject += 1
 
 def load_data(folder_path, train_tasks, test_tasks, file_type, num_classes, channels = None, verbose = 0):
     """
@@ -124,9 +124,9 @@ def load_data(folder_path, train_tasks, test_tasks, file_type, num_classes, chan
             if(verbose):
                 print(f'  > Loading data from subject {i}.')
 
-            if(file_type == 'edf'):
-                train_content.append(read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task), channels))
-            elif(file_type == 'csv'):
+            # if(file_type == 'edf'):
+                # train_content.append(read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, train_task), channels))
+            if(file_type == 'csv'):
                 train_content.append(loadtxt(folder_path+'S{:03d}/S{:03d}R{:02d}.csv'.format(i, i, train_task), delimiter=','))
             else:
                 print('ERROR: Invalid file_type parameter. Data will not be loaded.')
@@ -145,9 +145,9 @@ def load_data(folder_path, train_tasks, test_tasks, file_type, num_classes, chan
             if(verbose):
                 print(f'  > Loading data from subject {i}.')
 
-            if(file_type == 'edf'):
-                test_content.append(read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task), channels))
-            elif(file_type == 'csv'):
+            # if(file_type == 'edf'):
+                # test_content.append(read_EDF(folder_path+'S{:03d}/S{:03d}R{:02d}.edf'.format(i, i, test_task), channels))
+            if(file_type == 'csv'):
                 test_content.append(loadtxt(folder_path+'S{:03d}/S{:03d}R{:02d}.csv'.format(i, i, test_task), delimiter=','))
             else:
                 print('ERROR: Invalid file_type parameter. Data will not be loaded.')
@@ -334,6 +334,15 @@ def normalize_signal(content, normalize_type):
             content[c] /= max_value
             c += 1
         c = 0
+    elif(normalize_type == 'sun'):
+        while c < channels:
+            mean = np.mean(content[c])
+            std = np.std(content[c])
+
+            content[c] -= mean
+            content[c] /= std
+
+            c += 1
     else:
         print('ERROR: Invalid normalize_type parameter.')
 
