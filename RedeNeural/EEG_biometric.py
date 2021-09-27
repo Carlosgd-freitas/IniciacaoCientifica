@@ -20,7 +20,7 @@ np.random.seed()
 
 # Hyperparameters
 batch_size = 100 #80                # Batch Size
-training_epochs = 30 #500            # Total number of training epochs
+training_epochs = 60 #500            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
@@ -85,7 +85,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # variando epocas no procedimento normal
 # 10 épocas - 63,1193% acurácia e 3,3955% EER
 # 20 épocas - 00,0000% acurácia e 00,0000% EER
-# 30 épocas - 00,0000% acurácia e 00,0000% EER
+# 30 épocas - 64,2202% acurácia e 3,8529% EER
 # 40 épocas - 00,0000% acurácia e 00,0000% EER
 # 50 épocas - 00,0000% acurácia e 00,0000% EER
 # 60 épocas - 00,0000% acurácia e 00,0000% EER
