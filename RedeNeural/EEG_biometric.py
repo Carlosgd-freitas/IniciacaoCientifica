@@ -19,8 +19,8 @@ from tensorflow.keras.optimizers import SGD, Adam
 np.random.seed()
 
 # Hyperparameters
-batch_size = 80 #100                # Batch Size
-training_epochs = 500 #60            # Total number of training epochs
+batch_size = 100 #80                # Batch Size
+training_epochs = 10 #500            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
@@ -42,8 +42,8 @@ filter_type = 'filtfilt'        # Type of the filter used: 'sosfilt' or 'filtfil
 normalize_type = 'each_channel' # Type of the normalization that will be applied: 'each_channel' or 'all_channels'
 
 # Parameters used in functions.crop_data()
-window_size = 160 #1920              # Sliding window size, used when composing the dataset
-offset = 160 #35                     # Sliding window offset (deslocation), used when composing the dataset
+window_size = 1920 # 160             # Sliding window size, used when composing the dataset
+offset = 35 #160                     # Sliding window offset (deslocation), used when composing the dataset
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
@@ -77,27 +77,35 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # Task 13 - T3R3
 # Task 14 - T4R3
 
-# sun model
+# sun modelo
 # 1000 epochs - without filtering and data augmentation - 46,4952% acurácia e 10,3115% EER
-#  500 epochs - without filtering and data augmentation - 00,0000% acurácia e 00,0000% EER
-#  200 epochs - without filtering and data augmentation - 31,4380% acurácia e 10,3115% EER
+#  500 epochs - without filtering and data augmentation - 45,5024% acurácia e  9,3899% EER
+#  200 epochs - without filtering and data augmentation - 31,4380% acurácia e 12,8991% EER
+#
+# variando epocas no procedimento normal
+# 10 épocas - 00,0000% acurácia e 00,0000% EER
+# 20 épocas - 00,0000% acurácia e 00,0000% EER
+# 30 épocas - 00,0000% acurácia e 00,0000% EER
+# 40 épocas - 00,0000% acurácia e 00,0000% EER
+# 50 épocas - 00,0000% acurácia e 00,0000% EER
+# 60 épocas - 00,0000% acurácia e 00,0000% EER
 
 # functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
 
 # Creating the model
-model = models.create_model_sun(window_size, num_channels, num_classes)
+model = models.create_model(window_size, num_channels, num_classes)
 model.summary()
 
 # Loading the raw data
 train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes)   
 
 # Filtering the raw data
-# train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
-# test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
+train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
+test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
 
 # Normalize the filtered data
-train_content = functions.normalize_data(train_content, 'sun')
-test_content = functions.normalize_data(test_content, 'sun')
+# train_content = functions.normalize_data(train_content, 'sun')
+# test_content = functions.normalize_data(test_content, 'sun')
 
 # Apply data augmentation (sliding window cropping) on normalized data
 x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
@@ -379,8 +387,8 @@ print(f'y_test: {y_test.shape}\n')
 ####################################################################################################
 
 # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
-# opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
-opt = Adam(learning_rate = 0.0001)
+opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
+# opt = Adam(learning_rate = 0.0001)
 
 model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
 
@@ -389,7 +397,7 @@ results = model.fit(x_train,
                     y_train,
                     batch_size = batch_size,
                     epochs = training_epochs,
-                    # callbacks = [callback],
+                    callbacks = [callback],
                     validation_data = (x_val, y_val)
                     )
 
@@ -437,7 +445,7 @@ print("Minimum Loss : {:.4f}".format(min_loss))
 print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
 # Removing the last layers of the model and getting the features array
-model_for_verification = models.create_model_sun(window_size, num_channels, num_classes, True)
+model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
 
 model_for_verification.summary()
 model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
