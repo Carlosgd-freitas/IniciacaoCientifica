@@ -20,7 +20,7 @@ np.random.seed()
 
 # Hyperparameters
 batch_size = 80 #100                # Batch Size
-training_epochs = 1000 #60            # Total number of training epochs
+training_epochs = 200 #60            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
@@ -76,6 +76,10 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # Task 12 - T2R3
 # Task 13 - T3R3
 # Task 14 - T4R3
+
+# sun model
+# 1000 epochs - without filtering and data augmentation - 46,4952% acurácia e 10,3115% EER
+# 200 epochs - without filtering and data augmentation - 
 
 # functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
 
