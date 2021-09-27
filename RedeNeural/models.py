@@ -460,7 +460,7 @@ def create_model_sun(window_size, num_channels, num_classes, remove_last_layer=F
     model.add(Dropout(0.5, name='Layer_5-3'))
 
     model.add(LSTM(192, return_sequences=True, name='Layer_6'))
-    model.add(LSTM(192, return_sequences=True, name='Layer_7'))
+    model.add(LSTM(192, name='Layer_7'))
 
     model.add(Dense(192, name='Layer_8'))
     model.add(Dense(192, name='Layer_9'))
