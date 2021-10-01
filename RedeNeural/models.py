@@ -463,7 +463,7 @@ def create_model_sun(window_size, num_channels, num_classes, remove_last_layer=F
     model.add(LSTM(192, activation='sigmoid', name='Layer_6'))
     model.add(LSTM(192, activation='sigmoid', name='Layer_7'))
 
-    model.add(Flatten(name='Flatten_2'))
+    # model.add(Flatten(name='Flatten_2'))
     model.add(Dense(192, name='Layer_8'))
     model.add(Dense(192, name='Layer_9'))
 
