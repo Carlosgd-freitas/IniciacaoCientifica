@@ -450,18 +450,18 @@ def create_model_sun(window_size, num_channels, num_classes, remove_last_layer=F
     else:
         model = Sequential(name='Biometric_for_Verification')
 
-    model.add(Conv1D(128, (2), input_shape=(window_size, num_channels), activation='relu', name='Layer_1'))
-    model.add(Conv1D(256, (2), name='Layer_2'))
-    model.add(Conv1D(512, (2), name='Layer_3'))
-    model.add(Conv1D(1024, (2), name='Layer_4'))
+    model.add(Conv1D(128, (2), input_shape=(window_size, num_channels), padding='same', activation='relu', name='Layer_1'))
+    model.add(Conv1D(256, (2), padding='same', name='Layer_2'))
+    model.add(Conv1D(512, (2), padding='same', name='Layer_3'))
+    model.add(Conv1D(1024, (2), padding='same', name='Layer_4'))
 
     model.add(Flatten(name='Layer_5-1'))
     model.add(Dense(192, name='Layer_5-2'))
     model.add(Dropout(0.5, name='Layer_5-3'))
 
-    model.add(Reshape((-1, 192), name='Flatten_1'))
-    model.add(LSTM(192, return_sequences=True, name='Layer_6'))
-    model.add(LSTM(192, return_sequences=True, name='Layer_7'))
+    model.add(Reshape((1, 192), name='Reshape_1'))
+    model.add(LSTM(192, activation='sigmoid', name='Layer_6'))
+    model.add(LSTM(192, activation='sigmoid', name='Layer_7'))
 
     model.add(Flatten(name='Flatten_2'))
     model.add(Dense(192, name='Layer_8'))
