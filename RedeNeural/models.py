@@ -3,8 +3,7 @@ from tensorflow.keras.layers import Dense, Dropout, Flatten, Conv1D, MaxPooling1
 from tensorflow.keras.layers import Concatenate, GlobalAveragePooling1D, Reshape, Activation, Permute, Multiply
 from tensorflow.keras.layers import MultiHeadAttention, LayerNormalization, Bidirectional, LSTM, GRU, RNN
 from tensorflow.keras import Input, Model
-from tensorflow import transpose, reshape, split, float32
-from tensorflow.compat.v1.nn.rnn_cell import DropoutWrapper
+from tensorflow import transpose, reshape, split
 from tensorflow.keras.layers import LSTMCell, StackedRNNCells
 
 def scheduler(current_epoch, learning_rate):
@@ -464,11 +463,11 @@ def create_model_sun(window_size, num_channels, num_classes, remove_last_layer=F
     lstm_in = split(lstm_in, 160, 0)
     # Add LSTM layers
     lstm = LSTMCell(192)
-    drop = DropoutWrapper(lstm, output_keep_prob=0.5)
-    cell = StackedRNNCells([drop] * 2)
+    cell = StackedRNNCells(2)
 
     x = RNN(cell, unroll=True) (lstm_in)
 
+    x = Dropout(0.5) (x)
     x = Dense(200, name='Layer_8') (x)
     x = Dense(200, name='Layer_9') (x)
 
