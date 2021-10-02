@@ -463,7 +463,7 @@ def create_model_sun(window_size, num_channels, num_classes, remove_last_layer=F
     lstm_in = split(lstm_in, 160, 0)
     # Add LSTM layers
     lstm = LSTMCell(192)
-    cell = StackedRNNCells(2)
+    cell = StackedRNNCells(lstm)
 
     x = RNN(cell, unroll=True) (lstm_in)
 
