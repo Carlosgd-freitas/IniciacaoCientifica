@@ -465,7 +465,7 @@ def create_model_sun(window_size, num_channels, num_classes, remove_last_layer=F
     lstm = [LSTMCell(192) for _ in range(2)]
     cell = StackedRNNCells(lstm)
 
-    x = RNN(cell, unroll=True) (lstm_in)
+    x = RNN(cell) (x)
 
     x = Dropout(0.5) (x)
     x = Dense(200, name='Layer_8') (x)
