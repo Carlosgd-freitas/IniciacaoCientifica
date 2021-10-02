@@ -451,9 +451,9 @@ def create_model_sun(window_size, num_channels, num_classes, remove_last_layer=F
         model = Sequential(name='Biometric_for_Verification')
 
     model.add(Conv1D(128, (2), input_shape=(window_size, num_channels), padding='same', activation='relu', name='Layer_1'))
-    model.add(Conv1D(256, (2), padding='same', name='Layer_2'))
-    model.add(Conv1D(512, (2), padding='same', name='Layer_3'))
-    model.add(Conv1D(1024, (2), padding='same', name='Layer_4'))
+    model.add(Conv1D(256, (2), padding='same', activation='relu', name='Layer_2'))
+    model.add(Conv1D(512, (2), padding='same', activation='relu', name='Layer_3'))
+    model.add(Conv1D(1024, (2), padding='same', activation='relu', name='Layer_4'))
 
     model.add(Flatten(name='Layer_5-1'))
     model.add(Dense(192, name='Layer_5-2'))
@@ -464,8 +464,8 @@ def create_model_sun(window_size, num_channels, num_classes, remove_last_layer=F
     model.add(LSTM(192, return_sequences=True, name='Layer_7')) #activation='sigmoid'
 
     model.add(Flatten(name='Flatten_2'))
-    model.add(Dense(4096, name='Layer_8')) # 192 units
-    model.add(Dense(4096, name='Layer_9')) # 192 units
+    model.add(Dense(200, name='Layer_8')) # 192 units
+    model.add(Dense(200, name='Layer_9')) # 192 units
 
     if(remove_last_layer == False):
         model.add(Dense(num_classes, activation='softmax', name='Layer_10'))
