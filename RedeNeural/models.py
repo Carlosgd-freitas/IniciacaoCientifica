@@ -1,8 +1,10 @@
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Flatten, Conv1D, MaxPooling1D, BatchNormalization
 from tensorflow.keras.layers import Concatenate, GlobalAveragePooling1D, Reshape, Activation, Permute, Multiply
-from tensorflow.keras.layers import MultiHeadAttention, LayerNormalization, Bidirectional, LSTM, GRU, Reshape
+from tensorflow.keras.layers import MultiHeadAttention, LayerNormalization, Bidirectional, LSTM, GRU, RNN
 from tensorflow.keras import Input, Model
+from tensorflow import transpose, reshape, split, float32
+from tensorflow.compat.v1.nn.rnn_cell import LSTMCell, MultiRNNCell, DropoutWrapper
 
 def scheduler(current_epoch, learning_rate):
     """
@@ -443,31 +445,57 @@ def create_model_sun(window_size, num_channels, num_classes, remove_last_layer=F
         - remove_last_layer: if True, the model created won't have the fully connected block at the end with a
         softmax activation function.
     """
-    model = None
+    inputs = Input(shape=(window_size, num_channels))
 
+    x = (Conv1D(128, (2), padding='same', activation='relu', name='Layer_1')) (inputs)
+    x = (Conv1D(256, (2), padding='same', activation='relu', name='Layer_2')) (x)
+    x = (Conv1D(512, (2), padding='same', activation='relu', name='Layer_3')) (x)
+    x = (Conv1D(1024, (2), padding='same', activation='relu', name='Layer_4')) (x)
+
+    n_ch = 64 * 16
+
+    # Construct the LSTM inputs and LSTM cells
+    lstm_in = transpose(x, [1, 0, 2])  # reshape into (seq_len, batch, channels)
+    lstm_in = reshape(lstm_in, [-1, n_ch])  # Now (seq_len*N, n_channels)
+    # To cells
+    lstm_in = Dense(192) (lstm_in)  # or activation = tf.nn.relu
+    # Open up the tensor into a list of seq_len pieces
+    lstm_in = split(lstm_in, 160, 0)
+    # Add LSTM layers
+    lstm = LSTMCell(192)
+    drop = DropoutWrapper(lstm, output_keep_prob=0.5)
+    cell = MultiRNNCell([drop] * 2)
+    initial_state = cell.zero_state(80, float32)
+
+    x = RNN(cell, unroll=True) (lstm_in)
+
+    x = Dense(200, name='Layer_8') (x)
+    x = Dense(200, name='Layer_9') (x)
+
+    # Model used for Identification
     if(remove_last_layer == False):
-        model = Sequential(name='Biometric_for_Identification')
+        x = Dense(num_classes, activation='softmax') (x)
+        model = Model(inputs=inputs, outputs=x, name='Biometric_for_Identification')
+        
+    # Model used for Verification
     else:
-        model = Sequential(name='Biometric_for_Verification')
-
-    model.add(Conv1D(128, (2), input_shape=(window_size, num_channels), padding='same', activation='relu', name='Layer_1'))
-    model.add(Conv1D(256, (2), padding='same', activation='relu', name='Layer_2'))
-    model.add(Conv1D(512, (2), padding='same', activation='relu', name='Layer_3'))
-    model.add(Conv1D(1024, (2), padding='same', activation='relu', name='Layer_4'))
-
-    model.add(Flatten(name='Layer_5-1'))
-    model.add(Dense(192, name='Layer_5-2'))
-    model.add(Dropout(0.5, name='Layer_5-3'))
-
-    model.add(Reshape((-1, 192), name='Flatten_1'))
-    model.add(LSTM(192, return_sequences=True, name='Layer_6')) #activation='sigmoid'
-    model.add(LSTM(192, return_sequences=True, name='Layer_7')) #activation='sigmoid'
-
-    model.add(Flatten(name='Flatten_2'))
-    model.add(Dense(200, name='Layer_8')) # 192 units
-    model.add(Dense(200, name='Layer_9')) # 192 units
-
-    if(remove_last_layer == False):
-        model.add(Dense(num_classes, activation='softmax', name='Layer_10'))
+        model = Model(inputs=inputs, outputs=x, name='Biometric_for_Verification')
 
     return model
+
+    # model.add(Flatten(name='Layer_5-1'))
+    # model.add(Dense(192, name='Layer_5-2'))
+    # model.add(Dropout(0.5, name='Layer_5-3'))
+
+    # model.add(Reshape((-1, 192), name='Flatten_1'))
+    # model.add(LSTM(192, return_sequences=True, name='Layer_6')) #activation='sigmoid'
+    # model.add(LSTM(192, return_sequences=True, name='Layer_7')) #activation='sigmoid'
+
+    # model.add(Flatten(name='Flatten_2'))
+    # model.add(Dense(200, name='Layer_8')) # 192 units
+    # model.add(Dense(200, name='Layer_9')) # 192 units
+
+    # if(remove_last_layer == False):
+    #     model.add(Dense(num_classes, activation='softmax', name='Layer_10'))
+
+    # return model
