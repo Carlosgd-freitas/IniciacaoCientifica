@@ -4,7 +4,7 @@ from tensorflow.keras.layers import Concatenate, GlobalAveragePooling1D, Reshape
 from tensorflow.keras.layers import MultiHeadAttention, LayerNormalization, Bidirectional, LSTM, GRU, RNN
 from tensorflow.keras import Input, Model
 from tensorflow import transpose, reshape, split, float32
-from tensorflow.compat.v1.nn.rnn_cell import MultiRNNCell, DropoutWrapper
+from tensorflow.compat.v1.nn.rnn_cell import DropoutWrapper
 from tensorflow.keras.layers import LSTMCell, StackedRNNCells
 
 def scheduler(current_epoch, learning_rate):
@@ -466,7 +466,6 @@ def create_model_sun(window_size, num_channels, num_classes, remove_last_layer=F
     lstm = LSTMCell(192)
     drop = DropoutWrapper(lstm, output_keep_prob=0.5)
     cell = StackedRNNCells([drop] * 2)
-    initial_state = cell.zero_state(80, float32)
 
     x = RNN(cell, unroll=True) (lstm_in)
 
