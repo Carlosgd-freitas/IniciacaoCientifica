@@ -20,7 +20,7 @@ np.random.seed()
 
 # Hyperparameters
 batch_size = 80 #100                # Batch Size
-training_epochs = 100 #60            # Total number of training epochs
+training_epochs = 500 #60            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
@@ -81,6 +81,10 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # 1000 epochs - without filtering and data augmentation - 46,4952% acurácia e 10,3115% EER
 #  500 epochs - without filtering and data augmentation - 45,5024% acurácia e  9,3899% EER
 #  200 epochs - without filtering and data augmentation - 31,4380% acurácia e 12,8991% EER
+#
+# sun modelo, versão com LSTMCell, StackedRNNCells e RNN
+#  500 epochs - without filtering and data augmentation - XX,XXXX% acurácia e XX,XXXX% EER
+#  100 epochs - without filtering and data augmentation - 23,5259% acurácia e 29,9559% EER
 #
 # variando epocas no procedimento normal
 # 10 épocas - 63,1193% acurácia e 3,3955% EER

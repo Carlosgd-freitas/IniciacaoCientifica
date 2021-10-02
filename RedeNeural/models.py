@@ -452,15 +452,15 @@ def create_model_sun(window_size, num_channels, num_classes, remove_last_layer=F
     x = (Conv1D(512, (2), padding='same', activation='relu', name='Layer_3')) (x)
     x = (Conv1D(1024, (2), padding='same', activation='relu', name='Layer_4')) (x)
 
-    n_ch = 64 * 16
+    # n_ch = 64 * 16
 
     # Construct the LSTM inputs and LSTM cells
-    lstm_in = transpose(x, [1, 0, 2])  # reshape into (seq_len, batch, channels)
-    lstm_in = reshape(lstm_in, [-1, n_ch])  # Now (seq_len*N, n_channels)
-    # To cells
-    lstm_in = Dense(192) (lstm_in)  # or activation = tf.nn.relu
-    # Open up the tensor into a list of seq_len pieces
-    lstm_in = split(lstm_in, 160, 0)
+    # lstm_in = transpose(x, [1, 0, 2])  # reshape into (seq_len, batch, channels)
+    # lstm_in = reshape(lstm_in, [-1, n_ch])  # Now (seq_len*N, n_channels)
+    # # To cells
+    # lstm_in = Dense(192) (lstm_in)  # or activation = tf.nn.relu
+    # # Open up the tensor into a list of seq_len pieces
+    # lstm_in = split(lstm_in, 160, 0)
 
     # Add LSTM layers
     lstm = [LSTMCell(192) for _ in range(2)]
