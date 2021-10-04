@@ -326,11 +326,11 @@ def create_model_LSTM(window_size, num_channels, num_classes, remove_last_layer=
         model = Sequential(name='Biometric_for_Verification')
 
     model.add(Input(shape=(window_size, num_channels)))
-    model.add(Bidirectional(LSTM(10, return_sequences=True)))
-    model.add(Bidirectional(LSTM(10, return_sequences=True)))
-    model.add(Bidirectional(LSTM(10, return_sequences=True)))
-    model.add(Bidirectional(LSTM(10, return_sequences=True)))
-    model.add(Bidirectional(LSTM(10, return_sequences=True)))
+    model.add((LSTM(10, return_sequences=True)))
+    model.add((LSTM(10, return_sequences=True)))
+    model.add((LSTM(10, return_sequences=True)))
+    model.add((LSTM(10, return_sequences=True)))
+    model.add((LSTM(10, return_sequences=True)))
     model.add(Flatten())
     model.add(Dense(256))
 
