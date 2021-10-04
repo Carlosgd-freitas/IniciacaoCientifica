@@ -20,7 +20,7 @@ np.random.seed()
 
 # Hyperparameters
 batch_size = 100 #80                # Batch Size
-training_epochs = 60 #500            # Total number of training epochs
+training_epochs = 40 #500            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
@@ -90,18 +90,15 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # 10 épocas - 63,1193% acurácia e 3,3955% EER
 # 30 épocas - 64,2202% acurácia e 3,8529% EER
 # 60 épocas - 63,3027% acurácia e 3,4852% EER
+# 
+# Usando 40 epocas daki pra baixo
+# apenas LSTM - 5 blocos bidirecionais com 10 units cada - XX,XXXX% acurácia e XX,XXXX% EER
+# apenas LSTM - 5 blocos com 10 units cada               - XX,XXXX% acurácia e XX,XXXX% EER
+# LSTM + schons - 5 blocos com 10 units cada             - XX,XXXX% acurácia e XX,XXXX% EER
 #
-# modelo apenas LSTM
-# 5 blocos bidirecionais com 10 units cada - XX,XXXX% acurácia e XX,XXXX% EER
-# 5 blocos com 10 units cada               - XX,XXXX% acurácia e XX,XXXX% EER
-# 5 blocos com 10 units cada               - XX,XXXX% acurácia e XX,XXXX% EER
-# 5 blocos com 10 units cada               - XX,XXXX% acurácia e XX,XXXX% EER
-#
-# modelo apenas GRU
-# 5 blocos bidirecionais com 10 units cada - XX,XXXX% acurácia e XX,XXXX% EER
-# 5 blocos com 10 units cada               - XX,XXXX% acurácia e XX,XXXX% EER
-# 5 blocos com 10 units cada               - XX,XXXX% acurácia e XX,XXXX% EER
-# 5 blocos com 10 units cada               - XX,XXXX% acurácia e XX,XXXX% EER
+# apenas GRU - 5 blocos bidirecionais com 10 units cada - XX,XXXX% acurácia e XX,XXXX% EER
+# apenas GRU - 5 blocos com 10 units cada               - XX,XXXX% acurácia e XX,XXXX% EER
+# GRU + schons - 5 blocos com 10 units cada             - XX,XXXX% acurácia e XX,XXXX% EER
 
 # functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
 
