@@ -92,18 +92,18 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # 60 épocas - 63,3027% acurácia e 3,4852% EER
 # 
 # Usando 40 epocas daki pra baixo
-# apenas LSTM - 5 blocos bidirecionais com 10 units cada - XX,XXXX% acurácia e XX,XXXX% EER
-# apenas LSTM - 5 blocos com 10 units cada               - XX,XXXX% acurácia e XX,XXXX% EER
-# LSTM + schons - 5 blocos com 10 units cada             - XX,XXXX% acurácia e XX,XXXX% EER
+# apenas LSTM - 5 blocos bidirecionais com 10 units cada - 53,0275% acurácia, 48,9983% EER e 0.0849 Decidibilidade
+# apenas LSTM - 5 blocos com 10 units cada               - 57,2477% acurácia, 48,3405% EER e 0.0995 Decidibilidade
+# LSTM + schons - 5 blocos com 10 units cada             - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
 #
-# apenas GRU - 5 blocos bidirecionais com 10 units cada - XX,XXXX% acurácia e XX,XXXX% EER
-# apenas GRU - 5 blocos com 10 units cada               - XX,XXXX% acurácia e XX,XXXX% EER
-# GRU + schons - 5 blocos com 10 units cada             - XX,XXXX% acurácia e XX,XXXX% EER
+# apenas GRU - 5 blocos bidirecionais com 10 units cada - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
+# apenas GRU - 5 blocos com 10 units cada               - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
+# GRU + schons - 5 blocos com 10 units cada             - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
 
 # functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
 
 # Creating the model
-model = models.create_model_LSTM(window_size, num_channels, num_classes)
+model = models.create_model_GRU(window_size, num_channels, num_classes)
 model.summary()
 
 # Loading the raw data
@@ -455,7 +455,7 @@ print("Minimum Loss : {:.4f}".format(min_loss))
 print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
 # Removing the last layers of the model and getting the features array
-model_for_verification = models.create_model_LSTM(window_size, num_channels, num_classes, True)
+model_for_verification = models.create_model_GRU(window_size, num_channels, num_classes, True)
 
 model_for_verification.summary()
 model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
