@@ -159,37 +159,6 @@ def create_model(window_size, num_channels, num_classes, remove_last_layer=False
         # FC4
         model.add(Dense(num_classes, activation='softmax', name='FC4'))
 
-    # model.add(Conv1D(96, (11), input_shape=(window_size, num_channels), activation='relu', name='Conv1'))
-    # model.add(BatchNormalization(name='Norm1'))
-    # model.add(Dropout(0.1, name='Drop1'))
-    # model.add(MaxPooling1D(strides=2, name='Pool1'))
-
-    # model.add(Conv1D(128, (9), activation='relu', name='Conv2'))
-    # model.add(BatchNormalization(name='Norm2'))
-    # model.add(Dropout(0.1, name='Drop2'))
-    # model.add(MaxPooling1D(strides=2, name='Pool2'))
-
-    # model.add(Conv1D(256, (9), activation='relu', name='Conv3')) 
-    # model.add(BatchNormalization(name='Norm3'))
-    # model.add(Dropout(0.1, name='Drop3'))
-    # model.add(MaxPooling1D(strides=2, name='Pool3'))
-
-    # model.add(Conv1D(512, (7), activation='relu', name='Conv4')) 
-    # model.add(BatchNormalization(name='Norm4'))
-    # model.add(Dropout(0.1, name='Drop4'))
-    # model.add(MaxPooling1D(strides=2, name='Pool4'))
-
-    # model.add(Flatten())
-    # model.add(Dense(4096, activation='relu', name='FC1'))
-    # model.add(Dense(4096, activation='relu', name='FC2'))
-    # model.add(Dropout(0.1, name='Drop5'))
-    # model.add(Dense(256, name='FC3'))
-    # model.add(BatchNormalization(name='Norm5'))
-
-    # if(remove_last_layer == False):
-    #     model.add(Dropout(0.1, name='Drop'))
-    #     model.add(Dense(num_classes, activation='softmax', name='FC4'))
-
     return model
 
 def create_model_inception(window_size, num_channels, num_classes, remove_last_layer=False):
@@ -392,45 +361,40 @@ def create_model_mixed(window_size, num_channels, num_classes, remove_last_layer
         - remove_last_layer: if True, the model created won't have the fully connected block at the end with a
         softmax activation function.
     """
-    inputs = Input(shape=(window_size, num_channels))
+    model = None
 
-    # x = MultiHeadAttention(num_heads=10, key_dim=num_channels)
-    # output_tensor = x(inputs, inputs)
-    # x = LayerNormalization() (output_tensor) # Add & Norm
-
-    x = SEBlock(inputs)
-
-    x = Conv1D(96, (11), activation='relu') (x)
-    x = BatchNormalization() (x)
-    x = MaxPooling1D(strides=4) (x)
-
-    x = InceptionBlock(x, 1)
-
-    x = Conv1D(128, (9), activation='relu') (x)
-    x = BatchNormalization() (x)
-    x = MaxPooling1D(strides=2) (x)
-
-    x = InceptionBlock(x, 2)
-
-    x = Conv1D(256, (9), activation='relu') (x)
-    x = BatchNormalization() (x)
-    x = MaxPooling1D(strides=2) (x)
-
-    x = Flatten() (x)
-    x = Dense(4096)(x)
-    x = Dense(4096)(x)
-    x = Dense(256)(x)
-
-    # Model used for Identification
     if(remove_last_layer == False):
-        x = BatchNormalization()(x)
-        x = Dropout(0.1) (x)
-        x = Dense(num_classes, activation='softmax') (x)
-        model = Model(inputs=inputs, outputs=x, name='Biometric_for_Identification')
-        
-    # Model used for Verification
+        model = Sequential(name='Biometric_for_Identification')
     else:
-        model = Model(inputs=inputs, outputs=x, name='Biometric_for_Verification')
+        model = Sequential(name='Biometric_for_Verification')
+
+    model.add(Conv1D(96, (11), input_shape=(window_size, num_channels), activation='relu', name='Conv1'))
+    model.add(BatchNormalization(name='Norm1'))
+    model.add(MaxPooling1D(strides=4, name='Pool1'))
+    
+    model.add(Conv1D(128, (9), activation='relu', name='Conv2'))
+    model.add(BatchNormalization(name='Norm2'))
+    model.add(MaxPooling1D(strides=2, name='Pool2'))
+    
+    model.add(Conv1D(256, (9), activation='relu', name='Conv3')) 
+    model.add(BatchNormalization(name='Norm3'))
+    model.add(MaxPooling1D(strides=2, name='Pool3'))
+    
+    model.add(LSTM(10, return_sequences=True))
+    model.add(LSTM(10, return_sequences=True))
+    model.add(LSTM(10, return_sequences=True))
+    model.add(LSTM(10, return_sequences=True))
+    model.add(LSTM(10, return_sequences=True))
+
+    model.add(Flatten())
+    model.add(Dense(4096, activation='relu', name='FC1'))
+    model.add(Dense(4096, activation='relu', name='FC2'))
+    model.add(Dense(256, name='FC3'))
+    model.add(BatchNormalization(name='Norm4'))
+
+    if(remove_last_layer == False):
+        model.add(Dropout(0.1, name='Drop'))
+        model.add(Dense(num_classes, activation='softmax', name='FC4'))
 
     return model
 
