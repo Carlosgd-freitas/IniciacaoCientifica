@@ -94,11 +94,13 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # Usando 40 epocas daki pra baixo
 # apenas LSTM - 5 blocos bidirecionais com 10 units cada - 53,0275% acurácia, 48,9983% EER e 0.0849 Decidibilidade
 # apenas LSTM - 5 blocos com 10 units cada               - 57,2477% acurácia, 48,3405% EER e 0.0995 Decidibilidade
-# LSTM + schons - 5 blocos com 10 units cada             - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
+# LSTM entre Pool3 e flatten do schons - 5 blocos com 10 units cada - 40,7339% acurácia, 25,5107% EER e 1.0763 Decidibilidade
+# LSTM antes do Conv1 do schons        - 5 blocos com 10 units cada - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
 #
 # apenas GRU - 5 blocos bidirecionais com 10 units cada   - 67,3395% acurácia, 48,9588% EER e 0.0734 Decidibilidade
 # apenas GRU - 5 blocos com 10 units cada                 - 64,7706% acurácia, 48,3384% EER e 0.0696 Decidibilidade
-# GRU + schons - 5 blocos bidirecionais com 10 units cada - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
+# GRU entre Pool3 e flatten do schons - 5 blocos bidirecionais com 10 units cada - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
+# GRU antes de Conv1 do schons        - 5 blocos bidirecionais com 10 units cada - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
 
 # functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
 

@@ -368,6 +368,14 @@ def create_model_mixed(window_size, num_channels, num_classes, remove_last_layer
     else:
         model = Sequential(name='Biometric_for_Verification')
 
+    model.add(Input(shape=(window_size, num_channels)))
+
+    model.add(Bidirectional(GRU(10, return_sequences=True)))
+    model.add(Bidirectional(GRU(10, return_sequences=True)))
+    model.add(Bidirectional(GRU(10, return_sequences=True)))
+    model.add(Bidirectional(GRU(10, return_sequences=True)))
+    model.add(Bidirectional(GRU(10, return_sequences=True)))
+
     model.add(Conv1D(96, (11), input_shape=(window_size, num_channels), activation='relu', name='Conv1'))
     model.add(BatchNormalization(name='Norm1'))
     model.add(MaxPooling1D(strides=4, name='Pool1'))
@@ -379,12 +387,6 @@ def create_model_mixed(window_size, num_channels, num_classes, remove_last_layer
     model.add(Conv1D(256, (9), activation='relu', name='Conv3')) 
     model.add(BatchNormalization(name='Norm3'))
     model.add(MaxPooling1D(strides=2, name='Pool3'))
-    
-    model.add(Bidirectional(GRU(10, return_sequences=True)))
-    model.add(Bidirectional(GRU(10, return_sequences=True)))
-    model.add(Bidirectional(GRU(10, return_sequences=True)))
-    model.add(Bidirectional(GRU(10, return_sequences=True)))
-    model.add(Bidirectional(GRU(10, return_sequences=True)))
 
     model.add(Flatten())
     model.add(Dense(4096, activation='relu', name='FC1'))
