@@ -380,11 +380,11 @@ def create_model_mixed(window_size, num_channels, num_classes, remove_last_layer
     model.add(BatchNormalization(name='Norm3'))
     model.add(MaxPooling1D(strides=2, name='Pool3'))
     
-    model.add(LSTM(10, return_sequences=True))
-    model.add(LSTM(10, return_sequences=True))
-    model.add(LSTM(10, return_sequences=True))
-    model.add(LSTM(10, return_sequences=True))
-    model.add(LSTM(10, return_sequences=True))
+    model.add(Bidirectional(GRU(10, return_sequences=True)))
+    model.add(Bidirectional(GRU(10, return_sequences=True)))
+    model.add(Bidirectional(GRU(10, return_sequences=True)))
+    model.add(Bidirectional(GRU(10, return_sequences=True)))
+    model.add(Bidirectional(GRU(10, return_sequences=True)))
 
     model.add(Flatten())
     model.add(Dense(4096, activation='relu', name='FC1'))
