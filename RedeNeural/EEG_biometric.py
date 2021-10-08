@@ -102,7 +102,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # apenas GRU - 5 blocos com 10 units cada                 - 64,7706% acurácia, 48,3384% EER e 0.0696 Decidibilidade
 # GRU entre Pool3 e flatten do schons - 5 blocos bidirecionais com 10 units cada - 58,3486% acurácia, 19,0014% EER e 1.7760 Decidibilidade
 # GRU antes de Conv1 do schons        - 5 blocos bidirecionais com 10 units cada - 71,3761% acurácia, 45,9015% EER e 0.2043 Decidibilidade
-# GRU antes de Conv1 do schons + 'sun' normalization - 5 blocos bidirecionais com 10 units cada - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
+# GRU antes de Conv1 do schons + 'sun' normalization - 5 blocos bidirecionais com 10 units cada - 80,3670% acurácia, 47,9181% EER e 0.0969 Decidibilidade
 
 # functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
 
