@@ -1,24 +1,17 @@
 import models
-import functions
 
 import pickle
 import numpy as np
 from deap import algorithms, base, tools, creator
-from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
+from tensorflow.keras.layers import Dense, Dropout, BatchNormalization, Activation
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.utils import get_custom_objects
 from tensorflow.keras.backend import sigmoid
-from tensorflow.keras.layers import Activation
-from tensorflow.keras.layers import Dense
 from tensorflow.keras.models import Model
 import array, random
 
-# np.random.seed(42)
+# np.random.seed()
 
-# Parameters from EEG_biometric.py
-x_train, y_train, x_val, y_val, window_size, num_channels, num_classes = functions.load_ga_parameters()
-
-# Genetic algorithm
 class SwishActivation(Activation):
     def __init__(self, activation, **kwargs):
         super(SwishActivation, self).__init__(activation, **kwargs)
@@ -84,7 +77,7 @@ def decode(genome, verbose=False):
     dense_layers = max_dense_layers # excluindo a softmax layer
     dense_layer_size = len(dense_layer_shape)
 
-    model = models.create_model(window_size, num_channels, num_classes)
+    model = models.create_model_mixed(window_size, num_channels, num_classes)
     x = model.output
 
     offset = 0
@@ -155,7 +148,8 @@ def evaluate_individual(genome):
     (loss, accuracy) = model.evaluate(x_val, y_val, verbose=0)
     num_parameters = model.count_params()
 
-    return loss
+    # return loss
+    return accuracy
 
 def prepare_toolbox(problem_instance, number_of_variables, bounds_low, bounds_up):
     
@@ -240,7 +234,8 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
                 pickle.dump(cp, cp_file)
 
     # Print top N solutions 
-    best_individuals = tools.selBest(halloffame,k = 3)
+    # best_individuals = tools.selBest(halloffame, k = 3) # if evaluate_individual returns loss
+    best_individuals = tools.selWorst(halloffame, k = 3)  # if evaluate_individual returns accuracy
     
     print("\n\n ******* Best solution is: *******\n")
     for bi in best_individuals:
@@ -252,8 +247,8 @@ def ga(toolbox, tools, pop_size, num_generations, recover_last_run=None, checkpo
 
 def genetic_run():
 
-    population_size = 5#10    # num of solutions in the population
-    num_generations = 1#5     # num of time we generate new population
+    population_size = 5     # num of solutions in the population
+    num_generations = 8     # num of time we generate new population
 
     creator.create("FitnessMax1", base.Fitness, weights=(-1.0,) * 1)
     creator.create("Individual1", array.array, typecode='d', fitness=creator.FitnessMax1)
@@ -269,3 +264,13 @@ def genetic_run():
     # chama o metodo genetico
     best_individuals = ga(toolbox, tools, population_size, num_generations)
     return best_individuals
+
+best_individuals = genetic_run()
+
+i = 1
+for ind in best_individuals:
+    print(f'accuracy do individuo #{i}: {ind.fitness.values}')
+    i += 1
+
+model = decode(best_individuals[0], True)
+model.summary()
