@@ -9,8 +9,8 @@ from tensorflow.keras.optimizers import SGD, Adam
 np.random.seed()
 
 # Hyperparameters
-batch_size = 100 #80                # Batch Size
-training_epochs = 40 #500            # Total number of training epochs
+batch_size = 100                # Batch Size
+training_epochs = 40            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
@@ -32,8 +32,8 @@ filter_type = 'filtfilt'        # Type of the filter used: 'sosfilt' or 'filtfil
 normalize_type = 'each_channel' # Type of the normalization that will be applied: 'each_channel' or 'all_channels'
 
 # Parameters used in functions.crop_data()
-window_size = 1920 # 160              # Sliding window size, used when composing the dataset
-offset = 35 # 160                     # Sliding window offset (deslocation), used when composing the dataset
+window_size = 160 # 1920              # Sliding window size, used when composing the dataset
+offset = 160 # 35                     # Sliding window offset (deslocation), used when composing the dataset
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
@@ -88,8 +88,8 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # LSTM antes do Conv1 do schons        - 5 blocos com 10 units cada - 73,3945% acurácia, 48,7740% EER e 0.0657 Decidibilidade
 # LSTM antes do Conv1 do schons + 'sun' normalization - 5 blocos com 10 units cada - 73,3945% acurácia, 45,9701% EER e 0.1187 Decidibilidade
 # 5 blocos LSTM com 16 units cada - 90,6422% acurácia, 47,1237% EER e 0.1045 Decidibilidade
-# 5 blocos LSTM com 32 units cada - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
-# 5 blocos LSTM com 64 units cada - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
+# 5 blocos LSTM com 32 units cada - 92,2936% acurácia, 47,6884% EER e 0.1032 Decidibilidade
+# 5 blocos LSTM com 64 units cada - 94,3119% acurácia, 48,8325% EER e 0.1184 Decidibilidade
 # melhor LSTM com window_size e offset = 160 - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
 #
 # apenas GRU - 5 blocos bidirecionais com 10 units cada   - 67,3395% acurácia, 48,9588% EER e 0.0734 Decidibilidade
