@@ -370,11 +370,11 @@ def create_model_mixed(window_size, num_channels, num_classes, remove_last_layer
 
     model.add(Input(shape=(window_size, num_channels)))
 
-    model.add(LSTM(16, return_sequences=True))
-    model.add(LSTM(16, return_sequences=True))
-    model.add(LSTM(16, return_sequences=True))
-    model.add(LSTM(16, return_sequences=True))
-    model.add(LSTM(16, return_sequences=True))
+    model.add(LSTM(32, return_sequences=True))
+    model.add(LSTM(32, return_sequences=True))
+    model.add(LSTM(32, return_sequences=True))
+    model.add(LSTM(32, return_sequences=True))
+    model.add(LSTM(32, return_sequences=True))
 
     model.add(Conv1D(96, (11), input_shape=(window_size, num_channels), activation='relu', name='Conv1'))
     model.add(BatchNormalization(name='Norm1'))
