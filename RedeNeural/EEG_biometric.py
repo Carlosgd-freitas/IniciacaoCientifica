@@ -90,7 +90,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # 5 blocos LSTM com 16 units cada - 90,6422% acurácia, 47,1237% EER e 0.1045 Decidibilidade
 # 5 blocos LSTM com 32 units cada - 92,2936% acurácia, 47,6884% EER e 0.1032 Decidibilidade
 # 5 blocos LSTM com 64 units cada - 94,3119% acurácia, 48,8325% EER e 0.1184 Decidibilidade
-# melhor LSTM com window_size e offset = 160 - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
+# melhor LSTM com window_size e offset = 160 - 39,2900% acurácia, 48,4723% EER e 0.0708 Decidibilidade
 #
 # apenas GRU - 5 blocos bidirecionais com 10 units cada   - 67,3395% acurácia, 48,9588% EER e 0.0734 Decidibilidade
 # apenas GRU - 5 blocos com 10 units cada                 - 64,7706% acurácia, 48,3384% EER e 0.0696 Decidibilidade
