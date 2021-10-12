@@ -87,7 +87,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # LSTM entre Pool3 e flatten do schons - 5 blocos com 10 units cada - 40,7339% acurácia, 25,5107% EER e 1.0763 Decidibilidade
 # LSTM antes do Conv1 do schons        - 5 blocos com 10 units cada - 73,3945% acurácia, 48,7740% EER e 0.0657 Decidibilidade
 # LSTM antes do Conv1 do schons + 'sun' normalization - 5 blocos com 10 units cada - 73,3945% acurácia, 45,9701% EER e 0.1187 Decidibilidade
-# 5 blocos LSTM com 16 units cada - 74,8624% acurácia, 47,8345% EER e 0.1074 Decidibilidade
+# 5 blocos LSTM com 16 units cada - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
 # 5 blocos LSTM com 32 units cada - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
 # 5 blocos LSTM com 64 units cada - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
 # melhor LSTM com window_size e offset = 160 - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
@@ -97,9 +97,9 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # GRU entre Pool3 e flatten do schons - 5 blocos bidirecionais com 10 units cada - 58,3486% acurácia, 19,0014% EER e 1.7760 Decidibilidade
 # GRU antes de Conv1 do schons        - 5 blocos bidirecionais com 10 units cada - 71,3761% acurácia, 45,9015% EER e 0.2043 Decidibilidade
 # GRU antes de Conv1 do schons + 'sun' normalization - 5 blocos bidirecionais com 10 units cada - 80,3670% acurácia, 47,9181% EER e 0.0969 Decidibilidade
-# 5 blocos GRU bidirecionais com 16 units cada - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
-# 5 blocos GRU bidirecionais com 32 units cada - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
-# 5 blocos GRU bidirecionais com 64 units cada - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
+# 5 blocos GRU bidirecionais com 16 units cada - 74,8624% acurácia, 47,8345% EER e 0.1074 Decidibilidade
+# 5 blocos GRU bidirecionais com 32 units cada - 81,1009% acurácia, 47,6330% EER e 0.1225 Decidibilidade
+# 5 blocos GRU bidirecionais com 64 units cada - 85,1376% acurácia, 47,2504% EER e 0.1825 Decidibilidade
 # melhor GRU bidirecional com window_size e offset = 160 - XX,XXXX% acurácia, XX,XXXX% EER e X.XXXX Decidibilidade
 
 # functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
