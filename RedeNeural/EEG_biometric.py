@@ -102,7 +102,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
 
 # Creating the model
-model = models.create_model_mixed(window_size, num_channels, num_classes)
+model = models.create_model(window_size, num_channels, num_classes)
 model.summary()
 
 # Loading the raw data
@@ -203,7 +203,7 @@ print("Minimum Loss : {:.4f}".format(min_loss))
 print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
 # Removing the last layers of the model and getting the features array
-model_for_verification = models.create_model_mixed(window_size, num_channels, num_classes, True)
+model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
 
 model_for_verification.summary()
 model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
