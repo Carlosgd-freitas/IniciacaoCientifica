@@ -83,8 +83,6 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # 60 épocas - 63,3027% acurácia e 3,4852% EER
 # 
 # Usando 40 epocas daki pra baixo
-# apenas LSTM - 5 blocos bidirecionais com 10 units cada - 53,0275% acurácia, 48,9983% EER e 0.0849 Decidibilidade
-# apenas LSTM - 5 blocos com 10 units cada               - 57,2477% acurácia, 48,3405% EER e 0.0995 Decidibilidade
 # LSTM entre Pool3 e flatten do schons - 5 blocos com 10 units cada - 40,7339% acurácia, 25,5107% EER e 1.0763 Decidibilidade
 # LSTM antes do Conv1 do schons        - 5 blocos com 10 units cada - 73,3945% acurácia, 48,7740% EER e 0.0657 Decidibilidade
 # LSTM antes do Conv1 do schons + 'sun' normalization - 5 blocos com 10 units cada - 73,3945% acurácia, 45,9701% EER e 0.1187 Decidibilidade
@@ -93,8 +91,6 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # 5 blocos LSTM com 64 units cada - 94,3119% acurácia, 48,8325% EER e 0.1184 Decidibilidade
 # melhor LSTM com window_size e offset = 160 - 39,2900% acurácia, 48,4723% EER e 0.0708 Decidibilidade
 #
-# apenas GRU - 5 blocos bidirecionais com 10 units cada   - 67,3395% acurácia, 48,9588% EER e 0.0734 Decidibilidade
-# apenas GRU - 5 blocos com 10 units cada                 - 64,7706% acurácia, 48,3384% EER e 0.0696 Decidibilidade
 # GRU entre Pool3 e flatten do schons - 5 blocos bidirecionais com 10 units cada - 58,3486% acurácia, 19,0014% EER e 1.7760 Decidibilidade
 # GRU antes de Conv1 do schons        - 5 blocos bidirecionais com 10 units cada - 71,3761% acurácia, 45,9015% EER e 0.2043 Decidibilidade
 # GRU antes de Conv1 do schons + 'sun' normalization - 5 blocos bidirecionais com 10 units cada - 80,3670% acurácia, 47,9181% EER e 0.0969 Decidibilidade
