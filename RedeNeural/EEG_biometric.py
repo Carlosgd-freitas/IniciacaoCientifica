@@ -1,6 +1,7 @@
 import models
 import functions
 
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 from tensorflow.keras.callbacks import LearningRateScheduler
@@ -139,6 +140,8 @@ opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
 
 model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
 
+fit_begin = time.time()
+
 callback = LearningRateScheduler(models.scheduler, verbose=0)
 results = model.fit(x_train,
                     y_train,
@@ -147,6 +150,11 @@ results = model.fit(x_train,
                     callbacks = [callback],
                     validation_data = (x_val, y_val)
                     )
+
+fit_end = time.time()
+print(f'Training time in seconds: {fit_end - fit_begin}')
+print(f'Training time in minutes: {(fit_end - fit_begin)/60.0}')
+print(f'Training time in hours: {(fit_end - fit_begin)/3600.0}\n')
 
 # Saving model weights
 model.save('model_weights.h5')
@@ -161,8 +169,15 @@ print('Evaluating on validation set...')
 print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
 
 print('Evaluating on testing set...')
+test_begin = time.time()
+
 (loss, accuracy) = model.evaluate(x_test, y_test, verbose = 0)
 print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+
+test_end = time.time()
+print(f'Evaluating on testing set time in miliseconds: {(test_end - test_begin) * 1000.0}')
+print(f'Evaluating on testing set time in seconds: {test_end - test_begin}')
+print(f'Evaluating on testing set time in minutes: {(test_end - test_begin)/60.0}\n')
 
 # Summarize history for accuracy
 plt.subplot(211)
