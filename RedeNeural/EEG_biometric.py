@@ -78,17 +78,11 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 #  100 epochs - without filtering and data augmentation - 23,5259% acurácia e 29,9559% EER
 # 
 # Usando 40 epocas daki pra baixo
-# LSTM entre Pool3 e flatten do schons - 5 blocos com 10 units cada - 40,7339% acurácia, 25,5107% EER e 1.0763 Decidibilidade
-# LSTM antes do Conv1 do schons        - 5 blocos com 10 units cada - 73,3945% acurácia, 48,7740% EER e 0.0657 Decidibilidade
-# LSTM antes do Conv1 do schons + 'sun' normalization - 5 blocos com 10 units cada - 73,3945% acurácia, 45,9701% EER e 0.1187 Decidibilidade
 # 5 blocos LSTM com 16 units cada - 90,6422% acurácia, 47,1237% EER e 0.1045 Decidibilidade
 # 5 blocos LSTM com 32 units cada - 92,2936% acurácia, 47,6884% EER e 0.1032 Decidibilidade
 # 5 blocos LSTM com 64 units cada - 94,3119% acurácia, 48,8325% EER e 0.1184 Decidibilidade
 # melhor LSTM com window_size e offset = 160 - 39,2900% acurácia, 48,4723% EER e 0.0708 Decidibilidade
 #
-# GRU entre Pool3 e flatten do schons - 5 blocos bidirecionais com 10 units cada - 58,3486% acurácia, 19,0014% EER e 1.7760 Decidibilidade
-# GRU antes de Conv1 do schons        - 5 blocos bidirecionais com 10 units cada - 71,3761% acurácia, 45,9015% EER e 0.2043 Decidibilidade
-# GRU antes de Conv1 do schons + 'sun' normalization - 5 blocos bidirecionais com 10 units cada - 80,3670% acurácia, 47,9181% EER e 0.0969 Decidibilidade
 # 5 blocos GRU bidirecionais com 16 units cada - 74,8624% acurácia, 47,8345% EER e 0.1074 Decidibilidade
 # 5 blocos GRU bidirecionais com 32 units cada - 81,1009% acurácia, 47,6330% EER e 0.1225 Decidibilidade
 # 5 blocos GRU bidirecionais com 64 units cada - 85,1376% acurácia, 47,2504% EER e 0.1825 Decidibilidade
@@ -97,7 +91,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
 
 # Creating the model
-model = models.create_model(window_size, num_channels, num_classes)
+model = models.create_model_mixed(window_size, num_channels, num_classes)
 model.summary()
 
 # Loading the raw data
@@ -198,7 +192,7 @@ print("Minimum Loss : {:.4f}".format(min_loss))
 print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
 # Removing the last layers of the model and getting the features array
-model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
+model_for_verification = models.create_model_mixed(window_size, num_channels, num_classes, True)
 
 model_for_verification.summary()
 model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
