@@ -32,8 +32,8 @@ filter_type = 'filtfilt'        # Type of the filter used: 'sosfilt' or 'filtfil
 normalize_type = 'each_channel' # Type of the normalization that will be applied: 'each_channel' or 'all_channels'
 
 # Parameters used in functions.crop_data()
-window_size = 160 # 1920              # Sliding window size, used when composing the dataset
-offset = 160 # 35                     # Sliding window offset (deslocation), used when composing the dataset
+window_size = 1920 # 160              # Sliding window size, used when composing the dataset
+offset = 35 # 160                     # Sliding window offset (deslocation), used when composing the dataset
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
