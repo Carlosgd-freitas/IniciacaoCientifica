@@ -76,11 +76,6 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # sun modelo, versão com LSTMCell, StackedRNNCells e RNN
 #  500 epochs - without filtering and data augmentation - 31,4531% acurácia e 28,7219% EER
 #  100 epochs - without filtering and data augmentation - 23,5259% acurácia e 29,9559% EER
-#
-# variando epocas no procedimento normal
-# 10 épocas - 63,1193% acurácia e 3,3955% EER
-# 30 épocas - 64,2202% acurácia e 3,8529% EER
-# 60 épocas - 63,3027% acurácia e 3,4852% EER
 # 
 # Usando 40 epocas daki pra baixo
 # LSTM entre Pool3 e flatten do schons - 5 blocos com 10 units cada - 40,7339% acurácia, 25,5107% EER e 1.0763 Decidibilidade
@@ -113,8 +108,8 @@ train_content = functions.filter_data(train_content, band_pass_3, sample_frequen
 test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
 
 # Normalize the filtered data
-train_content = functions.normalize_data(train_content, 'sun')
-test_content = functions.normalize_data(test_content, 'sun')
+# train_content = functions.normalize_data(train_content, 'sun')
+# test_content = functions.normalize_data(test_content, 'sun')
 
 # Apply data augmentation (sliding window cropping) on normalized data
 x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
