@@ -102,8 +102,8 @@ train_content = functions.filter_data(train_content, band_pass_3, sample_frequen
 test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
 
 # Normalize the filtered data
-# train_content = functions.normalize_data(train_content, 'sun')
-# test_content = functions.normalize_data(test_content, 'sun')
+train_content = functions.normalize_data(train_content, 'sun')
+test_content = functions.normalize_data(test_content, 'sun')
 
 # Apply data augmentation (sliding window cropping) on normalized data
 x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
