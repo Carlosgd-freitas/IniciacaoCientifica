@@ -78,15 +78,15 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 #  100 epochs - without filtering and data augmentation - 23,5259% acurácia e 29,9559% EER
 # 
 # Usando 40 epocas daki pra baixo
-# 5 blocos LSTM com 16 units cada - 90,6422% acurácia, 47,1237% EER e 0.1045 Decidibilidade
-# 5 blocos LSTM com 32 units cada - 92,2936% acurácia, 47,6884% EER e 0.1032 Decidibilidade
-# 5 blocos LSTM com 64 units cada - 94,3119% acurácia, 48,8325% EER e 0.1184 Decidibilidade
-# melhor LSTM com window_size e offset = 160 - 39,2900% acurácia, 48,4723% EER e 0.0708 Decidibilidade
+# 5 blocos LSTM, 64 units com window_size e offset = 160 - 39,2900% acurácia, 48,4723% EER e 0.0708 Decidibilidade
 #
-# 5 blocos GRU bidirecionais com 16 units cada - 74,8624% acurácia, 47,8345% EER e 0.1074 Decidibilidade
-# 5 blocos GRU bidirecionais com 32 units cada - 81,1009% acurácia, 47,6330% EER e 0.1225 Decidibilidade
-# 5 blocos GRU bidirecionais com 64 units cada - 85,1376% acurácia, 47,2504% EER e 0.1825 Decidibilidade
-# melhor GRU bidirecional com window_size e offset = 160 - 17,6294% acurácia, 48,7600% EER e 0.0601 Decidibilidade
+# 5 blocos GRU bidirecional, 64 units com window_size e offset = 160 - 17,6294% acurácia, 48,7600% EER e 0.0601 Decidibilidade
+#
+# arquitetura ->   tempo para treinar ; tempo para testar
+#    lstm 128 ->  45 min for training ; 1.92 seconds for testing
+#    lstm 256 ->  64 min for training ; 2.51 seconds for testing
+#     gru 128 ->  XX min for training ; X.XX seconds for testing
+#     gru 256 ->  XX min for training ; X.XX seconds for testing
 
 # functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
 
