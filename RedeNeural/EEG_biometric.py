@@ -95,20 +95,20 @@ model = models.create_model_mixed(window_size, num_channels, num_classes)
 model.summary()
 
 # Loading the raw data
-train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes)   
+train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, verbose=1)   
 
 # Filtering the raw data
-train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
-test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
+train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, verbose=1)
+test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, verbose=1)
 
 # Normalize the filtered data
-train_content = functions.normalize_data(train_content, 'sun')
-test_content = functions.normalize_data(test_content, 'sun')
+train_content = functions.normalize_data(train_content, 'sun', verbose=1)
+test_content = functions.normalize_data(test_content, 'sun', verbose=1)
 
 # Apply data augmentation (sliding window cropping) on normalized data
 x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
-                                                     window_size, offset, split_ratio)
-x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, window_size, window_size)
+                                                     window_size, offset, split_ratio, verbose=1)
+x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, window_size, window_size, verbose=1)
 
 # Printing data formats
 print('\nData formats:')
