@@ -85,7 +85,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # arquitetura ->   tempo para treinar ; tempo para testar
 #    lstm 128 ->  45 min for training ; 1.92 seconds for testing
 #    lstm 256 ->  64 min for training ; 2.51 seconds for testing
-#     gru 128 ->  XX min for training ; X.XX seconds for testing
+#     gru 128 ->  86 min for training ; 3.68 seconds for testing
 #     gru 256 ->  XX min for training ; X.XX seconds for testing
 
 # functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
