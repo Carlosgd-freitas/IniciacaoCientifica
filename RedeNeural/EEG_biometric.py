@@ -88,7 +88,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 #     gru 128 ->  86 min for training ; 3.68 seconds for testing
 #     gru 256 -> 129 min for training ; 4.99 seconds for testing
 #
-# lstm 128  4 units -> XX min for training ; X.XX seconds for testing
+# lstm 128  4 units -> 37 min for training ; 1.56 seconds for testing
 # lstm 128  6 units -> XX min for training ; X.XX seconds for testing
 # lstm 128  7 units -> XX min for training ; X.XX seconds for testing
 # lstm 128  8 units -> XX min for training ; X.XX seconds for testing
