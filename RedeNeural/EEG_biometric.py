@@ -17,8 +17,8 @@ initial_learning_rate = 0.01    # Initial learning rate
 # Parameters used in functions.load_data()
 # folder_path = './Dataset_CSV/'
 folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
-train_tasks = [5, 13]               # Tasks used for training and validation
-test_tasks = [9]                # Tasks used for testing
+train_tasks = [3, 11]               # Tasks used for training and validation
+test_tasks = [7]                # Tasks used for testing
 num_classes = 109               # Total number of classes (individuals)
 
 # Parameters used in functions.filter_data()
@@ -38,7 +38,7 @@ offset = 35 # 160                     # Sliding window offset (deslocation), use
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
-num_channels = 64               # Number of channels in an EEG signal
+num_channels = 9 # 64               # Number of channels in an EEG signal
 
 # Channels for some lobes of the brain
 frontal_lobe   = ['Fp1.', 'Fpz.', 'Fp2.', 'Af7.', 'Af3.', 'Afz.', 'Af4.', 'Af8.', 'F7..', 'F5..', 'F3..',
@@ -92,10 +92,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # lstm 128  6 units -> 53 min for training ; 2.31 seconds for testing
 # lstm 128 10 units -> 84 min for training ; 3.57 seconds for testing
 #
-# p1 yang - t1r1 + t1r3 - t1r2 -> XX min for training ; X.XX seconds for testing (killed)
-# p1 yang - t2r1 + t2r3 - t2r2 -> XX min for training ; X.XX seconds for testing
-# p1 yang - t3r1 + t3r3 - t3r2 -> XX min for training ; X.XX seconds for testing
-# p1 yang - t4r1 + t4r3 - t4r2 -> XX min for training ; X.XX seconds for testing
+# p1 yang (all killed)
 
 # functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
 
@@ -104,7 +101,8 @@ model = models.create_model_mixed(window_size, num_channels, num_classes)
 model.summary()
 
 # Loading the raw data
-train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, verbose=1)   
+train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes,
+                                                  frontal_lobe_yang, verbose=1)   
 
 # Filtering the raw data
 train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, verbose=1)
