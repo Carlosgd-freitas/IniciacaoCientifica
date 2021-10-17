@@ -93,7 +93,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # lstm 128  7 units -> XX min for training ; X.XX seconds for testing
 # lstm 128  8 units -> XX min for training ; X.XX seconds for testing
 # lstm 128  9 units -> XX min for training ; X.XX seconds for testing
-# lstm 128 10 units -> XX min for training ; X.XX seconds for testing
+# lstm 128 10 units -> 84 min for training ; 3.57 seconds for testing
 
 # functions.create_csv_database_from_edf('./Dataset/','./Dataset_CSV/', num_classes)
 
