@@ -17,8 +17,8 @@ initial_learning_rate = 0.01    # Initial learning rate
 # Parameters used in functions.load_data()
 # folder_path = './Dataset_CSV/'
 folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Frontal_Lobe_Yang/'
-train_tasks = [3, 11]               # Tasks used for training and validation
-test_tasks = [7]                # Tasks used for testing
+train_tasks = [4, 12]               # Tasks used for training and validation
+test_tasks = [8]                # Tasks used for testing
 num_classes = 109               # Total number of classes (individuals)
 
 # Parameters used in functions.filter_data()
@@ -93,7 +93,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # lstm 128 10 units -> 84 min for training ; 3.57 seconds for testing
 #
 # p1 yang (all killed)
-# p1 yang 3 canais -> XX min for training ; X.XX seconds for testing
+# p1 yang 3 canais -> 198 min for training ; X.XX seconds for testing
 # p1 yang 9 canais -> XX min for training ; X.XX seconds for testing
 
 # functions.create_csv_database_from_edf('./Dataset/','./All_Channels_Yang/', num_classes, channels = all_channels_yang)
