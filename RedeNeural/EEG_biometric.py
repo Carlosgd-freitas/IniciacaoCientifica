@@ -33,8 +33,8 @@ filter_type = 'filtfilt'        # Type of the filter used: 'sosfilt' or 'filtfil
 normalize_type = 'each_channel' # Type of the normalization that will be applied: 'each_channel' or 'all_channels'
 
 # Parameters used in functions.crop_data()
-window_size = 1920 # 160              # Sliding window size, used when composing the dataset
-offset = 35 # 160                     # Sliding window offset (deslocation), used when composing the dataset
+window_size = 160 # 1920              # Sliding window size, used when composing the dataset
+offset = 80 # 35                     # Sliding window offset (deslocation), used when composing the dataset
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
@@ -92,9 +92,15 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # lstm 128  6 units -> 53 min for training ; 2.31 seconds for testing
 # lstm 128 10 units -> 84 min for training ; 3.57 seconds for testing
 #
-# p1 yang (all killed)
-# p1 yang 3 canais -> 198 min for training ; 3.38 seconds for testing
-# p1 yang 9 canais -> XX min for training ; X.XX seconds for testing
+# p1 yang 64 canais -> (all killed)
+# p1 yang  3 canais -> 198 min for training ; 3.38 seconds for testing
+#
+# lstm 128, 160 windows size, 40 offset -> 0,0% acurácia ; 0,0% EER ; 0,0 Decidibilidade
+#                                          0 min for training ; 0,0 seconds for testing
+# lstm 128, 160 windows size, 80 offset -> 0,0% acurácia ; 0,0% EER ; 0,0 Decidibilidade
+#                                          0 min for training ; 0,0 seconds for testing
+# lstm 128, 160 windows size, 100 offset -> 0,0% acurácia ; 0,0% EER ; 0,0 Decidibilidade
+#                                          0 min for training ; 0,0 seconds for testing
 
 # functions.create_csv_database_from_edf('./Dataset/','./All_Channels_Yang/', num_classes, channels = all_channels_yang)
 
