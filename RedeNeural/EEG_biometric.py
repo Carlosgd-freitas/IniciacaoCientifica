@@ -96,7 +96,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 
 print('opa')
 
-functions.create_csv_database_from_edf('./Dataset/','./Frontal_Lobe_Yang/', num_classes, frontal_lobe_yang)
+functions.create_csv_database_from_edf('./Dataset/','./Motor_Cortex_Yang/', num_classes, motor_cortex_yang)
 
 scapegoat = input("Agora quita.")
 
@@ -106,7 +106,7 @@ model.summary()
 
 # Loading the raw data
 train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes,
-                                                  motor_cortex_yang)   
+                                                  frontal_lobe_yang)   
 
 # Filtering the raw data
 train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
