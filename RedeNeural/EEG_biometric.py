@@ -96,7 +96,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 
 print('opa')
 
-functions.create_csv_database_from_edf('./Dataset/','./Motor_Cortex_Yang/', num_classes, motor_cortex_yang)
+functions.create_csv_database_from_edf('./Dataset/','./Occipital_Lobe_Yang/', num_classes, occipital_lobe_yang)
 
 scapegoat = input("Agora quita.")
 
