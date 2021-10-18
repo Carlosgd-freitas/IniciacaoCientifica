@@ -102,7 +102,7 @@ model.summary()
 
 # Loading the raw data
 train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes,
-                                                  frontal_lobe_yang, verbose=1)   
+                                                  motor_cortex_yang, verbose=1)   
 
 # Filtering the raw data
 train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, verbose=1)
