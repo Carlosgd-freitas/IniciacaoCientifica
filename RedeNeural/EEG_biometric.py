@@ -94,7 +94,9 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 #
 # p1 yang (all killed)
 
-functions.create_csv_database_from_edf('./Dataset/','./Frontal_Lobe_Yang/', num_classes, frontal_lobe)
+print('opa')
+
+functions.create_csv_database_from_edf('./Dataset/','./Frontal_Lobe_Yang/', num_classes, frontal_lobe_yang)
 
 scapegoat = input("Agora quita.")
 
