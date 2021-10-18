@@ -96,7 +96,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # p1 yang 3 canais -> XX min for training ; X.XX seconds for testing
 # p1 yang 9 canais -> XX min for training ; X.XX seconds for testing
 
-# functions.create_csv_database_from_edf('./Dataset/','./All_Channels_Yang/', num_classes)
+# functions.create_csv_database_from_edf('./Dataset/','./All_Channels_Yang/', num_classes, channels = all_channels_yang)
 
 # Creating the model
 model = models.create_model_mixed(window_size, num_channels, num_classes)
