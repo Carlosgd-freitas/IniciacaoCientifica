@@ -38,7 +38,7 @@ offset = 35 # 160                     # Sliding window offset (deslocation), use
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
-num_channels = 9 # 64               # Number of channels in an EEG signal
+num_channels = 3 # 64               # Number of channels in an EEG signal
 
 # Channels for some lobes of the brain
 frontal_lobe   = ['Fp1.', 'Fpz.', 'Fp2.', 'Af7.', 'Af3.', 'Afz.', 'Af4.', 'Af8.', 'F7..', 'F5..', 'F3..',
