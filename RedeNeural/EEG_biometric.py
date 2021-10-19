@@ -16,9 +16,9 @@ initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
 # folder_path = './Dataset_CSV/'
-folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Occipital_Lobe_Yang/'
-train_tasks = [5, 13]               # Tasks used for training and validation
-test_tasks = [9]                # Tasks used for testing
+folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
+train_tasks = [1]               # Tasks used for training and validation
+test_tasks = [2]                # Tasks used for testing
 num_classes = 109               # Total number of classes (individuals)
 
 # Parameters used in functions.filter_data()
@@ -34,11 +34,11 @@ normalize_type = 'each_channel' # Type of the normalization that will be applied
 
 # Parameters used in functions.crop_data()
 window_size = 160 # 1920              # Sliding window size, used when composing the dataset
-offset = 120 # 35                     # Sliding window offset (deslocation), used when composing the dataset
+offset = 80 # 35                     # Sliding window offset (deslocation), used when composing the dataset
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
-num_channels = 3 # 64               # Number of channels in an EEG signal
+num_channels = 64               # Number of channels in an EEG signal
 
 # Channels for some lobes of the brain
 frontal_lobe   = ['Fp1.', 'Fpz.', 'Fp2.', 'Af7.', 'Af3.', 'Afz.', 'Af4.', 'Af8.', 'F7..', 'F5..', 'F3..',
@@ -95,6 +95,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # p1 yang 64 canais -> (all killed)
 # p1 yang  3 canais -> 198 min for training ; 3.38 seconds for testing
 #
+# EO / EC:
 # lstm 128, 160 windows size, 1 offset  -> 0,0% acurácia ; 0,0% EER ; 0,0 Decidibilidade
 #                                          0+ min for training ; 0,0 seconds for testing
 # lstm 128, 160 windows size, 20 offset -> 0,0% acurácia ; 0,0% EER ; 0,0 Decidibilidade
@@ -111,8 +112,7 @@ model = models.create_model_mixed(window_size, num_channels, num_classes)
 model.summary()
 
 # Loading the raw data
-train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes,
-                                                  occipital_lobe_yang)   
+train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes)   
 
 # Filtering the raw data
 train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
