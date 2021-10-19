@@ -34,7 +34,7 @@ normalize_type = 'each_channel' # Type of the normalization that will be applied
 
 # Parameters used in functions.crop_data()
 window_size = 160 # 1920              # Sliding window size, used when composing the dataset
-offset = 80 # 35                     # Sliding window offset (deslocation), used when composing the dataset
+offset = 1 # 35                     # Sliding window offset (deslocation), used when composing the dataset
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
@@ -100,8 +100,8 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 #                                          0+ min for training ; 0,0 seconds for testing
 # lstm 128, 160 windows size, 20 offset -> 0,0% acurácia ; 0,0% EER ; 0,0 Decidibilidade
 #                                          0 min for training ; 0,0 seconds for testing
-# lstm 128, 160 windows size, 80 offset -> 23,6024% acurácia ; 48,8858% EER ; 0,0284 Decidibilidade
-#                                          11 min for training ; 7,23 seconds for testing
+# lstm 128, 160 windows size, 80 offset -> 46,7058% acurácia ; 48,6823% EER ; 0,0582 Decidibilidade
+#                                          3 min for training ; 3,89 seconds for testing
 # lstm 128, 160 windows size, 120 offset-> 0,0% acurácia ; 0,0% EER ; 0,0 Decidibilidade
 #                                          0 min for training ; 0,0 seconds for testing
 
