@@ -34,7 +34,7 @@ normalize_type = 'each_channel' # Type of the normalization that will be applied
 
 # Parameters used in functions.crop_data()
 window_size = 160 # 1920              # Sliding window size, used when composing the dataset
-offset = 120 # 35                     # Sliding window offset (deslocation), used when composing the dataset
+offset = 40 # 35                     # Sliding window offset (deslocation), used when composing the dataset
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
