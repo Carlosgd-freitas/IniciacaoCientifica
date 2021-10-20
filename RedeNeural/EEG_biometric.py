@@ -34,7 +34,7 @@ normalize_type = 'each_channel' # Type of the normalization that will be applied
 
 # Parameters used in functions.crop_data()
 window_size = 160 # 1920              # Sliding window size, used when composing the dataset
-offset = 40 # 35                     # Sliding window offset (deslocation), used when composing the dataset
+offset = 5 # 35                     # Sliding window offset (deslocation), used when composing the dataset
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
@@ -99,12 +99,12 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # lstm 128, 160 windows size, 1 offset  -> killed
 # lstm 128, 160 windows size, 20 offset -> 72,3977% acurácia ; 48,3229% EER ; 0,0865 Decidibilidade
 #                                          13 min for training ; 3,54 seconds for testing
-# lstm 128, 160 windows size, 40 offset -> 0,0% acurácia ; 0,0% EER ; 0,0 Decidibilidade
-#                                          0 min for training ; 0,0 seconds for testing
+# lstm 128, 160 windows size, 40 offset -> 53,5499% acurácia ; 47,7848% EER ; 0,1233 Decidibilidade
+#                                          6 min for training ; 3,89 seconds for testing
 # lstm 128, 160 windows size, 80 offset -> 46,7058% acurácia ; 48,6823% EER ; 0,0582 Decidibilidade
 #                                          3 min for training ; 3,89 seconds for testing
-# lstm 128, 160 windows size, 120 offset-> 0,0% acurácia ; 0,0% EER ; 0,0 Decidibilidade
-#                                          0 min for training ; 0,0 seconds for testing
+# lstm 128, 160 windows size, 120 offset-> 46,8562% acurácia ; 48,4491% EER ; 0,0741 Decidibilidade
+#                                          2 min for training ; 3,53 seconds for testing
 
 # functions.create_csv_database_from_edf('./Dataset/','./All_Channels_Yang/', num_classes, channels = all_channels_yang)
 
