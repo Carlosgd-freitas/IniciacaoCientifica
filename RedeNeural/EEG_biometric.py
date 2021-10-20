@@ -96,7 +96,9 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # p1 yang  3 canais -> 198 min for training ; 3.38 seconds for testing
 #
 # EO / EC:
-# lstm 128, 160 windows size, 1 offset  -> killed
+# lstm 128, 160 windows size,  1 offset -> killed
+# lstm 128, 160 windows size,  5 offset -> 86,1612% acurácia ; 48,7972% EER ; 0,0651 Decidibilidade
+#                                          48 min for training ; 3,72 seconds for testing
 # lstm 128, 160 windows size, 20 offset -> 72,3977% acurácia ; 48,3229% EER ; 0,0865 Decidibilidade
 #                                          13 min for training ; 3,54 seconds for testing
 # lstm 128, 160 windows size, 40 offset -> 53,5499% acurácia ; 47,7848% EER ; 0,1233 Decidibilidade
