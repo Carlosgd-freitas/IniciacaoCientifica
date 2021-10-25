@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from numpy import savetxt, loadtxt
 from scipy.signal import butter, sosfilt, firwin, filtfilt
 from sklearn.metrics.pairwise import euclidean_distances
+import tensorflow.keras as keras
 
 # def read_EDF(path, channels = None):
 #     """
@@ -451,7 +452,7 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
 
         return x_data, y_data, x_data_2, y_data_2
 
-def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.0, verbose=0):
+def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.0, reshape='sliding_window', verbose=0):
     """
     Applies a sliding window cropping for data augmentation of the signals recieved as input and outputs them
     as numpy arrays.
@@ -507,11 +508,17 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
         # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
         # input shape of the CNN is "a x window_size x num_channels".
-        x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
+        if reshape == 'sliding_window':
+            x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
+        elif reshape == 'full_signal':
+            x_data = x_data.reshape(x_data.shape[1], x_data.shape[0])
+        else:
+            print('ERROR: Invalid reshape parameter.')
 
         # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
         # is "a x num_classes".
-        y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
+        if reshape == 'sliding_window':
+            y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
 
         return x_data, y_data
     else:
@@ -535,13 +542,21 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
         # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
         # input shape of the CNN is "a x window_size x num_channels".
-        x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
-        x_data_2 = x_data_2.reshape(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
+        if reshape == 'sliding_window':
+            x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
+            x_data_2 = x_data_2.reshape(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
+        elif reshape == 'full_signal':
+            print(x_data)
+            x_data = x_data.reshape(x_data.shape[1], x_data.shape[0])
+            x_data_2 = x_data_2.reshape(x_data_2.shape[1], x_data_2.shape[0])
+        else:
+            print('ERROR: Invalid reshape parameter.')
 
         # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
         # is "a x num_classes".
-        y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
-        y_data_2 = y_data_2.reshape(y_data_2.shape[0], y_data_2.shape[2])
+        if reshape == 'sliding_window':
+            y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
+            y_data_2 = y_data_2.reshape(y_data_2.shape[0], y_data_2.shape[2])
 
         return x_data, y_data, x_data_2, y_data_2
 
@@ -663,3 +678,95 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
     thresholds = t[min_index]
 
     return d, eer, thresholds
+
+class DataGenerator(keras.utils.Sequence):
+    'Generates data for Keras'
+    def __init__(self, list_IDs, labels, batch_size, dim, n_channels, n_classes, shuffle=True):
+        'Initialization'
+        self.dim = dim
+        self.batch_size = batch_size
+        self.labels = labels
+        self.list_IDs = list_IDs
+        self.n_channels = n_channels
+        self.n_classes = n_classes
+        self.shuffle = shuffle
+        self.on_epoch_end()
+
+    def __len__(self):
+        'Denotes the number of batches per epoch'
+        return int(np.floor(len(self.list_IDs) / self.batch_size))
+
+    def __getitem__(self, index):
+        'Generate one batch of data'
+        # Generate indexes of the batch
+        indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
+
+        print(indexes)#
+
+        # Find list of IDs
+        list_IDs_temp = [self.list_IDs[k] for k in indexes]
+
+        # Generate data
+        x, y = self.__data_generation(list_IDs_temp)
+
+        return x, y
+    
+    # Teste #
+    def on_train_batch_begin(self):
+        print('owpa')
+    
+    def on_train_batch_end(self):
+        print('foi')
+    # Teste #
+
+    def on_epoch_end(self):
+        'Updates indexes after each epoch'
+        self.indexes = np.arange(len(self.list_IDs))
+        if self.shuffle == True:
+            np.random.shuffle(self.indexes)
+
+    def __data_generation(self, list_IDs_temp):
+        'Generates data containing batch_size samples' # X : (n_samples, *dim, n_channels)
+        # Initialization
+        #X = np.empty((self.batch_size, *self.dim, self.n_channels))
+        #y = np.empty((self.batch_size), dtype=int)
+
+        #X = np.empty((self.batch_size, *self.dim))
+        #y = np.empty((self.batch_size, self.n_classes), dtype=int)
+
+        x_list = list()
+        y_list = list()
+
+        # Generate data
+        for i, ID in enumerate(list_IDs_temp):
+            file_list = np.asarray(list_IDs_temp[i]).astype('str')
+            file_list = file_list.tolist()
+
+            for j in range(0, len(file_list)):
+                file_x = np.loadtxt('processed_data/' + file_list[j], delimiter=';', usecols=range(self.n_channels))
+                aux = file_list[j].replace('x','y')
+                file_y = np.loadtxt('processed_data/' + aux, delimiter=';', usecols=range(1))
+
+                x_list.append(file_x)
+                y_list.append(file_y)
+
+                # Store sample
+                # X[i] = np.load('processed_data/' + ID + '.npy')
+
+                # Store class
+                # y[i] = self.labels[ID]
+                #  y[i] = np.load('processed_data/' + ID + '.npy')
+
+        x = np.asarray(x_list, dtype = object).astype('float32')
+        y = np.asarray(y_list, dtype = object).astype('float32')
+
+        # print(x)
+        # print(y)
+    
+        # print(f'x.shape = {x.shape}')
+        # print(f'y.shape = {y.shape}')
+
+        # x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
+        # y = y.reshape(y.shape[0], y.shape[2])
+        
+        return x, y
