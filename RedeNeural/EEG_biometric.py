@@ -41,7 +41,7 @@ normalize_type = 'each_channel' # Type of the normalization that will be applied
 
 # Parameters used in functions.crop_data()
 window_size = 1920              # Sliding window size, used when composing the dataset
-full_signal_size = 9760         # 9760 for Tasks 1-2 , 20000 for Tasks 3-14
+full_signal_size = 9600         # 9600 for Tasks 1-2 , 19200 for Tasks 3-14
 offset = 35                     # Sliding window offset (deslocation), used when composing the dataset
 split_ratio = 0.9               # 90% for training | 10% for validation
 
@@ -151,6 +151,7 @@ if(option == 1):
 
     print(f'x_train[0] = {x_train[0]}')
     print(f'x_train[109] = {x_train[109]}')
+    print(f'x_test[0] = {x_test[0]}')
 
     input('quitaste?')
 
