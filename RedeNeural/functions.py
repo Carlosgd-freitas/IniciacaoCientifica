@@ -681,9 +681,10 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
 
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
-    def __init__(self, list_IDs, batch_size, dim, n_channels, n_classes, shuffle=True):
+    def __init__(self, list_IDs, batch_size, dim, offset, n_channels, n_classes, shuffle=True):
         'Initialization'
         self.dim = dim
+        self.offset = offset
         self.batch_size = batch_size
         self.n_channels = n_channels
         self.n_classes = n_classes
@@ -704,7 +705,7 @@ class DataGenerator(keras.utils.Sequence):
         list_IDs_temp = [self.list_IDs[k] for k in indexes]
 
         # Generate data
-        x, y = self.__data_generation(list_IDs_temp)
+        (x, y) = self.__data_generation(list_IDs_temp)
 
         return (x, y)
 
@@ -717,30 +718,41 @@ class DataGenerator(keras.utils.Sequence):
     def __data_generation(self, list_IDs_temp):
         'Generates data containing batch_size samples'
         # Initialization
-        x = np.empty((self.batch_size, self.dim, self.n_channels))
-        y = np.empty((self.batch_size, self.n_classes), dtype=int)
-        counter = 0
+        # x = np.empty((self.batch_size, self.dim, self.n_channels))
+        # y = np.empty((self.batch_size, self.n_classes), dtype=int)
+        # counter = 0
+        x_dataL = list()
+        y_dataL = list()
 
         # Generate data
-        for i, ID in enumerate(list_IDs_temp):
+        for i in enumerate(list_IDs_temp):
             file_x = np.loadtxt('processed_data/' + list_IDs_temp[i], delimiter=';', usecols=range(self.n_channels))
-            aux = list_IDs_temp[i].replace('x','y')
-            file_y = np.loadtxt('processed_data/' + aux, delimiter=';', usecols=range(1))
+            # aux = list_IDs_temp[i].replace('x','y')
+            # file_y = np.loadtxt('processed_data/' + aux, delimiter=';', usecols=range(1))
 
             file_x = np.asarray(file_x, dtype = object).astype('float32')
-            file_y = np.asarray(file_y, dtype = object).astype('float32')
+            # file_y = np.asarray(file_y, dtype = object).astype('float32')
+
+            x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, file_x, self.window_size, self.offset,
+                                               i, self.num_classes)
 
             # Store sample
-            x[i] = file_x
+            # x[i] = file_x
 
             # Store class
-            y[i] = file_y
+            # y[i] = file_y
 
-            counter += 1
+            # counter += 1
         
-        while(counter < self.batch_size):
-            x[counter] = np.zeros((self.dim, self.n_channels))
-            y[counter] = np.zeros((self.n_classes), dtype=int)
-            counter += 1
+        # while(counter < self.batch_size):
+        #     x[counter] = np.zeros((self.dim, self.n_channels))
+        #     y[counter] = np.zeros((self.n_classes), dtype=int)
+        #     counter += 1
+    
+        x = np.asarray(x_dataL, dtype = object).astype('float32')
+        y = np.asarray(y_dataL, dtype = object).astype('float32')
         
+        x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
+        y = y.reshape(y.shape[0], y.shape[2])
+
         return (x, y)

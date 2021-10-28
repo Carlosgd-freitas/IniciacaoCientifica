@@ -138,18 +138,23 @@ if(option == 1):
     train_content = functions.normalize_data(train_content, 'sun', 1)
     test_content = functions.normalize_data(test_content, 'sun', 1)
 
-    # Getting the training, validation and testing data
-    x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
-                                                         window_size, offset, split_ratio)
-    x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, window_size, window_size)
+    test_content = np.asarray(test_content, dype='float32')
+    print(f'test_content.shape = {test_content.shape}')
+    print(f'test_content = {test_content}')
+    input('quitaste?')
 
-    print('\nData formats:')
-    print(f'x_train: {x_train.shape}')
-    print(f'x_val: {x_val.shape}')
-    print(f'x_test: {x_test.shape}')
-    print(f'y_train: {y_train.shape}')
-    print(f'y_val: {y_val.shape}')
-    print(f'y_test: {y_test.shape}\n')
+    # Getting the training, validation and testing data
+    # x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
+    #                                                      window_size, offset, split_ratio)
+    # x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, window_size, window_size)
+
+    # print('\nData formats:')
+    # print(f'x_train: {x_train.shape}')
+    # print(f'x_val: {x_val.shape}')
+    # print(f'x_test: {x_test.shape}')
+    # print(f'y_train: {y_train.shape}')
+    # print(f'y_val: {y_val.shape}')
+    # print(f'y_test: {y_test.shape}\n')
 
     list = []
     list_2 = []
@@ -220,25 +225,25 @@ elif(option == 2):
     x_train_list = x_train_list.tolist()
     x_train_list = x_train_list[0]
 
-    y_train_list = np.asarray(y_train_list).astype('str')
-    y_train_list = y_train_list.tolist()
-    y_train_list = y_train_list[0]
+    # y_train_list = np.asarray(y_train_list).astype('str')
+    # y_train_list = y_train_list.tolist()
+    # y_train_list = y_train_list[0]
 
     x_val_list = np.asarray(x_val_list).astype('str')
     x_val_list = x_val_list.tolist()
     x_val_list = x_val_list[0]
 
-    y_val_list = np.asarray(y_val_list).astype('str')
-    y_val_list = y_val_list.tolist()
-    y_val_list = y_val_list[0]
+    # y_val_list = np.asarray(y_val_list).astype('str')
+    # y_val_list = y_val_list.tolist()
+    # y_val_list = y_val_list[0]
 
     x_test_list = np.asarray(x_test_list).astype('str')
     x_test_list = x_test_list.tolist()
     x_test_list = x_test_list[0]
 
-    y_test_list = np.asarray(y_test_list).astype('str')
-    y_test_list = y_test_list.tolist()
-    y_test_list = y_test_list[0]
+    # y_test_list = np.asarray(y_test_list).astype('str')
+    # y_test_list = y_test_list.tolist()
+    # y_test_list = y_test_list[0]
 
     # data = {'train': x_train_list, 'validation': x_val_list, 'test': x_test_list}
     # labels = {'train': y_train_list, 'validation': y_val_list, 'test': y_test_list}
@@ -248,12 +253,12 @@ elif(option == 2):
     print('\ny_train_list:')
     print(y_train_list)
 
-    training_generator = functions.DataGenerator(x_train_list, batch_size, window_size,
+    training_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset,
                                                  num_channels, num_classes, False)
-    validation_generator = functions.DataGenerator(x_val_list, batch_size,
-                                                 window_size, num_channels, num_classes, False)
-    testing_generator = functions.DataGenerator(x_test_list, batch_size,
-                                                 window_size, num_channels, num_classes, False)                                             
+    validation_generator = functions.DataGenerator(x_val_list, batch_size, window_size, offset,
+                                                   num_channels, num_classes, False)
+    testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size,
+                                                num_channels, num_classes, False)                                             
 
     # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
     opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
