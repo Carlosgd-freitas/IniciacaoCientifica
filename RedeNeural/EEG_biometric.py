@@ -24,7 +24,7 @@ initial_learning_rate = 0.01    # Initial learning rate
 # Parameters used in functions.load_data()
 # folder_path = './Dataset_CSV/'
 folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
-train_tasks = [1]               # Tasks used for training and validation
+train_tasks = [1, 2]               # Tasks used for training and validation
 test_tasks = [2]                # Tasks used for testing
 num_classes = 109               # Total number of classes (individuals)
 
