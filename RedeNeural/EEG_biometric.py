@@ -142,8 +142,10 @@ if(option == 1):
     # Getting the training, validation and testing data
     # x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
     #                                                      window_size, offset, split_ratio)
-    x_train, y_train = functions.crop_data(train_content, train_tasks, num_classes, full_signal_size, full_signal_size)
-    x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, full_signal_size, full_signal_size)
+    x_train, y_train = functions.crop_data(train_content, train_tasks, num_classes, full_signal_size,
+                                           full_signal_size, reshape='data_generator')
+    x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, full_signal_size,
+                                           full_signal_size, reshape='data_generator')
 
     # print('\nData formats:')
     print(f'x_train: {x_train.shape}')

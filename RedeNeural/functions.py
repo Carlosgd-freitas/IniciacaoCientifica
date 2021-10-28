@@ -452,7 +452,7 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
 
         return x_data, y_data, x_data_2, y_data_2
 
-def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.0, reshape='sliding_window', verbose=0):
+def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.0, reshape='classic', verbose=0):
     """
     Applies a sliding window cropping for data augmentation of the signals recieved as input and outputs them
     as numpy arrays.
