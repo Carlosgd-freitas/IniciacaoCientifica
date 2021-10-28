@@ -681,15 +681,14 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
 
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
-    def __init__(self, list_IDs, labels, batch_size, dim, n_channels, n_classes, shuffle=True):
+    def __init__(self, list_IDs, batch_size, dim, n_channels, n_classes, shuffle=True):
         'Initialization'
         self.dim = dim
         self.batch_size = batch_size
-        self.labels = labels
-        self.list_IDs = list_IDs
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.shuffle = shuffle
+        self.list_IDs = list_IDs
         self.on_epoch_end()
 
     def __len__(self):
@@ -701,23 +700,13 @@ class DataGenerator(keras.utils.Sequence):
         # Generate indexes of the batch
         indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
 
-        print(indexes)#
-
         # Find list of IDs
         list_IDs_temp = [self.list_IDs[k] for k in indexes]
 
         # Generate data
         x, y = self.__data_generation(list_IDs_temp)
 
-        return x, y
-    
-    # Teste #
-    def on_train_batch_begin(self):
-        print('owpa')
-    
-    def on_train_batch_end(self):
-        print('foi')
-    # Teste #
+        return (x, y)
 
     def on_epoch_end(self):
         'Updates indexes after each epoch'
@@ -726,47 +715,32 @@ class DataGenerator(keras.utils.Sequence):
             np.random.shuffle(self.indexes)
 
     def __data_generation(self, list_IDs_temp):
-        'Generates data containing batch_size samples' # X : (n_samples, *dim, n_channels)
+        'Generates data containing batch_size samples'
         # Initialization
-        #X = np.empty((self.batch_size, *self.dim, self.n_channels))
-        #y = np.empty((self.batch_size), dtype=int)
-
-        #X = np.empty((self.batch_size, *self.dim))
-        #y = np.empty((self.batch_size, self.n_classes), dtype=int)
-
-        x_list = list()
-        y_list = list()
+        x = np.empty((self.batch_size, self.dim, self.n_channels))
+        y = np.empty((self.batch_size, self.n_classes), dtype=int)
+        counter = 0
 
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
-            file_list = np.asarray(list_IDs_temp[i]).astype('str')
-            file_list = file_list.tolist()
+            file_x = np.loadtxt('processed_data/' + list_IDs_temp[i], delimiter=';', usecols=range(self.n_channels))
+            aux = list_IDs_temp[i].replace('x','y')
+            file_y = np.loadtxt('processed_data/' + aux, delimiter=';', usecols=range(1))
 
-            for j in range(0, len(file_list)):
-                file_x = np.loadtxt('processed_data/' + file_list[j], delimiter=';', usecols=range(self.n_channels))
-                aux = file_list[j].replace('x','y')
-                file_y = np.loadtxt('processed_data/' + aux, delimiter=';', usecols=range(1))
+            file_x = np.asarray(file_x, dtype = object).astype('float32')
+            file_y = np.asarray(file_y, dtype = object).astype('float32')
 
-                x_list.append(file_x)
-                y_list.append(file_y)
+            # Store sample
+            x[i] = file_x
 
-                # Store sample
-                # X[i] = np.load('processed_data/' + ID + '.npy')
+            # Store class
+            y[i] = file_y
 
-                # Store class
-                # y[i] = self.labels[ID]
-                #  y[i] = np.load('processed_data/' + ID + '.npy')
-
-        x = np.asarray(x_list, dtype = object).astype('float32')
-        y = np.asarray(y_list, dtype = object).astype('float32')
-
-        # print(x)
-        # print(y)
-    
-        # print(f'x.shape = {x.shape}')
-        # print(f'y.shape = {y.shape}')
-
-        # x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
-        # y = y.reshape(y.shape[0], y.shape[2])
+            counter += 1
         
-        return x, y
+        while(counter < self.batch_size):
+            x[counter] = np.zeros((self.dim, self.n_channels))
+            y[counter] = np.zeros((self.n_classes), dtype=int)
+            counter += 1
+        
+        return (x, y)
