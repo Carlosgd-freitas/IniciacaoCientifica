@@ -25,7 +25,7 @@ initial_learning_rate = 0.01    # Initial learning rate
 # folder_path = './Dataset_CSV/'
 folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
 train_tasks = [1]               # Tasks used for training and validation
-test_tasks = [3]                # Tasks used for testing
+test_tasks = [10]                # Tasks used for testing
 num_classes = 109               # Total number of classes (individuals)
 
 # Parameters used in functions.filter_data()
@@ -41,7 +41,7 @@ normalize_type = 'each_channel' # Type of the normalization that will be applied
 
 # Parameters used in functions.crop_data()
 window_size = 1920              # Sliding window size, used when composing the dataset
-full_signal_size = 9760 # 9760 for Tasks 1-2 , X for Tasks 3-14
+full_signal_size = 9760         # 9760 for Tasks 1-2 , 20000 for Tasks 3-14
 offset = 35                     # Sliding window offset (deslocation), used when composing the dataset
 split_ratio = 0.9               # 90% for training | 10% for validation
 
