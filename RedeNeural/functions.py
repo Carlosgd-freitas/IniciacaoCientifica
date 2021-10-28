@@ -491,9 +491,9 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
         print('ERROR: The split_ratio parameter needs to be in the interval (0,1].')
         return None
     elif split_ratio == 1:
-        for task in data_tasks:
+        for task in range(1, len(data_tasks)+1):
             for i in range(1, num_classes + 1):
-                x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, data[i-1],
+                x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, data[(i*task)-1],
                                                    window_size, offset, i, num_classes)
 
                 if verbose == 1:
@@ -529,9 +529,9 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
         return x_data, y_data
     else:
-        for task in data_tasks:
+        for task in range(1, len(data_tasks)+1):
             for i in range(1, num_classes + 1):
-                x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, data[i-1],
+                x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, data[(i*task)-1],
                                                                          window_size, offset, i, num_classes,
                                                                          split_ratio, x_dataL_2, y_dataL_2)
                 
