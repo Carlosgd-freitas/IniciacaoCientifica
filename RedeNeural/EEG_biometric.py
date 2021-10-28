@@ -131,28 +131,13 @@ if(option == 1):
     # Loading the raw data
     train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
 
-    print('after loading')
-    print(f'train_content[0] = {train_content[0]}')
-    print(f'train_content[109] = {train_content[109]}')
-    print(f'test_content[0] = {test_content[0]}')
-
     # Filtering the raw data
     train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
     test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
 
-    print('after filtering')
-    print(f'train_content[0] = {train_content[0]}')
-    print(f'train_content[109] = {train_content[109]}')
-    print(f'test_content[0] = {test_content[0]}')
-
     # Normalize the filtered data
     train_content = functions.normalize_data(train_content, 'sun', 1)
     test_content = functions.normalize_data(test_content, 'sun', 1)
-
-    print('after normalizing')
-    print(f'train_content[0] = {train_content[0]}')
-    print(f'train_content[109] = {train_content[109]}')
-    print(f'test_content[0] = {test_content[0]}')
 
     # Getting the training, validation and testing data
     # x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,

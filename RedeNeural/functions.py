@@ -508,16 +508,23 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
         # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
         # input shape of the CNN is "a x window_size x num_channels".
-        if reshape == 'sliding_window':
+        if reshape == 'classic':
             x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
-        elif reshape == 'full_signal':
-            x_data = x_data.reshape(x_data.shape[1], x_data.shape[0])
+        elif reshape == 'data_generator':
+            temp = np.empty(x_data.shape[0], x_data.shape[2], x_data.shape[1])
+
+            i = 0
+            while(i < x_data.shape[0]):
+                temp[i] = x_data[i].reshape(x_data.shape[2], x_data.shape[1])
+                i += 1
+
+            x_data = temp
         else:
             print('ERROR: Invalid reshape parameter.')
 
         # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
         # is "a x num_classes".
-        if reshape == 'sliding_window':
+        if reshape == 'classic':
             y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
 
         return x_data, y_data
@@ -542,19 +549,29 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
         # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
         # input shape of the CNN is "a x window_size x num_channels".
-        if reshape == 'sliding_window':
+        if reshape == 'classic':
             x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
             x_data_2 = x_data_2.reshape(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
-        elif reshape == 'full_signal':
-            print(x_data)
-            x_data = x_data.reshape(x_data.shape[1], x_data.shape[0])
-            x_data_2 = x_data_2.reshape(x_data_2.shape[1], x_data_2.shape[0])
+        elif reshape == 'data_generator':
+            temp = np.empty(x_data.shape[0], x_data.shape[2], x_data.shape[1])
+            i = 0
+            while(i < x_data.shape[0]):
+                temp[i] = x_data[i].reshape(x_data.shape[2], x_data.shape[1])
+                i += 1
+            x_data = temp
+            
+            temp = np.empty(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
+            i = 0
+            while(i < x_data_2.shape[0]):
+                temp[i] = x_data_2[i].reshape(x_data_2.shape[2], x_data_2.shape[1])
+                i += 1
+            x_data_2 = temp
         else:
             print('ERROR: Invalid reshape parameter.')
 
         # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
         # is "a x num_classes".
-        if reshape == 'sliding_window':
+        if reshape == 'classic':
             y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
             y_data_2 = y_data_2.reshape(y_data_2.shape[0], y_data_2.shape[2])
 
