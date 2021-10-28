@@ -511,7 +511,7 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
         if reshape == 'classic':
             x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
         elif reshape == 'data_generator':
-            temp = np.empty(x_data.shape[0], x_data.shape[2], x_data.shape[1])
+            temp = np.empty((x_data.shape[0], x_data.shape[2], x_data.shape[1]))
 
             i = 0
             while(i < x_data.shape[0]):
@@ -553,14 +553,14 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
             x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
             x_data_2 = x_data_2.reshape(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
         elif reshape == 'data_generator':
-            temp = np.empty(x_data.shape[0], x_data.shape[2], x_data.shape[1])
+            temp = np.empty((x_data.shape[0], x_data.shape[2], x_data.shape[1]))
             i = 0
             while(i < x_data.shape[0]):
                 temp[i] = x_data[i].reshape(x_data.shape[2], x_data.shape[1])
                 i += 1
             x_data = temp
             
-            temp = np.empty(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
+            temp = np.empty((x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1]))
             i = 0
             while(i < x_data_2.shape[0]):
                 temp[i] = x_data_2[i].reshape(x_data_2.shape[2], x_data_2.shape[1])
