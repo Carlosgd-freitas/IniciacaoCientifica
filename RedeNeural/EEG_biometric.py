@@ -25,7 +25,7 @@ initial_learning_rate = 0.01    # Initial learning rate
 # folder_path = './Dataset_CSV/'
 folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
 train_tasks = [1]               # Tasks used for training and validation
-test_tasks = [10]                # Tasks used for testing
+test_tasks = [2]                # Tasks used for testing
 num_classes = 109               # Total number of classes (individuals)
 
 # Parameters used in functions.filter_data()
@@ -139,26 +139,20 @@ if(option == 1):
     train_content = functions.normalize_data(train_content, 'sun', 1)
     test_content = functions.normalize_data(test_content, 'sun', 1)
 
-    print(f'test_content = {test_content}')
-    print(f'type(test_content) = {type(test_content)}')
-
-    test_content = np.asarray(test_content)
-    print(f'test_content.shape = {test_content.shape}')
-    print(f'test_content = {test_content}')
-    input('quitaste?')
-
     # Getting the training, validation and testing data
     # x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
     #                                                      window_size, offset, split_ratio)
-    # x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, window_size, window_size)
+    x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, window_size, window_size)
 
     # print('\nData formats:')
     # print(f'x_train: {x_train.shape}')
     # print(f'x_val: {x_val.shape}')
-    # print(f'x_test: {x_test.shape}')
+    print(f'x_test: {x_test.shape}')
     # print(f'y_train: {y_train.shape}')
     # print(f'y_val: {y_val.shape}')
     # print(f'y_test: {y_test.shape}\n')
+
+    input('quitaste?')
 
     list = []
     list_2 = []
@@ -168,12 +162,12 @@ if(option == 1):
         savetxt('processed_data/'+string+'.csv', data, fmt='%f', delimiter=';')
         list.append(string+'.csv')
         
-        data = y_train[index]
-        string = 'y_train_' + str(index)
-        savetxt('processed_data/'+string+'.csv', data, fmt='%d', delimiter=';')
-        list_2.append(string+'.csv')
+        # data = y_train[index]
+        # string = 'y_train_' + str(index)
+        # savetxt('processed_data/'+string+'.csv', data, fmt='%d', delimiter=';')
+        # list_2.append(string+'.csv')
     savetxt('processed_data/x_train_list.csv', [list], delimiter=',', fmt='%s')
-    savetxt('processed_data/y_train_list.csv', [list_2], delimiter=',', fmt='%s')
+    # savetxt('processed_data/y_train_list.csv', [list_2], delimiter=',', fmt='%s')
 
     list = []
     list_2 = []
@@ -183,12 +177,12 @@ if(option == 1):
         savetxt('processed_data/'+string+'.csv', data, fmt='%f', delimiter=';')
         list.append(string+'.csv')
         
-        data = y_val[index]
-        string = 'y_val_' + str(index)
-        savetxt('processed_data/'+string+'.csv', data, fmt='%d', delimiter=';')
-        list_2.append(string+'.csv')
+        # data = y_val[index]
+        # string = 'y_val_' + str(index)
+        # savetxt('processed_data/'+string+'.csv', data, fmt='%d', delimiter=';')
+        # list_2.append(string+'.csv')
     savetxt('processed_data/x_val_list.csv', [list], delimiter=',', fmt='%s')
-    savetxt('processed_data/y_val_list.csv', [list_2], delimiter=',', fmt='%s')
+    # savetxt('processed_data/y_val_list.csv', [list_2], delimiter=',', fmt='%s')
     
     list = []
     list_2 = []
@@ -198,12 +192,12 @@ if(option == 1):
         savetxt('processed_data/'+string+'.csv', data, fmt='%f', delimiter=';')
         list.append(string+'.csv')
         
-        data = y_test[index]
-        string = 'y_test_' + str(index)
-        savetxt('processed_data/'+string+'.csv', data, fmt='%d', delimiter=';')
-        list_2.append(string+'.csv')
+        # data = y_test[index]
+        # string = 'y_test_' + str(index)
+        # savetxt('processed_data/'+string+'.csv', data, fmt='%d', delimiter=';')
+        # list_2.append(string+'.csv')
     savetxt('processed_data/x_test_list.csv', [list], delimiter=',', fmt='%s')
-    savetxt('processed_data/y_test_list.csv', [list_2], delimiter=',', fmt='%s')
+    # savetxt('processed_data/y_test_list.csv', [list_2], delimiter=',', fmt='%s')
 
 elif(option == 2):
     # Creating the model
