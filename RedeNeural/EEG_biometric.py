@@ -138,9 +138,12 @@ if(option == 1):
     train_content = functions.normalize_data(train_content, 'sun', 1)
     test_content = functions.normalize_data(test_content, 'sun', 1)
 
-    test_content2 = np.asarray(test_content, dtype='float32')
-    print(f'test_content2.shape = {test_content2.shape}')
-    print(f'test_content2 = {test_content2}')
+    print(f'test_content = {test_content}')
+    print(f'type(test_content) = {type(test_content)}')
+
+    test_content = np.asarray(test_content)
+    print(f'test_content.shape = {test_content.shape}')
+    print(f'test_content = {test_content}')
     input('quitaste?')
 
     # Getting the training, validation and testing data
