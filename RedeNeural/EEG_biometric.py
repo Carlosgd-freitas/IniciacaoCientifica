@@ -12,6 +12,15 @@ from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.optimizers import SGD, Adam
 from numpy import savetxt, loadtxt
 
+############### TODO: ###############
+# - Salvar os .csv de x_train e x_test guardando o número do indivíduo no nome dos .csv
+# - Aplicar o data_augmentation dentro dos Data Generators
+# - Um Data Generator pro x_test
+# - Dois Data Generators que fazem a mesma operação de data_augmentation que volta quatro bagulho:
+#   x_train, y_train, x_val, y_val = functions.crop_data(), mas um vai voltar (x_train, y_train) no
+#   __data_generation() e outro vai voltar (x_val, y_val)
+#####################################
+
 random.seed(1051)
 np.random.seed(1051)
 tf.random.set_seed(1051)
@@ -148,16 +157,9 @@ if(option == 1):
                                            full_signal_size, reshape='data_generator')
 
     # print('\nData formats:')
-    print(f'x_train: {x_train.shape}')
-    print(f'x_test: {x_test.shape}')
-
-    print('after cropping')
-    print(f'x_train[0] = {x_train[0]}')
-    print(f'x_train[109] = {x_train[109]}')
-    print(f'x_test[0] = {x_test[0]}')
-
-    input('quitaste?')
-
+    # print(f'x_train: {x_train.shape}')
+    # print(f'x_test: {x_test.shape}')
+    
     list = []
     list_2 = []
     for index in range(0, x_train.shape[0]):
