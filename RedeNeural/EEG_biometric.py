@@ -138,7 +138,7 @@ if(option == 1):
     train_content = functions.normalize_data(train_content, 'sun', 1)
     test_content = functions.normalize_data(test_content, 'sun', 1)
 
-    test_content = np.asarray(test_content, dype='float32')
+    test_content = np.asarray(test_content, dtype='float32')
     print(f'test_content.shape = {test_content.shape}')
     print(f'test_content = {test_content}')
     input('quitaste?')
