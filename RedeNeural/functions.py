@@ -698,17 +698,17 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
 
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
-    def __init__(self, list_IDs, batch_size, dim, offset, n_channels, n_classes, type, split_ratio, shuffle=True):
+    def __init__(self, list_IDs, batch_size, dim, offset, n_channels, n_classes, dataset_type, split_ratio, shuffle=True):
         'Initialization'
+        self.list_IDs = list_IDs
+        self.batch_size = batch_size
         self.dim = dim
         self.offset = offset
-        self.batch_size = batch_size
         self.n_channels = n_channels
         self.n_classes = n_classes
-        self.shuffle = shuffle
-        self.list_IDs = list_IDs
-        self.type = type
+        self.dataset_type = dataset_type
         self.split_ratio = split_ratio
+        self.shuffle = shuffle
         self.on_epoch_end()
 
     def __len__(self):
@@ -756,11 +756,14 @@ class DataGenerator(keras.utils.Sequence):
             file_x = np.asarray(file_x, dtype = object).astype('float32')
             # file_y = np.asarray(file_y, dtype = object).astype('float32')
 
+            print(f'type(file_x) = {type(file_x)}')
+            print(f'file_x = {file_x}')
+
             string = 'processed_data/' + list_IDs_temp[i]
             string = string.split("_subject_")[1]      # 'X.csv'
             subject = int(string.split(".csv")[0])     # X
 
-            if(self.type == 'test'):
+            if(self.dataset_type == 'test'):
                 x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, file_x, self.dim, self.offset,
                                                    subject, self.n_classes)
             else:
@@ -782,11 +785,11 @@ class DataGenerator(keras.utils.Sequence):
         print(f'x_dataL = {x_dataL}')
         print(f'y_dataL = {y_dataL}')
 
-        if(self.type == 'train' or self.type == 'test'):
+        if(self.dataset_type == 'train' or self.dataset_type == 'test'):
             x = np.asarray(x_dataL, dtype = object).astype('float32')
             y = np.asarray(y_dataL, dtype = object).astype('float32')
 
-        elif(self.type == 'validation'):
+        elif(self.dataset_type == 'validation'):
             x = np.asarray(x_dataL_2, dtype = object).astype('float32')
             y = np.asarray(y_dataL_2, dtype = object).astype('float32')
         
