@@ -698,7 +698,7 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
 
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
-    def __init__(self, list_IDs, batch_size, dim, offset, n_channels, n_classes, dataset_type, split_ratio, shuffle=True):
+    def __init__(self, list_IDs, batch_size, dim, offset, n_channels, n_classes, tasks, dataset_type, split_ratio, shuffle=True):
         'Initialization'
         self.list_IDs = list_IDs
         self.batch_size = batch_size
@@ -706,6 +706,7 @@ class DataGenerator(keras.utils.Sequence):
         self.offset = offset
         self.n_channels = n_channels
         self.n_classes = n_classes
+        self.tasks = tasks
         self.dataset_type = dataset_type
         self.split_ratio = split_ratio
         self.shuffle = shuffle
@@ -740,10 +741,7 @@ class DataGenerator(keras.utils.Sequence):
         # x = np.empty((self.batch_size, self.dim, self.n_channels))
         # y = np.empty((self.batch_size, self.n_classes), dtype=int)
         # counter = 0
-        x_dataL = list()
-        y_dataL = list()
-        x_dataL_2 = list()
-        y_dataL_2 = list()
+        temp_x = list()
 
         print(f'list_IDs_temp = {list_IDs_temp}')
 
@@ -756,19 +754,19 @@ class DataGenerator(keras.utils.Sequence):
             file_x = np.asarray(file_x, dtype = object).astype('float32')
             # file_y = np.asarray(file_y, dtype = object).astype('float32')
 
-            string = 'processed_data/' + list_IDs_temp[i]
-            string = string.split("_subject_")[1]      # 'X.csv'
-            subject = int(string.split(".csv")[0])     # X
+            temp_x.append(file_x)
 
-            if(self.dataset_type == 'test'):
-                x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, file_x, self.dim, self.offset,
-                                                   subject, self.n_classes)
-            else:
-                x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, file_x, self.dim,
-                                        self.offset, subject, self.n_classes, self.split_ratio, x_dataL_2, y_dataL_2)
+            # string = 'processed_data/' + list_IDs_temp[i]
+            # string = string.split("_subject_")[1]      # 'X.csv'
+            # subject = int(string.split(".csv")[0])     # X
+
+            # if(self.dataset_type == 'test'):
+            #     x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, file_x, self.dim, self.offset,
+            #                                        subject, self.n_classes)
+            # else:
+            #     x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, file_x, self.dim,
+            #                             self.offset, subject, self.n_classes, self.split_ratio, x_dataL_2, y_dataL_2)
             
-            print(f'type(x_dataL) = {type(x_dataL)}')
-            print(f'x_dataL = {x_dataL}')
             # Store sample
             # x[i] = file_x
 
@@ -782,16 +780,19 @@ class DataGenerator(keras.utils.Sequence):
         #     y[counter] = np.zeros((self.n_classes), dtype=int)
         #     counter += 1
 
-        print(f'x_dataL = {x_dataL}')
-        print(f'y_dataL = {y_dataL}')
+        if(self.dataset_type == 'train' or self.dataset_type == 'validation'):
+            # x = np.asarray(x_dataL, dtype = object).astype('float32')
+            # y = np.asarray(y_dataL, dtype = object).astype('float32')
+            x, y, x_2, y_2 = crop_data(temp_x, self.tasks, self.n_classes, self.dim, self.offset, self.split_ratio)
 
-        if(self.dataset_type == 'train' or self.dataset_type == 'test'):
-            x = np.asarray(x_dataL, dtype = object).astype('float32')
-            y = np.asarray(y_dataL, dtype = object).astype('float32')
+            if(self.dataset_type == 'validation'):
+                x = x_2
+                y = y_2
 
-        elif(self.dataset_type == 'validation'):
-            x = np.asarray(x_dataL_2, dtype = object).astype('float32')
-            y = np.asarray(y_dataL_2, dtype = object).astype('float32')
+        elif(self.dataset_type == 'test'):
+            # x = np.asarray(x_dataL_2, dtype = object).astype('float32')
+            # y = np.asarray(y_dataL_2, dtype = object).astype('float32')
+            x, y = crop_data(temp_x, self.tasks, self.n_classes, self.dim, self.offset)
         
         print(f'x.shape = {x.shape}')
         print(f'y.shape = {y.shape}')
@@ -799,7 +800,7 @@ class DataGenerator(keras.utils.Sequence):
         print(f'x = {x}')
         print(f'y = {y}')
 
-        x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
-        y = y.reshape(y.shape[0], y.shape[2])
+        # x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
+        # y = y.reshape(y.shape[0], y.shape[2])
 
         return (x, y)

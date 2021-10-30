@@ -255,11 +255,11 @@ elif(option == 2):
     # print(y_train_list)
 
     training_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, num_channels,
-                                                 num_classes, 'train', split_ratio, False)
+                                                 num_classes, train_tasks, 'train', split_ratio, False)
     validation_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, num_channels,
-                                                   num_classes, 'validation', split_ratio, False)
+                                                   num_classes, train_tasks, 'validation', split_ratio, False)
     testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size, num_channels,
-                                                num_classes, 'test', 1.0, False)                                             
+                                                num_classes, test_tasks, 'test', 1.0, False)                                             
 
     # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
     opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
