@@ -129,6 +129,8 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 
 option = 3
 while option != 0:
+    option = 3
+    
     # Menu
     print('=============== MENU ===============')
     print('Remember: Always process the training, validation and testing data before running the model!')
