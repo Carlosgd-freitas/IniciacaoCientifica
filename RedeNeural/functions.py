@@ -756,9 +756,6 @@ class DataGenerator(keras.utils.Sequence):
             file_x = np.asarray(file_x, dtype = object).astype('float32')
             # file_y = np.asarray(file_y, dtype = object).astype('float32')
 
-            print(f'type(file_x) = {type(file_x)}')
-            print(f'file_x = {file_x}')
-
             string = 'processed_data/' + list_IDs_temp[i]
             string = string.split("_subject_")[1]      # 'X.csv'
             subject = int(string.split(".csv")[0])     # X
@@ -769,6 +766,9 @@ class DataGenerator(keras.utils.Sequence):
             else:
                 x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, file_x, self.dim,
                                         self.offset, subject, self.n_classes, self.split_ratio, x_dataL_2, y_dataL_2)
+            
+            print(f'type(x_dataL) = {type(x_dataL)}')
+            print(f'x_dataL = {x_dataL}')
             # Store sample
             # x[i] = file_x
 
