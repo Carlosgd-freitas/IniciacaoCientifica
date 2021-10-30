@@ -741,7 +741,7 @@ class DataGenerator(keras.utils.Sequence):
         # x = np.empty((self.batch_size, self.dim, self.n_channels))
         # y = np.empty((self.batch_size, self.n_classes), dtype=int)
         # counter = 0
-        temp_x = list()
+        temp_x = []
 
         print(f'list_IDs_temp = {list_IDs_temp}')
 
@@ -779,6 +779,8 @@ class DataGenerator(keras.utils.Sequence):
         #     x[counter] = np.zeros((self.dim, self.n_channels))
         #     y[counter] = np.zeros((self.n_classes), dtype=int)
         #     counter += 1
+
+        print(f'temp_x = {temp_x}')
 
         if(self.dataset_type == 'train' or self.dataset_type == 'validation'):
             # x = np.asarray(x_dataL, dtype = object).astype('float32')
