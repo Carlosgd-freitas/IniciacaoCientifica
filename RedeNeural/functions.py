@@ -757,7 +757,8 @@ class DataGenerator(keras.utils.Sequence):
             # file_y = np.asarray(file_y, dtype = object).astype('float32')
 
             string = 'processed_data/' + list_IDs_temp[i]
-            subject = string.split("_subject_")[1]
+            string = string.split("_subject_")[1]      # 'X.csv'
+            subject = int(string.split(".csv")[0])     # X
             print(f'subject = {subject}')
             input('quitaste?')
 
