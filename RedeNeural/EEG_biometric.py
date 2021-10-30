@@ -176,7 +176,9 @@ if(option == 1):
         # string = 'y_train_' + str(index)
         # savetxt('processed_data/'+string+'.csv', data, fmt='%d', delimiter=';')
         # list_2.append(string+'.csv')
+    print('saving file names to processed_data/x_train_list.csv ... ',end='')
     savetxt('processed_data/x_train_list.csv', [list], delimiter=',', fmt='%s')
+    print('saved!')
     # savetxt('processed_data/y_train_list.csv', [list_2], delimiter=',', fmt='%s')
     
     counter = 1
@@ -195,7 +197,9 @@ if(option == 1):
         # string = 'y_test_' + str(index)
         # savetxt('processed_data/'+string+'.csv', data, fmt='%d', delimiter=';')
         # list_2.append(string+'.csv')
+    print('saving file names to processed_data/x_test_list.csv ... ',end='')
     savetxt('processed_data/x_test_list.csv', [list], delimiter=',', fmt='%s')
+    print('saved!')
     # savetxt('processed_data/y_test_list.csv', [list_2], delimiter=',', fmt='%s')
 
 elif(option == 2):
@@ -250,12 +254,12 @@ elif(option == 2):
     # print('\ny_train_list:')
     # print(y_train_list)
 
-    training_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset,
-                                                 num_channels, num_classes, False)
-    validation_generator = functions.DataGenerator(x_val_list, batch_size, window_size, offset,
-                                                   num_channels, num_classes, False)
-    testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size,
-                                                num_channels, num_classes, False)                                             
+    training_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, num_channels,
+                                                 num_classes, 'train', split_ratio, False)
+    validation_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, num_channels,
+                                                   num_classes, 'validation', split_ratio, False)
+    testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size, num_channels,
+                                                num_classes, 'test', 1.0, False)                                             
 
     # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
     opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
