@@ -130,7 +130,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 option = 3
 while option != 0:
     option = 3
-    
+
     # Menu
     print('=============== MENU ===============')
     print('Remember: Always process the training, validation and testing data before running the model!')
@@ -239,11 +239,11 @@ while option != 0:
         x_test_list = []
         # y_test_list = []
 
-        x_train_list.append(loadtxt('processed_data/x_train_list.csv', delimiter=',', dtype='str'))
+        x_train_list.append(loadtxt('processed_train_data/x_train_list.csv', delimiter=',', dtype='str'))
         # y_train_list.append(loadtxt('processed_data/y_train_list.csv', delimiter=',', dtype='str'))
         # x_val_list.append(loadtxt('processed_data/x_val_list.csv', delimiter=',', dtype='str'))
         # y_val_list.append(loadtxt('processed_data/y_val_list.csv', delimiter=',', dtype='str'))
-        x_test_list.append(loadtxt('processed_data/x_test_list.csv', delimiter=',', dtype='str'))
+        x_test_list.append(loadtxt('processed_test_data/x_test_list.csv', delimiter=',', dtype='str'))
         # y_test_list.append(loadtxt('processed_data/y_test_list.csv', delimiter=',', dtype='str'))
 
         x_train_list = np.asarray(x_train_list).astype('str')
