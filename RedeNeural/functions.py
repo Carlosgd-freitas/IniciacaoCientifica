@@ -795,6 +795,9 @@ class DataGenerator(keras.utils.Sequence):
         
         x_data = np.asarray(x_dataL, dtype = object).astype('float32')
         y_data = np.asarray(y_dataL, dtype = object).astype('float32')
+
+        print(f'__data_generation: x_data.shape = {x_data.shape}')
+
         x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
         y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
 
