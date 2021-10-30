@@ -763,6 +763,7 @@ class DataGenerator(keras.utils.Sequence):
             file_x = np.asarray(file_x, dtype = object).astype('float32')
             # file_y = np.asarray(file_y, dtype = object).astype('float32')
 
+            print(f'file_x.shape = {file_x.shape}') #
             temp_x.append(file_x)
 
             string = string.split("_subject_")[1]      # 'X.csv'
@@ -816,9 +817,9 @@ class DataGenerator(keras.utils.Sequence):
                 pos += 1
         
         x_data = np.asarray(x_dataL, dtype = object).astype('float32')
-        x_data_2 = np.asarray(x_dataL_2, dtype = object).astype('float32')
         y_data = np.asarray(y_dataL, dtype = object).astype('float32')
-        y_data_2 = np.asarray(y_dataL_2, dtype = object).astype('float32')
+        x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
+        y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
 
         # print(f'x_data.shape = {x_data.shape}')
         # print(f'y_data.shape = {y_data.shape}')
@@ -828,20 +829,16 @@ class DataGenerator(keras.utils.Sequence):
 
         # input('quitaste?')
 
-        # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
-        # input shape of the CNN is "a x window_size x num_channels".
-        x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
-        x_data_2 = x_data_2.reshape(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
-
-        # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
-        # is "a x num_classes".
-        y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
-        y_data_2 = y_data_2.reshape(y_data_2.shape[0], y_data_2.shape[2])
-
         if(self.dataset_type == 'train' or self.dataset_type == 'test'):
             x = x_data
             y = y_data
         elif(self.dataset_type == 'validation'):
+            x_data_2 = np.asarray(x_dataL_2, dtype = object).astype('float32')
+            y_data_2 = np.asarray(y_dataL_2, dtype = object).astype('float32')
+
+            x_data_2 = x_data_2.reshape(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
+            y_data_2 = y_data_2.reshape(y_data_2.shape[0], y_data_2.shape[2])
+
             x = x_data_2
             y = y_data_2
 
