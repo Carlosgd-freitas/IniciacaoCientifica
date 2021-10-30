@@ -249,8 +249,8 @@ elif(option == 2):
     # data = {'train': x_train_list, 'validation': x_val_list, 'test': x_test_list}
     # labels = {'train': y_train_list, 'validation': y_val_list, 'test': y_test_list}
 
-    print('x_train_list:')
-    print(x_train_list)
+    # print('x_train_list:')
+    # print(x_train_list)
     # print('\ny_train_list:')
     # print(y_train_list)
 

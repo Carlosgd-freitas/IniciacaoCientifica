@@ -745,6 +745,8 @@ class DataGenerator(keras.utils.Sequence):
         x_dataL_2 = list()
         y_dataL_2 = list()
 
+        print(f'list_IDs_temp = {list_IDs_temp}')
+
         # Generate data
         for i in enumerate(list_IDs_temp):
             file_x = np.loadtxt('processed_data/' + list_IDs_temp[i], delimiter=';', usecols=range(self.n_channels))
