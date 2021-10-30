@@ -373,5 +373,5 @@ while option != 0:
         # print(f'EER: {eer*100.0} %')
         # print(f'Decidability: {d}')
 
-    else:
+    elif(option != 0):
         print('ERROR: Enter a valid option.')
