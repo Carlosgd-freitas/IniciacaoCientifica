@@ -127,245 +127,251 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 
 # functions.create_csv_database_from_edf('./Dataset/','./All_Channels_Yang/', num_classes, channels = all_channels_yang)
 
-# First process the data, then run the model
-print('Press [0] and [ENTER] to QUIT')
-print('Press [1] and [ENTER] to process the training/validation data')
-print('Press [2] and [ENTER] to process the testing data')
-print('Press [3] and [ENTER] to run the model')
-option = int(input('Enter option: '))
+option = 3
+while option != 0:
+    # Menu
+    print('=============== MENU ===============')
+    print('Remember: Always process the training, validation and testing data before running the model!')
+    print('Press [0] and [ENTER] to QUIT')
+    print('Press [1] and [ENTER] to process the training/validation data')
+    print('Press [2] and [ENTER] to process the testing data')
+    print('Press [3] and [ENTER] to run the model')
+    print('====================================')
+
+    option = int(input('Enter option: '))
     
-if(option == 1):  
-    if(os.path.exists('processed_train_data')):
-        shutil.rmtree('processed_train_data', ignore_errors=True)
-    os.mkdir('processed_train_data')
+    if(option == 1):  
+        if(os.path.exists('processed_train_data')):
+            shutil.rmtree('processed_train_data', ignore_errors=True)
+        os.mkdir('processed_train_data')
 
-    # Loading the raw data
-    train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
+        # Loading the raw data
+        train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
 
-    # Filtering the raw data
-    train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+        # Filtering the raw data
+        train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
 
-    # Normalize the filtered data
-    train_content = functions.normalize_data(train_content, 'sun', 1)
+        # Normalize the filtered data
+        train_content = functions.normalize_data(train_content, 'sun', 1)
 
-    # Getting the training, validation and testing data
-    # x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
-    #                                                      window_size, offset, split_ratio)
-    x_train, y_train = functions.crop_data(train_content, train_tasks, num_classes, full_signal_size,
-                                           full_signal_size, reshape='no_reshape')
+        # Getting the training, validation and testing data
+        # x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
+        #                                                      window_size, offset, split_ratio)
+        x_train, y_train = functions.crop_data(train_content, train_tasks, num_classes, full_signal_size,
+                                            full_signal_size, reshape='no_reshape')
 
-    counter = 1
-    list = []
-    # list_2 = []
-    for index in range(0, x_train.shape[0]):
-        if(counter > num_classes):
-            counter = 1
-        data = x_train[index]
-        string = 'x_train_' + str(index) + '_subject_' + str(counter)
-        savetxt('processed_train_data/'+string+'.csv', data, fmt='%f', delimiter=';')
-        list.append(string+'.csv')
-        counter += 1
+        counter = 1
+        list = []
+        # list_2 = []
+        for index in range(0, x_train.shape[0]):
+            if(counter > num_classes):
+                counter = 1
+            data = x_train[index]
+            string = 'x_train_' + str(index) + '_subject_' + str(counter)
+            savetxt('processed_train_data/'+string+'.csv', data, fmt='%f', delimiter=';')
+            list.append(string+'.csv')
+            counter += 1
+            
+            # data = y_train[index]
+            # string = 'y_train_' + str(index)
+            # savetxt('processed_train_data/'+string+'.csv', data, fmt='%d', delimiter=';')
+            # list_2.append(string+'.csv')
+        print('saving file names to processed_train_data/x_train_list.csv ... ',end='')
+        savetxt('processed_train_data/x_train_list.csv', [list], delimiter=',', fmt='%s')
+        print('saved!')
+        # savetxt('processed_train_data/y_train_list.csv', [list_2], delimiter=',', fmt='%s')
+
+    elif(option == 2):  
+        if(os.path.exists('processed_test_data')):
+            shutil.rmtree('processed_test_data', ignore_errors=True)
+        os.mkdir('processed_test_data')
+
+        # Loading the raw data
+        train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
+
+        # Filtering the raw data
+        test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+
+        # Normalize the filtered data
+        test_content = functions.normalize_data(test_content, 'sun', 1)
+
+        # Getting the training, validation and testing data
+        # x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
+        #                                                      window_size, offset, split_ratio)
+        x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, full_signal_size,
+                                            full_signal_size, reshape='no_reshape')
         
-        # data = y_train[index]
-        # string = 'y_train_' + str(index)
-        # savetxt('processed_train_data/'+string+'.csv', data, fmt='%d', delimiter=';')
-        # list_2.append(string+'.csv')
-    print('saving file names to processed_train_data/x_train_list.csv ... ',end='')
-    savetxt('processed_train_data/x_train_list.csv', [list], delimiter=',', fmt='%s')
-    print('saved!')
-    # savetxt('processed_train_data/y_train_list.csv', [list_2], delimiter=',', fmt='%s')
+        counter = 1
+        list = []
+        # list_2 = []
+        for index in range(0, x_test.shape[0]):
+            if(counter > num_classes):
+                counter = 1
+            data = x_test[index]
+            string = 'x_test_' + str(index) + '_subject_' + str(counter)
+            savetxt('processed_test_data/'+string+'.csv', data, fmt='%f', delimiter=';')
+            list.append(string+'.csv')
+            counter += 1
+            
+            # data = y_test[index]
+            # string = 'y_test_' + str(index)
+            # savetxt('processed_test_data/'+string+'.csv', data, fmt='%d', delimiter=';')
+            # list_2.append(string+'.csv')
+        print('saving file names to processed_test_data/x_test_list.csv ... ',end='')
+        savetxt('processed_test_data/x_test_list.csv', [list], delimiter=',', fmt='%s')
+        print('saved!')
+        # savetxt('processed_test_data/y_test_list.csv', [list_2], delimiter=',', fmt='%s')
 
-elif(option == 2):  
-    if(os.path.exists('processed_test_data')):
-        shutil.rmtree('processed_test_data', ignore_errors=True)
-    os.mkdir('processed_test_data')
+    elif(option == 3):
+        # Creating the model
+        model = models.create_model(window_size, num_channels, num_classes)
+        model.summary()
 
-    # Loading the raw data
-    train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
+        # Composing the dictionary
+        x_train_list = []
+        # y_train_list = []
+        # x_val_list = []
+        # y_val_list = []
+        x_test_list = []
+        # y_test_list = []
 
-    # Filtering the raw data
-    test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+        x_train_list.append(loadtxt('processed_data/x_train_list.csv', delimiter=',', dtype='str'))
+        # y_train_list.append(loadtxt('processed_data/y_train_list.csv', delimiter=',', dtype='str'))
+        # x_val_list.append(loadtxt('processed_data/x_val_list.csv', delimiter=',', dtype='str'))
+        # y_val_list.append(loadtxt('processed_data/y_val_list.csv', delimiter=',', dtype='str'))
+        x_test_list.append(loadtxt('processed_data/x_test_list.csv', delimiter=',', dtype='str'))
+        # y_test_list.append(loadtxt('processed_data/y_test_list.csv', delimiter=',', dtype='str'))
 
-    # Normalize the filtered data
-    test_content = functions.normalize_data(test_content, 'sun', 1)
+        x_train_list = np.asarray(x_train_list).astype('str')
+        x_train_list = x_train_list.tolist()
+        x_train_list = x_train_list[0]
 
-    # Getting the training, validation and testing data
-    # x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
-    #                                                      window_size, offset, split_ratio)
-    x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, full_signal_size,
-                                           full_signal_size, reshape='no_reshape')
-    
-    counter = 1
-    list = []
-    # list_2 = []
-    for index in range(0, x_test.shape[0]):
-        if(counter > num_classes):
-            counter = 1
-        data = x_test[index]
-        string = 'x_test_' + str(index) + '_subject_' + str(counter)
-        savetxt('processed_test_data/'+string+'.csv', data, fmt='%f', delimiter=';')
-        list.append(string+'.csv')
-        counter += 1
-        
-        # data = y_test[index]
-        # string = 'y_test_' + str(index)
-        # savetxt('processed_test_data/'+string+'.csv', data, fmt='%d', delimiter=';')
-        # list_2.append(string+'.csv')
-    print('saving file names to processed_test_data/x_test_list.csv ... ',end='')
-    savetxt('processed_test_data/x_test_list.csv', [list], delimiter=',', fmt='%s')
-    print('saved!')
-    # savetxt('processed_test_data/y_test_list.csv', [list_2], delimiter=',', fmt='%s')
+        # y_train_list = np.asarray(y_train_list).astype('str')
+        # y_train_list = y_train_list.tolist()
+        # y_train_list = y_train_list[0]
 
-elif(option == 3):
-    # Creating the model
-    model = models.create_model(window_size, num_channels, num_classes)
-    model.summary()
+        # x_val_list = np.asarray(x_val_list).astype('str')
+        # x_val_list = x_val_list.tolist()
+        # x_val_list = x_val_list[0]
 
-    # Composing the dictionary
-    x_train_list = []
-    # y_train_list = []
-    # x_val_list = []
-    # y_val_list = []
-    x_test_list = []
-    # y_test_list = []
+        # y_val_list = np.asarray(y_val_list).astype('str')
+        # y_val_list = y_val_list.tolist()
+        # y_val_list = y_val_list[0]
 
-    x_train_list.append(loadtxt('processed_data/x_train_list.csv', delimiter=',', dtype='str'))
-    # y_train_list.append(loadtxt('processed_data/y_train_list.csv', delimiter=',', dtype='str'))
-    # x_val_list.append(loadtxt('processed_data/x_val_list.csv', delimiter=',', dtype='str'))
-    # y_val_list.append(loadtxt('processed_data/y_val_list.csv', delimiter=',', dtype='str'))
-    x_test_list.append(loadtxt('processed_data/x_test_list.csv', delimiter=',', dtype='str'))
-    # y_test_list.append(loadtxt('processed_data/y_test_list.csv', delimiter=',', dtype='str'))
+        x_test_list = np.asarray(x_test_list).astype('str')
+        x_test_list = x_test_list.tolist()
+        x_test_list = x_test_list[0]
 
-    x_train_list = np.asarray(x_train_list).astype('str')
-    x_train_list = x_train_list.tolist()
-    x_train_list = x_train_list[0]
+        # y_test_list = np.asarray(y_test_list).astype('str')
+        # y_test_list = y_test_list.tolist()
+        # y_test_list = y_test_list[0]
 
-    # y_train_list = np.asarray(y_train_list).astype('str')
-    # y_train_list = y_train_list.tolist()
-    # y_train_list = y_train_list[0]
+        # data = {'train': x_train_list, 'validation': x_val_list, 'test': x_test_list}
+        # labels = {'train': y_train_list, 'validation': y_val_list, 'test': y_test_list}
 
-    # x_val_list = np.asarray(x_val_list).astype('str')
-    # x_val_list = x_val_list.tolist()
-    # x_val_list = x_val_list[0]
+        # print('x_train_list:')
+        # print(x_train_list)
+        # print('\ny_train_list:')
+        # print(y_train_list)
 
-    # y_val_list = np.asarray(y_val_list).astype('str')
-    # y_val_list = y_val_list.tolist()
-    # y_val_list = y_val_list[0]
+        training_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, num_channels,
+                                                    num_classes, train_tasks, 'train', split_ratio, False)
+        validation_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, num_channels,
+                                                    num_classes, train_tasks, 'validation', split_ratio, False)
+        testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size, num_channels,
+                                                    num_classes, test_tasks, 'test', 1.0, False)                                             
 
-    x_test_list = np.asarray(x_test_list).astype('str')
-    x_test_list = x_test_list.tolist()
-    x_test_list = x_test_list[0]
+        # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
+        opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
+        # opt = Adam(learning_rate = 0.0001)
 
-    # y_test_list = np.asarray(y_test_list).astype('str')
-    # y_test_list = y_test_list.tolist()
-    # y_test_list = y_test_list[0]
+        model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
 
-    # data = {'train': x_train_list, 'validation': x_val_list, 'test': x_test_list}
-    # labels = {'train': y_train_list, 'validation': y_val_list, 'test': y_test_list}
+        fit_begin = time.time()
 
-    # print('x_train_list:')
-    # print(x_train_list)
-    # print('\ny_train_list:')
-    # print(y_train_list)
+        callback = LearningRateScheduler(models.scheduler, verbose=0)
+        results = model.fit_generator(generator = training_generator,
+                            validation_data = validation_generator,
+                            epochs = training_epochs,
+                            callbacks = [callback],
+                            )
 
-    training_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, num_channels,
-                                                 num_classes, train_tasks, 'train', split_ratio, False)
-    validation_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, num_channels,
-                                                   num_classes, train_tasks, 'validation', split_ratio, False)
-    testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size, num_channels,
-                                                num_classes, test_tasks, 'test', 1.0, False)                                             
+        # results = model.fit(x_train,
+        #                     y_train,
+        #                     batch_size = batch_size,
+        #                     epochs = training_epochs,
+        #                     callbacks = [callback],
+        #                     validation_data = (x_val, y_val)
+        #                     )
 
-    # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
-    opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
-    # opt = Adam(learning_rate = 0.0001)
+        fit_end = time.time()
+        print(f'Training time in seconds: {fit_end - fit_begin}')
+        print(f'Training time in minutes: {(fit_end - fit_begin)/60.0}')
+        print(f'Training time in hours: {(fit_end - fit_begin)/3600.0}\n')
 
-    model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+        # Saving model weights
+        model.save('model_weights.h5')
 
-    fit_begin = time.time()
+        # Evaluate the model to see the accuracy
+        print('\nEvaluating on training set...')
+        (loss, accuracy) = model.evaluate(training_generator, verbose = 0)
+        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
 
-    callback = LearningRateScheduler(models.scheduler, verbose=0)
-    results = model.fit_generator(generator = training_generator,
-                        validation_data = validation_generator,
-                        epochs = training_epochs,
-                        callbacks = [callback],
-                        )
+        print('Evaluating on validation set...')
+        (loss, accuracy) = model.evaluate(validation_generator, verbose = 0)
+        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
 
-    # results = model.fit(x_train,
-    #                     y_train,
-    #                     batch_size = batch_size,
-    #                     epochs = training_epochs,
-    #                     callbacks = [callback],
-    #                     validation_data = (x_val, y_val)
-    #                     )
+        print('Evaluating on testing set...')
+        test_begin = time.time()
 
-    fit_end = time.time()
-    print(f'Training time in seconds: {fit_end - fit_begin}')
-    print(f'Training time in minutes: {(fit_end - fit_begin)/60.0}')
-    print(f'Training time in hours: {(fit_end - fit_begin)/3600.0}\n')
+        (loss, accuracy) = model.evaluate(testing_generator, verbose = 0)
+        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
 
-    # Saving model weights
-    model.save('model_weights.h5')
+        test_end = time.time()
+        print(f'Evaluating on testing set time in miliseconds: {(test_end - test_begin) * 1000.0}')
+        print(f'Evaluating on testing set time in seconds: {test_end - test_begin}')
+        print(f'Evaluating on testing set time in minutes: {(test_end - test_begin)/60.0}\n')
 
-    # Evaluate the model to see the accuracy
-    print('\nEvaluating on training set...')
-    (loss, accuracy) = model.evaluate(training_generator, verbose = 0)
-    print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+        # Summarize history for accuracy
+        plt.subplot(211)
+        plt.plot(results.history['accuracy'])
+        plt.plot(results.history['val_accuracy'])
+        plt.title('model accuracy')
+        plt.ylabel('accuracy')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'])
 
-    print('Evaluating on validation set...')
-    (loss, accuracy) = model.evaluate(validation_generator, verbose = 0)
-    print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+        # Summarize history for loss
+        plt.subplot(212)
+        plt.plot(results.history['loss'])
+        plt.plot(results.history['val_loss'])
+        plt.title('model loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'])
+        plt.tight_layout()
+        plt.savefig(r'accuracy-loss.png', format='png')
+        plt.show()
 
-    print('Evaluating on testing set...')
-    test_begin = time.time()
+        max_loss = np.max(results.history['loss'])
+        min_loss = np.min(results.history['loss'])
+        print("Maximum Loss : {:.4f}".format(max_loss))
+        print("Minimum Loss : {:.4f}".format(min_loss))
+        print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
-    (loss, accuracy) = model.evaluate(testing_generator, verbose = 0)
-    print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+        # Removing the last layers of the model and getting the features array
+        # model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
 
-    test_end = time.time()
-    print(f'Evaluating on testing set time in miliseconds: {(test_end - test_begin) * 1000.0}')
-    print(f'Evaluating on testing set time in seconds: {test_end - test_begin}')
-    print(f'Evaluating on testing set time in minutes: {(test_end - test_begin)/60.0}\n')
+        # model_for_verification.summary()
+        # model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+        # model_for_verification.load_weights('model_weights.h5', by_name=True)
+        # x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
-    # Summarize history for accuracy
-    plt.subplot(211)
-    plt.plot(results.history['accuracy'])
-    plt.plot(results.history['val_accuracy'])
-    plt.title('model accuracy')
-    plt.ylabel('accuracy')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'])
+        # # Calculating EER and Decidability
+        # y_test_classes = functions.one_hot_encoding_to_classes(y_test)
+        # d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
+        # print(f'EER: {eer*100.0} %')
+        # print(f'Decidability: {d}')
 
-    # Summarize history for loss
-    plt.subplot(212)
-    plt.plot(results.history['loss'])
-    plt.plot(results.history['val_loss'])
-    plt.title('model loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'])
-    plt.tight_layout()
-    plt.savefig(r'accuracy-loss.png', format='png')
-    plt.show()
-
-    max_loss = np.max(results.history['loss'])
-    min_loss = np.min(results.history['loss'])
-    print("Maximum Loss : {:.4f}".format(max_loss))
-    print("Minimum Loss : {:.4f}".format(min_loss))
-    print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
-
-    # Removing the last layers of the model and getting the features array
-    # model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
-
-    # model_for_verification.summary()
-    # model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-    # model_for_verification.load_weights('model_weights.h5', by_name=True)
-    # x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
-
-    # # Calculating EER and Decidability
-    # y_test_classes = functions.one_hot_encoding_to_classes(y_test)
-    # d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
-    # print(f'EER: {eer*100.0} %')
-    # print(f'Decidability: {d}')
-
-else:
-    print('ERROR: Enter a valid option.')
+    else:
+        print('ERROR: Enter a valid option.')
