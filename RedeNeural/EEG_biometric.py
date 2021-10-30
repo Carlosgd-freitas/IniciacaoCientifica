@@ -127,39 +127,33 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 
 # functions.create_csv_database_from_edf('./Dataset/','./All_Channels_Yang/', num_classes, channels = all_channels_yang)
 
-# First process the data, then train the model, then evaluate the model
-print('Press [1] and [ENTER] to process the data')
-print('Press [2] and [ENTER] to run the model')
+# First process the data, then run the model
+print('Press [0] and [ENTER] to QUIT')
+print('Press [1] and [ENTER] to process the training/validation data')
+print('Press [2] and [ENTER] to process the testing data')
+print('Press [3] and [ENTER] to run the model')
 option = int(input('Enter option: '))
     
 if(option == 1):  
-    if(os.path.exists('processed_data')):
-        shutil.rmtree('processed_data', ignore_errors=True)
-    os.mkdir('processed_data')
+    if(os.path.exists('processed_train_data')):
+        shutil.rmtree('processed_train_data', ignore_errors=True)
+    os.mkdir('processed_train_data')
 
     # Loading the raw data
     train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
 
     # Filtering the raw data
     train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
-    test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
 
     # Normalize the filtered data
     train_content = functions.normalize_data(train_content, 'sun', 1)
-    test_content = functions.normalize_data(test_content, 'sun', 1)
 
     # Getting the training, validation and testing data
     # x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
     #                                                      window_size, offset, split_ratio)
     x_train, y_train = functions.crop_data(train_content, train_tasks, num_classes, full_signal_size,
-                                           full_signal_size, reshape='data_generator')
-    x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, full_signal_size,
-                                           full_signal_size, reshape='data_generator')
+                                           full_signal_size, reshape='no_reshape')
 
-    # print('\nData formats:')
-    # print(f'x_train: {x_train.shape}')
-    # print(f'x_test: {x_test.shape}')
-    
     counter = 1
     list = []
     # list_2 = []
@@ -168,18 +162,38 @@ if(option == 1):
             counter = 1
         data = x_train[index]
         string = 'x_train_' + str(index) + '_subject_' + str(counter)
-        savetxt('processed_data/'+string+'.csv', data, fmt='%f', delimiter=';')
+        savetxt('processed_train_data/'+string+'.csv', data, fmt='%f', delimiter=';')
         list.append(string+'.csv')
         counter += 1
         
         # data = y_train[index]
         # string = 'y_train_' + str(index)
-        # savetxt('processed_data/'+string+'.csv', data, fmt='%d', delimiter=';')
+        # savetxt('processed_train_data/'+string+'.csv', data, fmt='%d', delimiter=';')
         # list_2.append(string+'.csv')
-    print('saving file names to processed_data/x_train_list.csv ... ',end='')
-    savetxt('processed_data/x_train_list.csv', [list], delimiter=',', fmt='%s')
+    print('saving file names to processed_train_data/x_train_list.csv ... ',end='')
+    savetxt('processed_train_data/x_train_list.csv', [list], delimiter=',', fmt='%s')
     print('saved!')
-    # savetxt('processed_data/y_train_list.csv', [list_2], delimiter=',', fmt='%s')
+    # savetxt('processed_train_data/y_train_list.csv', [list_2], delimiter=',', fmt='%s')
+
+elif(option == 2):  
+    if(os.path.exists('processed_test_data')):
+        shutil.rmtree('processed_test_data', ignore_errors=True)
+    os.mkdir('processed_test_data')
+
+    # Loading the raw data
+    train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
+
+    # Filtering the raw data
+    test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+
+    # Normalize the filtered data
+    test_content = functions.normalize_data(test_content, 'sun', 1)
+
+    # Getting the training, validation and testing data
+    # x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
+    #                                                      window_size, offset, split_ratio)
+    x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, full_signal_size,
+                                           full_signal_size, reshape='no_reshape')
     
     counter = 1
     list = []
@@ -189,20 +203,20 @@ if(option == 1):
             counter = 1
         data = x_test[index]
         string = 'x_test_' + str(index) + '_subject_' + str(counter)
-        savetxt('processed_data/'+string+'.csv', data, fmt='%f', delimiter=';')
+        savetxt('processed_test_data/'+string+'.csv', data, fmt='%f', delimiter=';')
         list.append(string+'.csv')
         counter += 1
         
         # data = y_test[index]
         # string = 'y_test_' + str(index)
-        # savetxt('processed_data/'+string+'.csv', data, fmt='%d', delimiter=';')
+        # savetxt('processed_test_data/'+string+'.csv', data, fmt='%d', delimiter=';')
         # list_2.append(string+'.csv')
-    print('saving file names to processed_data/x_test_list.csv ... ',end='')
-    savetxt('processed_data/x_test_list.csv', [list], delimiter=',', fmt='%s')
+    print('saving file names to processed_test_data/x_test_list.csv ... ',end='')
+    savetxt('processed_test_data/x_test_list.csv', [list], delimiter=',', fmt='%s')
     print('saved!')
-    # savetxt('processed_data/y_test_list.csv', [list_2], delimiter=',', fmt='%s')
+    # savetxt('processed_test_data/y_test_list.csv', [list_2], delimiter=',', fmt='%s')
 
-elif(option == 2):
+elif(option == 3):
     # Creating the model
     model = models.create_model(window_size, num_channels, num_classes)
     model.summary()

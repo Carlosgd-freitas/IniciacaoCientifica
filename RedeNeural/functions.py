@@ -520,7 +520,7 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
                 i += 1
 
             x_data = temp
-        else:
+        elif reshape != 'no_reshape':
             print('ERROR: Invalid reshape parameter.')
 
         # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
@@ -567,7 +567,7 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
                 temp[i] = x_data_2[i].reshape(x_data_2.shape[2], x_data_2.shape[1])
                 i += 1
             x_data_2 = temp
-        else:
+        elif reshape != 'no_reshape':
             print('ERROR: Invalid reshape parameter.')
 
         # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
@@ -749,7 +749,14 @@ class DataGenerator(keras.utils.Sequence):
 
         # Loading data
         for i, ID in enumerate(list_IDs_temp):
-            file_x = np.loadtxt('processed_data/' + list_IDs_temp[i], delimiter=';', usecols=range(self.n_channels))
+            if(self.dataset_type == 'train' or self.dataset_type == 'validation'):
+                file_x = np.loadtxt('processed_train_data/' + list_IDs_temp[i], delimiter=';', usecols=range(self.n_channels))
+                string = 'processed_train_data/' + list_IDs_temp[i]
+
+            elif(self.dataset_type == 'test'):
+                file_x = np.loadtxt('processed_test_data/' + list_IDs_temp[i], delimiter=';', usecols=range(self.n_channels))
+                string = 'processed_test_data/' + list_IDs_temp[i]
+
             # aux = list_IDs_temp[i].replace('x','y')
             # file_y = np.loadtxt('processed_data/' + aux, delimiter=';', usecols=range(1))
 
@@ -758,7 +765,6 @@ class DataGenerator(keras.utils.Sequence):
 
             temp_x.append(file_x)
 
-            string = 'processed_data/' + list_IDs_temp[i]
             string = string.split("_subject_")[1]      # 'X.csv'
             subject = int(string.split(".csv")[0])     # X
             subjects.append(subject)
@@ -782,8 +788,6 @@ class DataGenerator(keras.utils.Sequence):
         #     x[counter] = np.zeros((self.dim, self.n_channels))
         #     y[counter] = np.zeros((self.n_classes), dtype=int)
         #     counter += 1
-
-        print(f'temp_x[0].shape = {temp_x[0].shape}')
 
         # Cropping Data
         x_dataL = list()
@@ -816,13 +820,13 @@ class DataGenerator(keras.utils.Sequence):
         y_data = np.asarray(y_dataL, dtype = object).astype('float32')
         y_data_2 = np.asarray(y_dataL_2, dtype = object).astype('float32')
 
-        print(f'x_data.shape = {x_data.shape}')
-        print(f'y_data.shape = {y_data.shape}')
+        # print(f'x_data.shape = {x_data.shape}')
+        # print(f'y_data.shape = {y_data.shape}')
 
-        print(f'x_data = {x_data}')
-        print(f'y_data = {y_data}')
+        # print(f'x_data = {x_data}')
+        # print(f'y_data = {y_data}')
 
-        input('quitaste?')
+        # input('quitaste?')
 
         # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
         # input shape of the CNN is "a x window_size x num_channels".
@@ -840,7 +844,6 @@ class DataGenerator(keras.utils.Sequence):
         elif(self.dataset_type == 'validation'):
             x = x_data_2
             y = y_data_2
-
 
         # x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
         # y = y.reshape(y.shape[0], y.shape[2])
