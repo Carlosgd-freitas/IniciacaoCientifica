@@ -169,6 +169,7 @@ while option != 0:
             data = x_train[index]
             string = 'x_train_' + str(index) + '_subject_' + str(counter)
             savetxt('processed_train_data/'+string+'.csv', data, fmt='%f', delimiter=';')
+            print('processed_train_data/'+string+'.csv was saved.')
             list.append(string+'.csv')
             counter += 1
             
@@ -210,6 +211,7 @@ while option != 0:
             data = x_test[index]
             string = 'x_test_' + str(index) + '_subject_' + str(counter)
             savetxt('processed_test_data/'+string+'.csv', data, fmt='%f', delimiter=';')
+            print('processed_test_data/'+string+'.csv was saved.')
             list.append(string+'.csv')
             counter += 1
             
