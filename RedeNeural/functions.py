@@ -781,15 +781,12 @@ class DataGenerator(keras.utils.Sequence):
         if(self.type == 'train' or self.type == 'test'):
             x = np.asarray(x_dataL, dtype = object).astype('float32')
             y = np.asarray(y_dataL, dtype = object).astype('float32')
-            
-            x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
-            y = y.reshape(y.shape[0], y.shape[2])
 
         elif(self.type == 'validation'):
             x = np.asarray(x_dataL_2, dtype = object).astype('float32')
             y = np.asarray(y_dataL_2, dtype = object).astype('float32')
             
-            x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
-            y = y.reshape(y.shape[0], y.shape[2])
+        x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
+        y = y.reshape(y.shape[0], y.shape[2])
 
         return (x, y)
