@@ -814,6 +814,14 @@ class DataGenerator(keras.utils.Sequence):
         y_data = np.asarray(y_dataL, dtype = object).astype('float32')
         y_data_2 = np.asarray(y_dataL_2, dtype = object).astype('float32')
 
+        print(f'x_data.shape = {x_data.shape}')
+        print(f'y_data.shape = {y_data.shape}')
+
+        print(f'x_data = {x_data}')
+        print(f'y_data = {y_data}')
+
+        input('quitaste?')
+
         # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
         # input shape of the CNN is "a x window_size x num_channels".
         x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
@@ -831,13 +839,6 @@ class DataGenerator(keras.utils.Sequence):
             x = x_data_2
             y = y_data_2
 
-        print(f'x.shape = {x.shape}')
-        print(f'y.shape = {y.shape}')
-
-        print(f'x = {x}')
-        print(f'y = {y}')
-
-        input('quitaste?')
 
         # x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
         # y = y.reshape(y.shape[0], y.shape[2])
