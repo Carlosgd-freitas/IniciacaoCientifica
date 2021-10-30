@@ -160,13 +160,17 @@ if(option == 1):
     # print(f'x_train: {x_train.shape}')
     # print(f'x_test: {x_test.shape}')
     
+    counter = 1
     list = []
-    list_2 = []
+    # list_2 = []
     for index in range(0, x_train.shape[0]):
+        if(counter > num_classes):
+            counter = 1
         data = x_train[index]
-        string = 'x_train_' + str(index)
+        string = 'x_train_' + str(index) + '_subject_' + str(counter)
         savetxt('processed_data/'+string+'.csv', data, fmt='%f', delimiter=';')
         list.append(string+'.csv')
+        counter += 1
         
         # data = y_train[index]
         # string = 'y_train_' + str(index)
@@ -175,11 +179,14 @@ if(option == 1):
     savetxt('processed_data/x_train_list.csv', [list], delimiter=',', fmt='%s')
     # savetxt('processed_data/y_train_list.csv', [list_2], delimiter=',', fmt='%s')
     
+    counter = 1
     list = []
-    list_2 = []
+    # list_2 = []
     for index in range(0, x_test.shape[0]):
+        if(counter > num_classes):
+            counter = 1
         data = x_test[index]
-        string = 'x_test_' + str(index)
+        string = 'x_test_' + str(index) + '_subject_' + str(counter)
         savetxt('processed_data/'+string+'.csv', data, fmt='%f', delimiter=';')
         list.append(string+'.csv')
         
