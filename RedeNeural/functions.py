@@ -698,7 +698,7 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
 
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
-    def __init__(self, list_IDs, batch_size, dim, offset, n_channels, n_classes, shuffle=True):
+    def __init__(self, list_IDs, batch_size, dim, offset, n_channels, n_classes, type, split_ratio, shuffle=True):
         'Initialization'
         self.dim = dim
         self.offset = offset
@@ -707,6 +707,8 @@ class DataGenerator(keras.utils.Sequence):
         self.n_classes = n_classes
         self.shuffle = shuffle
         self.list_IDs = list_IDs
+        self.type = type
+        self.split_ratio = split_ratio
         self.on_epoch_end()
 
     def __len__(self):
@@ -740,6 +742,8 @@ class DataGenerator(keras.utils.Sequence):
         # counter = 0
         x_dataL = list()
         y_dataL = list()
+        x_dataL_2 = list()
+        y_dataL_2 = list()
 
         # Generate data
         for i in enumerate(list_IDs_temp):
@@ -750,9 +754,17 @@ class DataGenerator(keras.utils.Sequence):
             file_x = np.asarray(file_x, dtype = object).astype('float32')
             # file_y = np.asarray(file_y, dtype = object).astype('float32')
 
-            x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, file_x, self.window_size, self.offset,
-                                               i, self.num_classes)
+            string = 'processed_data/' + list_IDs_temp[i]
+            subject = string.split("_subject_")[1]
+            print(f'subject = {subject}')
+            input('quitaste?')
 
+            if(self.type == 'test'):
+                x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, file_x, self.dim, self.offset,
+                                                   i, self.n_classes)
+            else:
+                x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, file_x, self.dim,
+                                        self.offset, i, self.n_classes, self.split_ratio, x_dataL_2, y_dataL_2)
             # Store sample
             # x[i] = file_x
 
@@ -766,10 +778,18 @@ class DataGenerator(keras.utils.Sequence):
         #     y[counter] = np.zeros((self.n_classes), dtype=int)
         #     counter += 1
     
-        x = np.asarray(x_dataL, dtype = object).astype('float32')
-        y = np.asarray(y_dataL, dtype = object).astype('float32')
-        
-        x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
-        y = y.reshape(y.shape[0], y.shape[2])
+        if(self.type == 'train' or self.type == 'test'):
+            x = np.asarray(x_dataL, dtype = object).astype('float32')
+            y = np.asarray(y_dataL, dtype = object).astype('float32')
+            
+            x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
+            y = y.reshape(y.shape[0], y.shape[2])
+
+        elif(self.type == 'validation'):
+            x = np.asarray(x_dataL_2, dtype = object).astype('float32')
+            y = np.asarray(y_dataL_2, dtype = object).astype('float32')
+            
+            x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
+            y = y.reshape(y.shape[0], y.shape[2])
 
         return (x, y)

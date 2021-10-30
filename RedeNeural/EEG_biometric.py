@@ -189,6 +189,7 @@ if(option == 1):
         string = 'x_test_' + str(index) + '_subject_' + str(counter)
         savetxt('processed_data/'+string+'.csv', data, fmt='%f', delimiter=';')
         list.append(string+'.csv')
+        counter += 1
         
         # data = y_test[index]
         # string = 'y_test_' + str(index)
@@ -204,18 +205,18 @@ elif(option == 2):
 
     # Composing the dictionary
     x_train_list = []
-    y_train_list = []
-    x_val_list = []
-    y_val_list = []
+    # y_train_list = []
+    # x_val_list = []
+    # y_val_list = []
     x_test_list = []
-    y_test_list = []
+    # y_test_list = []
 
     x_train_list.append(loadtxt('processed_data/x_train_list.csv', delimiter=',', dtype='str'))
-    y_train_list.append(loadtxt('processed_data/y_train_list.csv', delimiter=',', dtype='str'))
-    x_val_list.append(loadtxt('processed_data/x_val_list.csv', delimiter=',', dtype='str'))
-    y_val_list.append(loadtxt('processed_data/y_val_list.csv', delimiter=',', dtype='str'))
+    # y_train_list.append(loadtxt('processed_data/y_train_list.csv', delimiter=',', dtype='str'))
+    # x_val_list.append(loadtxt('processed_data/x_val_list.csv', delimiter=',', dtype='str'))
+    # y_val_list.append(loadtxt('processed_data/y_val_list.csv', delimiter=',', dtype='str'))
     x_test_list.append(loadtxt('processed_data/x_test_list.csv', delimiter=',', dtype='str'))
-    y_test_list.append(loadtxt('processed_data/y_test_list.csv', delimiter=',', dtype='str'))
+    # y_test_list.append(loadtxt('processed_data/y_test_list.csv', delimiter=',', dtype='str'))
 
     x_train_list = np.asarray(x_train_list).astype('str')
     x_train_list = x_train_list.tolist()
@@ -225,9 +226,9 @@ elif(option == 2):
     # y_train_list = y_train_list.tolist()
     # y_train_list = y_train_list[0]
 
-    x_val_list = np.asarray(x_val_list).astype('str')
-    x_val_list = x_val_list.tolist()
-    x_val_list = x_val_list[0]
+    # x_val_list = np.asarray(x_val_list).astype('str')
+    # x_val_list = x_val_list.tolist()
+    # x_val_list = x_val_list[0]
 
     # y_val_list = np.asarray(y_val_list).astype('str')
     # y_val_list = y_val_list.tolist()
@@ -246,8 +247,8 @@ elif(option == 2):
 
     print('x_train_list:')
     print(x_train_list)
-    print('\ny_train_list:')
-    print(y_train_list)
+    # print('\ny_train_list:')
+    # print(y_train_list)
 
     training_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset,
                                                  num_channels, num_classes, False)
