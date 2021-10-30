@@ -783,6 +783,8 @@ class DataGenerator(keras.utils.Sequence):
         #     y[counter] = np.zeros((self.n_classes), dtype=int)
         #     counter += 1
 
+        print(f'temp_x[0].shape = {temp_x[0].shape}')
+
         # Cropping Data
         x_dataL = list()
         x_dataL_2 = list()
