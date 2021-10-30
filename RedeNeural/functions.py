@@ -763,6 +763,7 @@ class DataGenerator(keras.utils.Sequence):
             file_x = np.asarray(file_x, dtype = object).astype('float32')
             # file_y = np.asarray(file_y, dtype = object).astype('float32')
 
+            file_x = file_x.T
             print(f'file_x.shape = {file_x.shape}') #
             temp_x.append(file_x)
 

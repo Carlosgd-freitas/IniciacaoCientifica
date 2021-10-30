@@ -156,15 +156,11 @@ while option != 0:
         # Normalize the filtered data
         train_content = functions.normalize_data(train_content, 'sun', 1)
 
-        print(f'train_content[0].shape = {train_content[0].shape}') #
-
         # Getting the training, validation and testing data
         # x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
         #                                                      window_size, offset, split_ratio)
         x_train, y_train = functions.crop_data(train_content, train_tasks, num_classes, full_signal_size,
                                             full_signal_size, reshape='data_generator')
-
-        print(f'x_train[0].shape = {x_train[0].shape}') #
 
         counter = 1
         list = []
