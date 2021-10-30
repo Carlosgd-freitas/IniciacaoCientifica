@@ -759,8 +759,6 @@ class DataGenerator(keras.utils.Sequence):
             string = 'processed_data/' + list_IDs_temp[i]
             string = string.split("_subject_")[1]      # 'X.csv'
             subject = int(string.split(".csv")[0])     # X
-            print(f'subject = {subject}')
-            input('quitaste?')
 
             if(self.type == 'test'):
                 x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, file_x, self.dim, self.offset,
@@ -788,7 +786,10 @@ class DataGenerator(keras.utils.Sequence):
         elif(self.type == 'validation'):
             x = np.asarray(x_dataL_2, dtype = object).astype('float32')
             y = np.asarray(y_dataL_2, dtype = object).astype('float32')
-            
+        
+        print(f'x.shape = {x.shape}')
+        print(f'y.shape = {y.shape}')
+
         x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
         y = y.reshape(y.shape[0], y.shape[2])
 
