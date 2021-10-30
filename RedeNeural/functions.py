@@ -1,4 +1,5 @@
 import os
+from re import X
 import numpy as np
 import matplotlib.pyplot as plt
 # from pyedflib import EdfReader
@@ -742,10 +743,11 @@ class DataGenerator(keras.utils.Sequence):
         # y = np.empty((self.batch_size, self.n_classes), dtype=int)
         # counter = 0
         temp_x = []
+        subjects = []
 
         print(f'list_IDs_temp = {list_IDs_temp}')
 
-        # Generate data
+        # Loading data
         for i, ID in enumerate(list_IDs_temp):
             file_x = np.loadtxt('processed_data/' + list_IDs_temp[i], delimiter=';', usecols=range(self.n_channels))
             # aux = list_IDs_temp[i].replace('x','y')
@@ -756,9 +758,10 @@ class DataGenerator(keras.utils.Sequence):
 
             temp_x.append(file_x)
 
-            # string = 'processed_data/' + list_IDs_temp[i]
-            # string = string.split("_subject_")[1]      # 'X.csv'
-            # subject = int(string.split(".csv")[0])     # X
+            string = 'processed_data/' + list_IDs_temp[i]
+            string = string.split("_subject_")[1]      # 'X.csv'
+            subject = int(string.split(".csv")[0])     # X
+            subjects.append(subject)
 
             # if(self.dataset_type == 'test'):
             #     x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, file_x, self.dim, self.offset,
@@ -780,27 +783,61 @@ class DataGenerator(keras.utils.Sequence):
         #     y[counter] = np.zeros((self.n_classes), dtype=int)
         #     counter += 1
 
-        print(f'temp_x = {temp_x}')
+        # Cropping Data
+        x_dataL = list()
+        x_dataL_2 = list()
+        y_dataL = list()
+        y_dataL_2 = list()
 
         if(self.dataset_type == 'train' or self.dataset_type == 'validation'):
             # x = np.asarray(x_dataL, dtype = object).astype('float32')
             # y = np.asarray(y_dataL, dtype = object).astype('float32')
-            x, y, x_2, y_2 = crop_data(temp_x, self.tasks, self.n_classes, self.dim, self.offset, self.split_ratio)
-
-            if(self.dataset_type == 'validation'):
-                x = x_2
-                y = y_2
+            
+            pos = 0
+            for data in temp_x:
+                x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, data, self.dim,
+                                                        self.offset, subjects[pos], self.n_classes,
+                                                        self.split_ratio, x_dataL_2, y_dataL_2)
+                pos += 1
 
         elif(self.dataset_type == 'test'):
             # x = np.asarray(x_dataL_2, dtype = object).astype('float32')
             # y = np.asarray(y_dataL_2, dtype = object).astype('float32')
-            x, y = crop_data(temp_x, self.tasks, self.n_classes, self.dim, self.offset)
+            pos = 0
+            for data in temp_x:
+                x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, data, self.dim, self.offset, subjects[pos],
+                                    self.n_classes)
+                pos += 1
         
+        x_data = np.asarray(x_dataL, dtype = object).astype('float32')
+        x_data_2 = np.asarray(x_dataL_2, dtype = object).astype('float32')
+        y_data = np.asarray(y_dataL, dtype = object).astype('float32')
+        y_data_2 = np.asarray(y_dataL_2, dtype = object).astype('float32')
+
+        # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
+        # input shape of the CNN is "a x window_size x num_channels".
+        x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
+        x_data_2 = x_data_2.reshape(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
+
+        # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
+        # is "a x num_classes".
+        y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
+        y_data_2 = y_data_2.reshape(y_data_2.shape[0], y_data_2.shape[2])
+
+        if(self.dataset_type == 'train' or self.dataset_type == 'test'):
+            x = x_data
+            y = y_data
+        elif(self.dataset_type == 'validation'):
+            x = x_data_2
+            y = y_data_2
+
         print(f'x.shape = {x.shape}')
         print(f'y.shape = {y.shape}')
 
         print(f'x = {x}')
         print(f'y = {y}')
+
+        input('quitaste?')
 
         # x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
         # y = y.reshape(y.shape[0], y.shape[2])
