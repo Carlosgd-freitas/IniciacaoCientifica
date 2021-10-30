@@ -12,15 +12,6 @@ from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.optimizers import SGD, Adam
 from numpy import savetxt, loadtxt
 
-############### TODO: ###############
-# - Salvar os .csv de x_train e x_test guardando o número do indivíduo no nome dos .csv
-# - Aplicar o data_augmentation dentro dos Data Generators
-# - Um Data Generator pro x_test
-# - Dois Data Generators que fazem a mesma operação de data_augmentation que volta quatro bagulho:
-#   x_train, y_train, x_val, y_val = functions.crop_data(), mas um vai voltar (x_train, y_train) no
-#   __data_generation() e outro vai voltar (x_val, y_val)
-#####################################
-
 random.seed(1051)
 np.random.seed(1051)
 tf.random.set_seed(1051)
@@ -68,6 +59,10 @@ frontal_lobe_yang = ['Af3.', 'Afz.', 'Af4.']
 motor_cortex_yang = ['C1..', 'Cz..', 'C2..']
 occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
+
+#################### TODO ####################
+# - Cada batch gerado pelo DataGenerator deve ter 100 samples
+##############################################
 
 # Tasks:
 # Task 1 - EO
@@ -133,11 +128,13 @@ while option != 0:
 
     # Menu
     print('=============== MENU ===============')
-    print('Remember: Always process the training, validation and testing data before running the model!')
+    print('> Process the training, validation and testing data before running the model in Identification Mode!')
+    print('> Run the model in Identification Mode before running it in Verification Mode!\n')
     print('Press [0] and [ENTER] to QUIT')
     print('Press [1] and [ENTER] to process the training/validation data')
     print('Press [2] and [ENTER] to process the testing data')
-    print('Press [3] and [ENTER] to run the model')
+    print('Press [3] and [ENTER] to run the model in Identification Mode')
+    print('Press [4] and [ENTER] to run the model in Verification Mode')
     print('====================================')
 
     option = int(input('Enter option: '))
@@ -278,12 +275,12 @@ while option != 0:
         # print('\ny_train_list:')
         # print(y_train_list)
 
-        training_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, num_channels,
-                                                    num_classes, train_tasks, 'train', split_ratio, False)
-        validation_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, num_channels,
-                                                    num_classes, train_tasks, 'validation', split_ratio, False)
-        testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size, num_channels,
-                                                    num_classes, test_tasks, 'test', 1.0, False)                                             
+        training_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, full_signal_size,
+                                                num_channels, num_classes, train_tasks, 'train', split_ratio)
+        validation_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, full_signal_size,
+                                                num_channels, num_classes, train_tasks, 'validation', split_ratio)
+        testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size, full_signal_size,
+                                                num_channels, num_classes, test_tasks, 'test', test_tasks, 1.0)                                             
 
         # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
         opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
@@ -363,19 +360,60 @@ while option != 0:
         print("Minimum Loss : {:.4f}".format(min_loss))
         print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
-        # Removing the last layers of the model and getting the features array
-        # model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
+    elif(option == 4):
+        # List of files that contains x_test data
+        x_test_list = []
+        x_test_list.append(loadtxt('processed_test_data/x_test_list.csv', delimiter=',', dtype='str'))
+        x_test_list = np.asarray(x_test_list).astype('str')
+        x_test_list = x_test_list.tolist()
+        x_test_list = x_test_list[0]
 
-        # model_for_verification.summary()
-        # model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-        # model_for_verification.load_weights('model_weights.h5', by_name=True)
+        # Loading x_test data
+        temp_x = []
+        subjects = []
+        for i, ID in enumerate(x_test_list):
+            file_x = np.loadtxt('processed_test_data/' + x_test_list[i], delimiter=';', usecols=range(num_channels))
+            string = 'processed_test_data/' + x_test_list[i]
+
+            file_x = np.asarray(file_x, dtype = object).astype('float32')
+            file_x = file_x.T
+            temp_x.append(file_x)
+
+            string = string.split("_subject_")[1]      # 'X.csv'
+            subject = int(string.split(".csv")[0])     # X
+            subjects.append(subject)
+
+        # Cropping y_test data
+        x_dataL = list()
+        y_dataL = list()
+
+        pos = 0
+        for data in temp_x:
+            x_dataL, y_dataL = functions.signal_cropping(x_dataL, y_dataL, data, window_size, offset, subjects[pos],
+                                num_classes, mode='labels_only')
+            pos += 1
+        
+        y_test = np.asarray(y_dataL, dtype = object).astype('float32')
+        y_test = y_test.reshape(y_test.shape[0], y_test.shape[2])
+
+        # Defining the generator
+        testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size, full_signal_size,
+                                                num_channels, num_classes, test_tasks, 'test', test_tasks, 1.0)
+
+        # Removing the last layers of the model and getting the features array
+        model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
+
+        model_for_verification.summary()
+        model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+        model_for_verification.load_weights('model_weights.h5', by_name=True)
+        x_pred = model_for_verification.predict_generator(testing_generator)
         # x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
-        # # Calculating EER and Decidability
-        # y_test_classes = functions.one_hot_encoding_to_classes(y_test)
-        # d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
-        # print(f'EER: {eer*100.0} %')
-        # print(f'Decidability: {d}')
+        # Calculating EER and Decidability
+        y_test_classes = functions.one_hot_encoding_to_classes(y_test)
+        d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
+        print(f'EER: {eer*100.0} %')
+        print(f'Decidability: {d}')
 
     elif(option != 0):
         print('ERROR: Enter a valid option.')

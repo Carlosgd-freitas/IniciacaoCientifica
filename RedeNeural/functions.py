@@ -385,7 +385,7 @@ def normalize_data(data, normalize_type, verbose = 0):
 
     return normalized_data
 
-def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, num_classes, split_ratio=1.0, x_data_2=0, y_data_2=0):
+def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, num_classes, split_ratio=1.0, x_data_2=0, y_data_2=0, mode=None):
     """
     Crops a content (EEG signal) and returns the processed signal and its' respective label using a sliding
     window.
@@ -429,8 +429,9 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
     else:
         i = window_size
         while i <= content.shape[1] * split_ratio:
-            arr = content[: , (i-window_size):i]
-            x_data.append(arr)
+            if(mode != 'labels_only'):
+                arr = content[: , (i-window_size):i]
+                x_data.append(arr)
 
             arr2 = np.zeros((1,num_classes))
             arr2[0, num_subject] = 1
@@ -442,8 +443,9 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
             return x_data, y_data
         
         while i <= content.shape[1]:
-            arr = content[: , (i-window_size):i]
-            x_data_2.append(arr)
+            if(mode != 'labels_only'):
+                arr = content[: , (i-window_size):i]
+                x_data_2.append(arr)
 
             arr2 = np.zeros((1,num_classes))
             arr2[0, num_subject] = 1
@@ -453,7 +455,7 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
 
         return x_data, y_data, x_data_2, y_data_2
 
-def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.0, reshape='classic', verbose=0):
+def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.0, reshape='classic', mode=None, verbose=0):
     """
     Applies a sliding window cropping for data augmentation of the signals recieved as input and outputs them
     as numpy arrays.
@@ -495,7 +497,7 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
         for task in range(0, len(data_tasks)):
             for i in range(1, num_classes + 1):
                 x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, data[ (task * num_classes) + i - 1],
-                                                   window_size, offset, i, num_classes)
+                                                   window_size, offset, i, num_classes, mode=mode)
 
                 if verbose == 1:
                     count += 1
@@ -534,7 +536,7 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
             for i in range(1, num_classes + 1):
                 x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, data[ (task * num_classes) + i - 1],
                                                                          window_size, offset, i, num_classes,
-                                                                         split_ratio, x_dataL_2, y_dataL_2)
+                                                                         split_ratio, x_dataL_2, y_dataL_2, mode)
                 
                 if verbose == 1:
                     count += 1
@@ -699,12 +701,13 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
 
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
-    def __init__(self, list_IDs, batch_size, dim, offset, n_channels, n_classes, tasks, dataset_type, split_ratio, shuffle=True):
+    def __init__(self, list_IDs, batch_size, dim, offset, full_signal_size, n_channels, n_classes, tasks, dataset_type, split_ratio, shuffle=False):
         'Initialization'
         self.list_IDs = list_IDs
         self.batch_size = batch_size
         self.dim = dim
         self.offset = offset
+        self.full_signal_size = full_signal_size
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.tasks = tasks
@@ -715,6 +718,14 @@ class DataGenerator(keras.utils.Sequence):
 
     def __len__(self):
         'Denotes the number of batches per epoch'
+        samples_per_file = np.floor((self.full_signal_size - self.dim) / self.offset) + 1
+        n_samples = samples_per_file * len(self.tasks) * self.n_classes
+
+        ### temporario ###
+        if (n_samples > len(self.list_IDs)):
+            return len(self.list_IDs)
+        ### temporario ###
+
         return int(np.floor(len(self.list_IDs) / self.batch_size))
 
     def __getitem__(self, index):
@@ -738,14 +749,10 @@ class DataGenerator(keras.utils.Sequence):
 
     def __data_generation(self, list_IDs_temp):
         'Generates data containing batch_size samples'
+
         # Initialization
-        # x = np.empty((self.batch_size, self.dim, self.n_channels))
-        # y = np.empty((self.batch_size, self.n_classes), dtype=int)
-        # counter = 0
         temp_x = []
         subjects = []
-
-        print(f'list_IDs_temp = {list_IDs_temp}')
 
         # Loading data
         for i, ID in enumerate(list_IDs_temp):
@@ -757,39 +764,13 @@ class DataGenerator(keras.utils.Sequence):
                 file_x = np.loadtxt('processed_test_data/' + list_IDs_temp[i], delimiter=';', usecols=range(self.n_channels))
                 string = 'processed_test_data/' + list_IDs_temp[i]
 
-            # aux = list_IDs_temp[i].replace('x','y')
-            # file_y = np.loadtxt('processed_data/' + aux, delimiter=';', usecols=range(1))
-
             file_x = np.asarray(file_x, dtype = object).astype('float32')
-            # file_y = np.asarray(file_y, dtype = object).astype('float32')
-
             file_x = file_x.T
-            print(f'file_x.shape = {file_x.shape}') #
             temp_x.append(file_x)
 
             string = string.split("_subject_")[1]      # 'X.csv'
             subject = int(string.split(".csv")[0])     # X
             subjects.append(subject)
-
-            # if(self.dataset_type == 'test'):
-            #     x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, file_x, self.dim, self.offset,
-            #                                        subject, self.n_classes)
-            # else:
-            #     x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, file_x, self.dim,
-            #                             self.offset, subject, self.n_classes, self.split_ratio, x_dataL_2, y_dataL_2)
-            
-            # Store sample
-            # x[i] = file_x
-
-            # Store class
-            # y[i] = file_y
-
-            # counter += 1
-        
-        # while(counter < self.batch_size):
-        #     x[counter] = np.zeros((self.dim, self.n_channels))
-        #     y[counter] = np.zeros((self.n_classes), dtype=int)
-        #     counter += 1
 
         # Cropping Data
         x_dataL = list()
@@ -798,9 +779,6 @@ class DataGenerator(keras.utils.Sequence):
         y_dataL_2 = list()
 
         if(self.dataset_type == 'train' or self.dataset_type == 'validation'):
-            # x = np.asarray(x_dataL, dtype = object).astype('float32')
-            # y = np.asarray(y_dataL, dtype = object).astype('float32')
-            
             pos = 0
             for data in temp_x:
                 x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, data, self.dim,
@@ -809,8 +787,6 @@ class DataGenerator(keras.utils.Sequence):
                 pos += 1
 
         elif(self.dataset_type == 'test'):
-            # x = np.asarray(x_dataL_2, dtype = object).astype('float32')
-            # y = np.asarray(y_dataL_2, dtype = object).astype('float32')
             pos = 0
             for data in temp_x:
                 x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, data, self.dim, self.offset, subjects[pos],
@@ -821,14 +797,6 @@ class DataGenerator(keras.utils.Sequence):
         y_data = np.asarray(y_dataL, dtype = object).astype('float32')
         x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
         y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
-
-        # print(f'x_data.shape = {x_data.shape}')
-        # print(f'y_data.shape = {y_data.shape}')
-
-        # print(f'x_data = {x_data}')
-        # print(f'y_data = {y_data}')
-
-        # input('quitaste?')
 
         if(self.dataset_type == 'train' or self.dataset_type == 'test'):
             x = x_data
@@ -842,8 +810,8 @@ class DataGenerator(keras.utils.Sequence):
 
             x = x_data_2
             y = y_data_2
-
-        # x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
-        # y = y.reshape(y.shape[0], y.shape[2])
+        
+        print(f'Batch - x.shape = {x.shape}')
+        print(f'Batch - y.shape = {y.shape}')
 
         return (x, y)
