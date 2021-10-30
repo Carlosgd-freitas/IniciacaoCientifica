@@ -762,10 +762,10 @@ class DataGenerator(keras.utils.Sequence):
 
             if(self.type == 'test'):
                 x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, file_x, self.dim, self.offset,
-                                                   i, self.n_classes)
+                                                   subject, self.n_classes)
             else:
                 x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, file_x, self.dim,
-                                        self.offset, i, self.n_classes, self.split_ratio, x_dataL_2, y_dataL_2)
+                                        self.offset, subject, self.n_classes, self.split_ratio, x_dataL_2, y_dataL_2)
             # Store sample
             # x[i] = file_x
 
@@ -778,7 +778,10 @@ class DataGenerator(keras.utils.Sequence):
         #     x[counter] = np.zeros((self.dim, self.n_channels))
         #     y[counter] = np.zeros((self.n_classes), dtype=int)
         #     counter += 1
-    
+
+        print(f'x_dataL = {x_dataL}')
+        print(f'y_dataL = {y_dataL}')
+
         if(self.type == 'train' or self.type == 'test'):
             x = np.asarray(x_dataL, dtype = object).astype('float32')
             y = np.asarray(y_dataL, dtype = object).astype('float32')
@@ -789,6 +792,9 @@ class DataGenerator(keras.utils.Sequence):
         
         print(f'x.shape = {x.shape}')
         print(f'y.shape = {y.shape}')
+
+        print(f'x = {x}')
+        print(f'y = {y}')
 
         x = x.reshape(x.shape[0], x.shape[2], x.shape[1])
         y = y.reshape(y.shape[0], y.shape[2])
