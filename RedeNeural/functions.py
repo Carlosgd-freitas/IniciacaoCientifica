@@ -714,7 +714,7 @@ class DataGenerator(keras.utils.Sequence):
         self.dataset_type = dataset_type
         self.split_ratio = split_ratio
         self.shuffle = shuffle
-        self.last_index = -1
+        self.first_index = 0
         self.on_epoch_end()
 
     def __len__(self):
@@ -735,7 +735,7 @@ class DataGenerator(keras.utils.Sequence):
         print(f'__getitem__ : index = {index}')
 
         # indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
-        indexes = self.indexes[self.last_index + 1:self.last_index + 1 + self.batch_size - 1]
+        indexes = self.indexes[self.first_index:self.first_index + self.batch_size]
 
         print(f'__getitem__ : index = {index}')
         print(f'__getitem__ : self.batch_size = {self.batch_size}')
@@ -756,7 +756,6 @@ class DataGenerator(keras.utils.Sequence):
         self.indexes = np.arange(len(self.list_IDs))
         if self.shuffle == True:
             np.random.shuffle(self.indexes)
-        
 
     def __data_generation(self, list_IDs_temp):
         'Generates data containing batch_size samples'
@@ -833,7 +832,7 @@ class DataGenerator(keras.utils.Sequence):
         print(f'__data_generation - y.shape = {y.shape}')
 
         # Updating last index used
-        self.last_index = int(list_IDs_temp[-1].split("_")[2])
-        print(f'__data_generation - self.last_index = {self.last_index}')
+        self.first_index = int(list_IDs_temp[-1].split("_")[2]) + 1
+        print(f'__data_generation - self.first_index = {self.first_index}')
 
         return (x, y)
