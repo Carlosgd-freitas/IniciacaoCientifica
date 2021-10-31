@@ -731,12 +731,13 @@ class DataGenerator(keras.utils.Sequence):
     def __getitem__(self, index):
         'Generate one batch of data'
         # Generate indexes of the batch
-        indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
+        #indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
+        indexes = self.indexes[index+self.batch_size:(index+1)+self.batch_size]
 
-        print(f'index = {index}')
-        print(f'self.batch_size = {self.batch_size}')
-        print(f'self.indexes = {self.indexes}')
-        print(f'indexes = {indexes}')
+        # print(f'index = {index}')
+        # print(f'self.batch_size = {self.batch_size}')
+        # print(f'self.indexes = {self.indexes}')
+        # print(f'indexes = {indexes}')
 
         # Find list of IDs
         list_IDs_temp = [self.list_IDs[k] for k in indexes]
@@ -748,13 +749,13 @@ class DataGenerator(keras.utils.Sequence):
 
     def on_epoch_end(self):
         'Updates indexes after each epoch'
-        print(f'self.list_IDs = {self.list_IDs}')
+        # print(f'self.list_IDs = {self.list_IDs}')
 
         self.indexes = np.arange(len(self.list_IDs))
         if self.shuffle == True:
             np.random.shuffle(self.indexes)
         
-        print(f'self.indexes = {self.indexes}')
+        # print(f'self.indexes = {self.indexes}')
 
     def __data_generation(self, list_IDs_temp):
         'Generates data containing batch_size samples'
