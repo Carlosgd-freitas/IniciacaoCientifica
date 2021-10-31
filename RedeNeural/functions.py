@@ -733,6 +733,8 @@ class DataGenerator(keras.utils.Sequence):
         # Generate indexes of the batch
         indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
 
+        print(f'indexes = {indexes}')
+
         # Find list of IDs
         list_IDs_temp = [self.list_IDs[k] for k in indexes]
 
@@ -753,6 +755,8 @@ class DataGenerator(keras.utils.Sequence):
         # Initialization
         temp_x = []
         subjects = []
+
+        print(f'self.dataset_type = {self.dataset_type}')
 
         # Loading data
         for i, ID in enumerate(list_IDs_temp):
@@ -793,17 +797,19 @@ class DataGenerator(keras.utils.Sequence):
                                     self.n_classes)
                 pos += 1
         
-        x_data = np.asarray(x_dataL, dtype = object).astype('float32')
-        y_data = np.asarray(y_dataL, dtype = object).astype('float32')
-
-        print(f'__data_generation: x_data.shape = {x_data.shape}')
-
-        x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
-        y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
+        x = None
+        y = None
 
         if(self.dataset_type == 'train' or self.dataset_type == 'test'):
+            x_data = np.asarray(x_dataL, dtype = object).astype('float32')
+            y_data = np.asarray(y_dataL, dtype = object).astype('float32')
+
+            x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
+            y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
+
             x = x_data
             y = y_data
+
         elif(self.dataset_type == 'validation'):
             x_data_2 = np.asarray(x_dataL_2, dtype = object).astype('float32')
             y_data_2 = np.asarray(y_dataL_2, dtype = object).astype('float32')
