@@ -733,6 +733,9 @@ class DataGenerator(keras.utils.Sequence):
         # Generate indexes of the batch
         indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
 
+        print(f'index = {index}')
+        print(f'self.batch_size = {self.batch_size}')
+        print(f'self.indexes = {self.indexes}')
         print(f'indexes = {indexes}')
 
         # Find list of IDs
