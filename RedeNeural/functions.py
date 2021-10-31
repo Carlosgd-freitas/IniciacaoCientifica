@@ -714,7 +714,7 @@ class DataGenerator(keras.utils.Sequence):
         self.dataset_type = dataset_type
         self.split_ratio = split_ratio
         self.shuffle = shuffle
-        self.last_index = 0
+        self.last_index = -1
         self.on_epoch_end()
 
     def __len__(self):
@@ -734,7 +734,8 @@ class DataGenerator(keras.utils.Sequence):
         # Generate indexes of the batch
         print(f'__getitem__ : index = {index}')
 
-        indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
+        # indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
+        indexes = self.indexes[self.last_index + 1:self.last_index + 1 + self.batch_size - 1]
 
         print(f'__getitem__ : index = {index}')
         print(f'__getitem__ : self.batch_size = {self.batch_size}')
