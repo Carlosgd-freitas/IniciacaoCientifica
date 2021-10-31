@@ -722,8 +722,8 @@ class DataGenerator(keras.utils.Sequence):
         n_samples = samples_per_file * len(self.tasks) * self.n_classes
 
         ### temporario ###
-        if (n_samples > len(self.list_IDs)):
-            return len(self.list_IDs)
+        # if (n_samples > len(self.list_IDs)):
+        #     return len(self.list_IDs)
         ### temporario ###
 
         return int(np.floor(len(self.list_IDs) / self.batch_size))
@@ -731,13 +731,12 @@ class DataGenerator(keras.utils.Sequence):
     def __getitem__(self, index):
         'Generate one batch of data'
         # Generate indexes of the batch
-        #indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
-        indexes = self.indexes[index+self.batch_size:(index+1)+self.batch_size]
+        indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
 
-        # print(f'index = {index}')
-        # print(f'self.batch_size = {self.batch_size}')
-        # print(f'self.indexes = {self.indexes}')
-        # print(f'indexes = {indexes}')
+        print(f'__getitem__ : index = {index}')
+        print(f'__getitem__ : self.batch_size = {self.batch_size}')
+        print(f'__getitem__ : self.indexes = {self.indexes}')
+        print(f'__getitem__ : indexes = {indexes}')
 
         # Find list of IDs
         list_IDs_temp = [self.list_IDs[k] for k in indexes]
@@ -749,13 +748,14 @@ class DataGenerator(keras.utils.Sequence):
 
     def on_epoch_end(self):
         'Updates indexes after each epoch'
-        # print(f'self.list_IDs = {self.list_IDs}')
+        print(f'on_epoch_end : self.list_IDs = {self.list_IDs}')
 
         self.indexes = np.arange(len(self.list_IDs))
+
         if self.shuffle == True:
             np.random.shuffle(self.indexes)
         
-        # print(f'self.indexes = {self.indexes}')
+        print(f'on_epoch_end : self.indexes = {self.indexes}')
 
     def __data_generation(self, list_IDs_temp):
         'Generates data containing batch_size samples'
@@ -764,7 +764,7 @@ class DataGenerator(keras.utils.Sequence):
         temp_x = []
         subjects = []
 
-        print(f'self.dataset_type = {self.dataset_type}')
+        print(f'__data_generation : self.dataset_type = {self.dataset_type}')
 
         # Loading data
         for i, ID in enumerate(list_IDs_temp):
