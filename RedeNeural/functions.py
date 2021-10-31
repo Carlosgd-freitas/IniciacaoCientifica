@@ -722,8 +722,8 @@ class DataGenerator(keras.utils.Sequence):
         n_samples = samples_per_file * len(self.tasks) * self.n_classes
 
         ### temporario ###
-        # if (n_samples > len(self.list_IDs)):
-        #     return len(self.list_IDs)
+        if (n_samples > len(self.list_IDs)):
+            return len(self.list_IDs)
         ### temporario ###
 
         return int(np.floor(len(self.list_IDs) / self.batch_size))
