@@ -638,6 +638,9 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
     dist = euclidean_distances(feature1, feature2)
 
     # Separating distances from genuine pairs and impostor pairs
+    print(f'len(label1) = {len(label1)}')
+    print(f'len(label2) = {len(label2)}')
+
     same_list = []
     dif_list = []
     for row in range(len(label1)):
@@ -803,28 +806,13 @@ class DataGenerator(keras.utils.Sequence):
         if(len(indexes) < 10):
             menor = len(indexes)
 
-        # Generate data
-        if(self.data_generator_type == 'process_data'):
-            for i in range(0, menor):
-                k = indexes[i]
-                list_temp.append(k)
+        for i in range(0, menor):
+            k = indexes[i]
+            list_temp.append(self.list_IDs[k])
 
-            print(f'__getitem__ : list_temp = {list_temp}')
+        print(f'__getitem__ : list_temp = {list_temp}')
 
-            (x, y) = self.__data_generation_process_data(list_temp)
-
-        elif(self.data_generator_type == 'crop_only'):
-            for i in range(0, menor):
-                k = indexes[i]
-                list_temp.append(self.list_IDs[k])
-
-            print(f'__getitem__ : list_temp = {list_temp}')
-
-            (x, y) = self.__data_generation_crop_only(list_temp)
-            
-        else:
-            (x, y) = (None, None)
-            print('ERROR: Invalid data_generator_type parameter.')
+        (x, y) = self.__data_generation(list_temp)
 
         return (x, y)
 
@@ -838,96 +826,7 @@ class DataGenerator(keras.utils.Sequence):
         if self.shuffle == True:
             np.random.shuffle(self.indexes)
 
-    def __data_generation_crop_only(self, list_IDs_temp):
-        """
-        Generates data containing batch_size samples.
-        """
-
-        # Initialization
-        temp_x = []
-        subjects = []
-
-        print(f'__data_generation : self.dataset_type = {self.dataset_type}')
-
-        # Loading data from .csv files ('crop_only' DataGenerator)
-        for i, ID in enumerate(list_IDs_temp):
-            if(self.dataset_type == 'train' or self.dataset_type == 'validation'):
-                file_x = np.loadtxt('processed_train_data/' + list_IDs_temp[i], delimiter=';', usecols=range(self.n_channels))
-                string = 'processed_train_data/' + list_IDs_temp[i]
-
-            elif(self.dataset_type == 'test'):
-                file_x = np.loadtxt('processed_test_data/' + list_IDs_temp[i], delimiter=';', usecols=range(self.n_channels))
-                string = 'processed_test_data/' + list_IDs_temp[i]
-
-            file_x = np.asarray(file_x, dtype = object).astype('float32')
-            file_x = file_x.T
-            temp_x.append(file_x)
-
-            string = string.split("_subject_")[1]      # 'X.csv'
-            subject = int(string.split(".csv")[0])     # X
-            subjects.append(subject)
-
-        # Cropping Data
-        x_dataL = list()
-        x_dataL_2 = list()
-        y_dataL = list()
-        y_dataL_2 = list()
-
-        if(self.dataset_type == 'train' or self.dataset_type == 'validation'):
-            pos = 0
-            for data in temp_x:
-                x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, data, self.dim,
-                                                        self.offset, subjects[pos], self.n_classes,
-                                                        self.split_ratio, x_dataL_2, y_dataL_2)
-                pos += 1
-
-        elif(self.dataset_type == 'test'):
-            pos = 0
-            for data in temp_x:
-                x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, data, self.dim, self.offset, subjects[pos],
-                                    self.n_classes)
-                pos += 1
-        
-        x = None
-        y = None
-
-        if(self.dataset_type == 'train' or self.dataset_type == 'test'):
-            x_data = np.asarray(x_dataL, dtype = object).astype('float32')
-            y_data = np.asarray(y_dataL, dtype = object).astype('float32')
-
-            if(x_data.shape[0] != 0):
-                x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
-                y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
-
-            x = x_data
-            y = y_data
-
-        elif(self.dataset_type == 'validation'):
-            x_data_2 = np.asarray(x_dataL_2, dtype = object).astype('float32')
-            y_data_2 = np.asarray(y_dataL_2, dtype = object).astype('float32')
-
-            if(x_data_2.shape[0] != 0):
-                x_data_2 = x_data_2.reshape(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
-                y_data_2 = y_data_2.reshape(y_data_2.shape[0], y_data_2.shape[2])
-
-            x = x_data_2
-            y = y_data_2
-        
-        # print(f'__data_generation - x.shape = {x.shape}')
-        # print(f'__data_generation - y.shape = {y.shape}')
-
-        # Updating last index used
-        self.first_index = int(list_IDs_temp[-1].split("_")[2]) + 1
-        # print(f'__data_generation - self.first_index = {self.first_index}')
-
-        # temporary : no files read
-        if(x.shape[0] == 0):
-            x = np.zeros((self.batch_size, self.dim, self.n_channels))
-            y = np.zeros((self.batch_size, self.n_classes))
-
-        return (x, y)
-
-    def __data_generation_process_data(self, list_IDs_temp):
+    def __data_generation(self, list_IDs_temp):
         """
         Generates data containing batch_size samples.
         """

@@ -66,6 +66,9 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # - Ambos são métodos de keras.utils.Sequence
 #
 # - Cada batch gerado pelo DataGenerator deve ter batch_size samples
+#################### Conversar com o Pedro ####################
+# - Já que tanto no 'crop_only' quanto no 'process_data' eu tenho que ler os dados de um .csv, é melhor
+#   salvar os dados já preprocessados, ou seja, não existe necessidade da fazer o 'process_data' DataGenerator.
 ##############################################
 
 # Tasks:
@@ -138,7 +141,7 @@ while option != 0:
     print('Press [1] and [ENTER] to process the data and run the model directly (without Data Generators)\n')
 
     print('> Using Data Generators that pre-processes and crop the data on the fly')
-    print('Press [2] and [ENTER] to process the data and run the model with Data Generators\n')
+    print('Press [2] and [ENTER] to process the data and run the model with Data Generators [NAO CONTINUAR]\n')
 
     print('> Using Data Generators while saving the pre-processed data in .csv files')
     print('Press [3] and [ENTER] to process the training/validation data and save it in files')
@@ -256,7 +259,90 @@ while option != 0:
         print(f'Decidability: {d}')
 
     elif(option == 2):  
-        print('soon...')
+        # Creating the model
+        model = models.create_model(window_size, num_channels, num_classes)
+        model.summary()
+
+        # Defining the data generators
+        training_generator = functions.DataGenerator('process_data', batch_size, window_size, offset, full_signal_size,
+                                                    num_channels, num_classes, train_tasks, 'train', split_ratio)
+        validation_generator = functions.DataGenerator('process_data', batch_size, window_size, offset, full_signal_size,
+                                                    num_channels, num_classes, train_tasks, 'validation', split_ratio)
+        testing_generator = functions.DataGenerator('process_data', batch_size, window_size, window_size, full_signal_size,
+                                                    num_channels, num_classes, test_tasks, 'test', 1.0)
+
+        # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
+        opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
+
+        model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+
+        fit_begin = time.time()
+
+        callback = LearningRateScheduler(models.scheduler, verbose=0)
+        results = model.fit_generator(generator = training_generator,
+                            validation_data = validation_generator,
+                            epochs = training_epochs,
+                            callbacks = [callback],
+                            )
+
+        fit_end = time.time()
+        print(f'Training time in seconds: {fit_end - fit_begin}')
+        print(f'Training time in minutes: {(fit_end - fit_begin)/60.0}')
+        print(f'Training time in hours: {(fit_end - fit_begin)/3600.0}\n')
+
+        # Saving model weights
+        model.save('model_weights.h5')
+
+        # Evaluate the model to see the accuracy
+        print('\nEvaluating on training set...')
+        (loss, accuracy) = model.evaluate(training_generator, verbose = 0)
+        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+
+        print('Evaluating on validation set...')
+        (loss, accuracy) = model.evaluate(validation_generator, verbose = 0)
+        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+
+        print('Evaluating on testing set...')
+        test_begin = time.time()
+
+        (loss, accuracy) = model.evaluate(testing_generator, verbose = 0)
+        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+
+        test_end = time.time()
+        print(f'Evaluating on testing set time in miliseconds: {(test_end - test_begin) * 1000.0}')
+        print(f'Evaluating on testing set time in seconds: {test_end - test_begin}')
+        print(f'Evaluating on testing set time in minutes: {(test_end - test_begin)/60.0}\n')
+
+        # Summarize history for accuracy
+        plt.subplot(211)
+        plt.plot(results.history['accuracy'])
+        plt.plot(results.history['val_accuracy'])
+        plt.title('model accuracy')
+        plt.ylabel('accuracy')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'])
+
+        # Summarize history for loss
+        plt.subplot(212)
+        plt.plot(results.history['loss'])
+        plt.plot(results.history['val_loss'])
+        plt.title('model loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'])
+        plt.tight_layout()
+        plt.savefig(r'accuracy-loss.png', format='png')
+        plt.show()
+
+        max_loss = np.max(results.history['loss'])
+        min_loss = np.min(results.history['loss'])
+        print("Maximum Loss : {:.4f}".format(max_loss))
+        print("Minimum Loss : {:.4f}".format(min_loss))
+        print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
+
+        ###
+        # Code for Verification Mode
+        ###
 
     elif(option == 3):  
         if(os.path.exists('processed_train_data')):
@@ -349,13 +435,13 @@ while option != 0:
         # Defining the data generators
         training_generator = functions.DataGenerator('crop_only', batch_size, window_size, offset, full_signal_size,
                                                     num_channels, num_classes, train_tasks, 'train', split_ratio,
-                                                    x_train_list)
+                                                    list_IDs = x_train_list)
         validation_generator = functions.DataGenerator('crop_only', batch_size, window_size, offset, full_signal_size,
                                                     num_channels, num_classes, train_tasks, 'validation', split_ratio,
-                                                    x_train_list)
+                                                    list_IDs = x_train_list)
         testing_generator = functions.DataGenerator('crop_only', batch_size, window_size, window_size, full_signal_size,
                                                     num_channels, num_classes, test_tasks, 'test', 1.0,
-                                                    x_test_list)
+                                                    list_IDs = x_test_list)
 
         # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
         opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
@@ -467,7 +553,7 @@ while option != 0:
         # Defining the generator
         testing_generator = functions.DataGenerator('crop_only', batch_size, window_size, window_size, full_signal_size,
                                                     num_channels, num_classes, test_tasks, 'test', 1.0,
-                                                    x_test_list)
+                                                    list_IDs = x_test_list)
 
         ###
         print(f'\n\n\ny_test.shape = {y_test.shape}\n\n\n')
