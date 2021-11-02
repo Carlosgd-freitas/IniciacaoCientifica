@@ -913,4 +913,6 @@ class DataGenerator(keras.utils.Sequence):
             x = np.zeros((self.batch_size, self.dim, self.n_channels))
             y = np.zeros((self.batch_size, self.n_classes))
 
+        print(f'{y.shape[0]} samples were created.')
+
         return (x, y)
