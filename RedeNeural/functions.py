@@ -790,9 +790,6 @@ class DataGenerator(keras.utils.Sequence):
         Generate one batch of data.
         """
         # Generate indexes of the batch
-        # print(f'__getitem__ : index = {index}')
-
-        # indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
         indexes = self.indexes[self.first_index:self.first_index + self.batch_size]
 
         print(f'__getitem__ : index = {index}')
@@ -800,24 +797,31 @@ class DataGenerator(keras.utils.Sequence):
         print(f'__getitem__ : self.indexes = {self.indexes}')
         print(f'__getitem__ : indexes = {indexes}\n')
 
-        # Find list of IDs
-        # list_IDs_temp = [self.list_IDs[k] for k in indexes]
-        list_IDs_temp = []
+        # Find list of IDs/indexes
+        list_temp = []
         menor = 10
         if(len(indexes) < 10):
             menor = len(indexes)
 
-        for i in range(0, menor):
-            k = indexes[i]
-            list_IDs_temp.append(self.list_IDs[k])
-
-        print(f'__getitem__ : list_IDs_temp = {list_IDs_temp}')
-
         # Generate data
         if(self.data_generator_type == 'process_data'):
-            (x, y) = self.__data_generation_process_data(list_IDs_temp)
+            for i in range(0, menor):
+                k = indexes[i]
+                list_temp.append(k)
+
+            print(f'__getitem__ : list_temp = {list_temp}')
+
+            (x, y) = self.__data_generation_process_data(list_temp)
+
         elif(self.data_generator_type == 'crop_only'):
-            (x, y) = self.__data_generation_crop_only(list_IDs_temp)
+            for i in range(0, menor):
+                k = indexes[i]
+                list_temp.append(self.list_IDs[k])
+
+            print(f'__getitem__ : list_temp = {list_temp}')
+
+            (x, y) = self.__data_generation_crop_only(list_temp)
+            
         else:
             (x, y) = (None, None)
             print('ERROR: Invalid data_generator_type parameter.')

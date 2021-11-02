@@ -470,7 +470,7 @@ while option != 0:
                                                     x_test_list)
 
         ###
-        print(f'y_test.shape = {y_test.shape}')
+        print(f'\n\n\ny_test.shape = {y_test.shape}\n\n\n')
         ###
 
         # Removing the last layers of the model and getting the features array
