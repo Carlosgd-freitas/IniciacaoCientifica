@@ -736,7 +736,6 @@ class DataGenerator(keras.utils.Sequence):
         self.dataset_type = dataset_type
         self.split_ratio = split_ratio
         self.shuffle = shuffle
-        self.first_index = 0
         self.on_epoch_end()
 
     def __len__(self):
@@ -763,7 +762,7 @@ class DataGenerator(keras.utils.Sequence):
         # print(f'__getitem__ : index = {index}')
         # print(f'__getitem__ : self.batch_size = {self.batch_size}')
         # print(f'__getitem__ : self.indexes = {self.indexes}')
-        print(f'__getitem__ : indexes = {indexes}')
+        print(f'__getitem__ : indexes = {indexes}\n')
 
         # Find list of IDs
         # list_IDs_temp = [self.list_IDs[k] for k in indexes]
@@ -776,7 +775,7 @@ class DataGenerator(keras.utils.Sequence):
             k = indexes[i]
             list_IDs_temp.append(self.list_IDs[k])
 
-        print(f'__getitem__ : list_IDs_temp = {list_IDs_temp}')
+        # print(f'__getitem__ : list_IDs_temp = {list_IDs_temp}')
 
         # Generate data
         (x, y) = self.__data_generation(list_IDs_temp)
@@ -786,6 +785,7 @@ class DataGenerator(keras.utils.Sequence):
     def on_epoch_end(self):
         'Updates indexes after each epoch'
 
+        self.first_index = 0
         self.indexes = np.arange(len(self.list_IDs))
         if self.shuffle == True:
             np.random.shuffle(self.indexes)
@@ -868,7 +868,7 @@ class DataGenerator(keras.utils.Sequence):
 
         # Updating last index used
         self.first_index = int(list_IDs_temp[-1].split("_")[2]) + 1
-        print(f'__data_generation - self.first_index = {self.first_index}')
+        # print(f'__data_generation - self.first_index = {self.first_index}')
 
         # temporary : no files read
         if(x.shape[0] == 0):
