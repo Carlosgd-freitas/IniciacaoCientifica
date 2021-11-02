@@ -469,6 +469,10 @@ while option != 0:
                                                     num_channels, num_classes, test_tasks, 'test', 1.0,
                                                     x_test_list)
 
+        ###
+        print(f'y_test.shape = {y_test.shape}')
+        ###
+
         # Removing the last layers of the model and getting the features array
         model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
 
