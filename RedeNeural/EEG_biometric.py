@@ -18,13 +18,13 @@ tf.random.set_seed(1051)
 
 # Hyperparameters
 batch_size = 100                # Batch Size
-training_epochs = 2             # Total number of training epochs
+training_epochs = 2 #40            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
 # folder_path = './Dataset_CSV/'
 folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
-train_tasks = [1, 2]               # Tasks used for training and validation
+train_tasks = [1, 2]            # Tasks used for training and validation
 test_tasks = [2]                # Tasks used for testing
 num_classes = 109               # Total number of classes (individuals)
 

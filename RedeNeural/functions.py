@@ -420,7 +420,7 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
         print('ERROR: The offset parameter can\'t be negative.')
         return x_data, y_data
     elif offset == 0:
-        print('ERROR: An offset equals to 0 would result in "infinite" equal windows.')
+        print('ERROR: An offset equal to 0 would result in "infinite" equal windows.')
         return x_data, y_data
     # Checking the split_ratio parameter
     elif split_ratio <= 0 or split_ratio > 1:
@@ -699,6 +699,28 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
 
     return d, eer, thresholds
 
+def n_samples_with_slinding_window(full_signal_size, window_size, offset):
+    """
+    Returns the number of samples in a signal, generated after applying a sliding window.
+
+    Paramteres:
+        - full_signal_size: full size of the signal;
+        - window_size: size of the sliding window;
+        - offset: amount of samples the window will slide in each iteration.
+    """
+    n_samples = 1
+    i = window_size
+
+    if(offset == 0):
+        print('ERROR: An offset equal to 0 would result in "infinite" equal windows.')
+        return 0
+
+    while(i <= full_signal_size):
+        n_samples += 1
+        i += offset
+
+    return n_samples
+
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
     def __init__(self, list_IDs, batch_size, dim, offset, full_signal_size, n_channels, n_classes, tasks, dataset_type, split_ratio, shuffle=False):
@@ -719,8 +741,8 @@ class DataGenerator(keras.utils.Sequence):
 
     def __len__(self):
         'Denotes the number of batches per epoch'
-        # samples_per_file = np.floor((self.full_signal_size - self.dim) / self.offset) + 1
-        # n_samples = samples_per_file * len(self.tasks) * self.n_classes
+        samples_per_file = n_samples_with_slinding_window(self.full_signal_size, self.dim, self.offset)
+        n_samples = samples_per_file * len(self.tasks) * self.n_classes
 
         ### temporario ###
         # if (n_samples > len(self.list_IDs)):
@@ -823,8 +845,9 @@ class DataGenerator(keras.utils.Sequence):
             x_data = np.asarray(x_dataL, dtype = object).astype('float32')
             y_data = np.asarray(y_dataL, dtype = object).astype('float32')
 
-            x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
-            y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
+            if(x_data.shape[0] != 0):
+                x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
+                y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
 
             x = x_data
             y = y_data
@@ -833,8 +856,9 @@ class DataGenerator(keras.utils.Sequence):
             x_data_2 = np.asarray(x_dataL_2, dtype = object).astype('float32')
             y_data_2 = np.asarray(y_dataL_2, dtype = object).astype('float32')
 
-            x_data_2 = x_data_2.reshape(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
-            y_data_2 = y_data_2.reshape(y_data_2.shape[0], y_data_2.shape[2])
+            if(x_data_2.shape[0] != 0):
+                x_data_2 = x_data_2.reshape(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
+                y_data_2 = y_data_2.reshape(y_data_2.shape[0], y_data_2.shape[2])
 
             x = x_data_2
             y = y_data_2
@@ -845,5 +869,10 @@ class DataGenerator(keras.utils.Sequence):
         # Updating last index used
         self.first_index = int(list_IDs_temp[-1].split("_")[2]) + 1
         print(f'__data_generation - self.first_index = {self.first_index}')
+
+        # temporary : no files read
+        if(x.shape[0] == 0):
+            x = np.zeros((self.batch_size, self.dim, self.n_channels))
+            y = np.zeros((self.batch_size, self.n_classes))
 
         return (x, y)
