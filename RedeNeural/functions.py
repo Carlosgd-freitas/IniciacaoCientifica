@@ -725,7 +725,7 @@ class DataGenerator(keras.utils.Sequence):
         ### temporario ###
         # if (n_samples > len(self.list_IDs)):
         #     return len(self.list_IDs)
-        return 22
+        return int(np.floor(len(self.list_IDs) / 10))
         ### temporario ###
 
         # return int(np.floor(len(self.list_IDs) / self.batch_size))
@@ -733,14 +733,14 @@ class DataGenerator(keras.utils.Sequence):
     def __getitem__(self, index):
         'Generate one batch of data'
         # Generate indexes of the batch
-        print(f'__getitem__ : index = {index}')
+        # print(f'__getitem__ : index = {index}')
 
         # indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
         indexes = self.indexes[self.first_index:self.first_index + self.batch_size]
 
-        print(f'__getitem__ : index = {index}')
-        print(f'__getitem__ : self.batch_size = {self.batch_size}')
-        print(f'__getitem__ : self.indexes = {self.indexes}')
+        # print(f'__getitem__ : index = {index}')
+        # print(f'__getitem__ : self.batch_size = {self.batch_size}')
+        # print(f'__getitem__ : self.indexes = {self.indexes}')
         print(f'__getitem__ : indexes = {indexes}')
 
         # Find list of IDs

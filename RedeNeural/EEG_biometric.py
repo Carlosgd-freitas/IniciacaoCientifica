@@ -18,7 +18,7 @@ tf.random.set_seed(1051)
 
 # Hyperparameters
 batch_size = 100                # Batch Size
-training_epochs = 40            # Total number of training epochs
+training_epochs = 2             # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
