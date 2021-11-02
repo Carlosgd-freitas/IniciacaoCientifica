@@ -699,11 +699,11 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
 
     return d, eer, thresholds
 
-def n_samples_with_slinding_window(full_signal_size, window_size, offset):
+def n_samples_with_sliding_window(full_signal_size, window_size, offset):
     """
     Returns the number of samples in a signal, generated after applying a sliding window.
 
-    Paramteres:
+    Parameters:
         - full_signal_size: full size of the signal;
         - window_size: size of the sliding window;
         - offset: amount of samples the window will slide in each iteration.
@@ -722,9 +722,43 @@ def n_samples_with_slinding_window(full_signal_size, window_size, offset):
     return n_samples
 
 class DataGenerator(keras.utils.Sequence):
-    'Generates data for Keras'
-    def __init__(self, list_IDs, batch_size, dim, offset, full_signal_size, n_channels, n_classes, tasks, dataset_type, split_ratio, shuffle=False):
-        'Initialization'
+    """
+    Generates data for the model on the fly.
+    """
+    def __init__(self, data_generator_type, batch_size, dim, offset, full_signal_size, n_channels,
+                n_classes, tasks, dataset_type, split_ratio, list_IDs=None, shuffle=False):
+        """
+        Initialization function of the class.
+        
+        Parameters:
+            - data_generator_type: what kind of input does the data generator expects, and what it will do before
+            feeding the data into the model;
+                * 'process_data': the data generator will load, filter, normalize and crop the data, using a
+                sliding window in the last method.
+                * 'crop_only': the data generator will take preprocessed data, stored in csv files, and crop
+                them using a sliding window.
+            - batch_size: while training, the processed data will be split into groups of shape
+            (batch_size, dim, n_channels), which will be fed into the model;
+            - dim: size of the sliding window;
+            - offset: amount of samples the window will slide in each iteration;
+            - full_signal_size: full size of the signals being processed;
+            - n_channels: number of channels in each signal being processed;
+            - n_classes: total number of classes (individuals);
+            - tasks: list that contains the numbers of the experimental runs that will be used;
+            - dataset_type: which type of dataset will be created by the data generator. Valid types are 'train',
+            'validation' and 'test';
+            - split_ratio: a number in the interval (0,1]. 
+            
+            (split_ratio * 100)% of the processed signals will be
+            stored in x_data and y_data, and [100 - (split_ratio * 100)]% will be stored in x_data_2 and y_data_2;
+        
+        Optional Parameters:
+            - list_IDs: used if the data_generator_type is 'crop_only'. A list of csv file names, in which the
+            preprocessed data are stored. Default value is None;
+            - shuffle: if the data being fed into the model will be shuffled or not at each epoch. Default value is
+            False.
+        """
+        self.data_generator_type = data_generator_type
         self.list_IDs = list_IDs
         self.batch_size = batch_size
         self.dim = dim
@@ -739,8 +773,10 @@ class DataGenerator(keras.utils.Sequence):
         self.on_epoch_end()
 
     def __len__(self):
-        'Denotes the number of batches per epoch'
-        samples_per_file = n_samples_with_slinding_window(self.full_signal_size, self.dim, self.offset)
+        """
+        Denotes the number of batches per epoch.
+        """
+        samples_per_file = n_samples_with_sliding_window(self.full_signal_size, self.dim, self.offset)
         n_samples = samples_per_file * len(self.tasks) * self.n_classes
 
         ### temporario ###
@@ -752,7 +788,9 @@ class DataGenerator(keras.utils.Sequence):
         # return int(np.floor(len(self.list_IDs) / self.batch_size))
 
     def __getitem__(self, index):
-        'Generate one batch of data'
+        """
+        Generate one batch of data.
+        """
         # Generate indexes of the batch
         # print(f'__getitem__ : index = {index}')
 
@@ -783,7 +821,9 @@ class DataGenerator(keras.utils.Sequence):
         return (x, y)
 
     def on_epoch_end(self):
-        'Updates indexes after each epoch'
+        """
+        Updates indexes after each epoch.
+        """
 
         self.first_index = 0
         self.indexes = np.arange(len(self.list_IDs))
@@ -791,7 +831,9 @@ class DataGenerator(keras.utils.Sequence):
             np.random.shuffle(self.indexes)
 
     def __data_generation(self, list_IDs_temp):
-        'Generates data containing batch_size samples'
+        """
+        Generates data containing batch_size samples.
+        """
 
         # Initialization
         temp_x = []
@@ -799,7 +841,7 @@ class DataGenerator(keras.utils.Sequence):
 
         print(f'__data_generation : self.dataset_type = {self.dataset_type}')
 
-        # Loading data
+        # Loading data from .csv files ('crop_only' DataGenerator)
         for i, ID in enumerate(list_IDs_temp):
             if(self.dataset_type == 'train' or self.dataset_type == 'validation'):
                 file_x = np.loadtxt('processed_train_data/' + list_IDs_temp[i], delimiter=';', usecols=range(self.n_channels))

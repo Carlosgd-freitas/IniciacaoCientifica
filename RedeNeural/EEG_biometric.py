@@ -331,7 +331,7 @@ while option != 0:
         model = models.create_model(window_size, num_channels, num_classes)
         model.summary()
 
-        # Composing the dictionary
+        # Getting the file names that contains the preprocessed data
         x_train_list = []
         x_test_list = []
 
@@ -346,12 +346,16 @@ while option != 0:
         x_test_list = x_test_list.tolist()
         x_test_list = x_test_list[0]
 
-        training_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, full_signal_size,
-                                                num_channels, num_classes, train_tasks, 'train', split_ratio)
-        validation_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, full_signal_size,
-                                                num_channels, num_classes, train_tasks, 'validation', split_ratio)
-        testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size, full_signal_size,
-                                                num_channels, num_classes, test_tasks, 'test', 1.0)                                             
+        # Defining the data generators
+        training_generator = functions.DataGenerator('crop_only', batch_size, window_size, offset, full_signal_size,
+                                                    num_channels, num_classes, train_tasks, 'train', split_ratio,
+                                                    x_train_list)
+        validation_generator = functions.DataGenerator('crop_only', batch_size, window_size, offset, full_signal_size,
+                                                    num_channels, num_classes, train_tasks, 'validation', split_ratio,
+                                                    x_train_list)
+        testing_generator = functions.DataGenerator('crop_only', batch_size, window_size, window_size, full_signal_size,
+                                                    num_channels, num_classes, test_tasks, 'test', 1.0,
+                                                    x_test_list)
 
         # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
         opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
@@ -423,6 +427,8 @@ while option != 0:
         print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
     elif(option == 6):
+        opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
+
         # List of files that contains x_test data
         x_test_list = []
         x_test_list.append(loadtxt('processed_test_data/x_test_list.csv', delimiter=',', dtype='str'))
@@ -459,8 +465,9 @@ while option != 0:
         y_test = y_test.reshape(y_test.shape[0], y_test.shape[2])
 
         # Defining the generator
-        testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size, full_signal_size,
-                                                num_channels, num_classes, test_tasks, 'test', test_tasks, 1.0)
+        testing_generator = functions.DataGenerator('crop_only', batch_size, window_size, window_size, full_signal_size,
+                                                    num_channels, num_classes, test_tasks, 'test', 1.0,
+                                                    x_test_list)
 
         # Removing the last layers of the model and getting the features array
         model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
