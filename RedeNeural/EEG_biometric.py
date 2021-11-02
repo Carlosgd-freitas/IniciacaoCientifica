@@ -543,7 +543,7 @@ while option != 0:
 
         pos = 0
         for data in temp_x:
-            x_dataL, y_dataL = functions.signal_cropping(x_dataL, y_dataL, data, window_size, offset, subjects[pos],
+            x_dataL, y_dataL = functions.signal_cropping(x_dataL, y_dataL, data, window_size, window_size, subjects[pos],
                                 num_classes, mode='labels_only')
             pos += 1
         
@@ -555,10 +555,6 @@ while option != 0:
                                                     num_channels, num_classes, test_tasks, 'test', 1.0,
                                                     list_IDs = x_test_list)
 
-        ###
-        print(f'\n\n\ny_test.shape = {y_test.shape}\n\n\n')
-        ###
-
         # Removing the last layers of the model and getting the features array
         model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
 
@@ -566,6 +562,11 @@ while option != 0:
         model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
         model_for_verification.load_weights('model_weights.h5', by_name=True)
         x_pred = model_for_verification.predict_generator(testing_generator)
+
+        ###
+        print(f'\ny_test.shape = {y_test.shape}\n')
+        print(f'\nx_pred.shape = {x_pred.shape}\n')
+        ###
 
         # Calculating EER and Decidability
         y_test_classes = functions.one_hot_encoding_to_classes(y_test)
