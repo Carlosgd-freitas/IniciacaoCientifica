@@ -719,15 +719,16 @@ class DataGenerator(keras.utils.Sequence):
 
     def __len__(self):
         'Denotes the number of batches per epoch'
-        samples_per_file = np.floor((self.full_signal_size - self.dim) / self.offset) + 1
-        n_samples = samples_per_file * len(self.tasks) * self.n_classes
+        # samples_per_file = np.floor((self.full_signal_size - self.dim) / self.offset) + 1
+        # n_samples = samples_per_file * len(self.tasks) * self.n_classes
 
         ### temporario ###
-        if (n_samples > len(self.list_IDs)):
-            return len(self.list_IDs)
+        # if (n_samples > len(self.list_IDs)):
+        #     return len(self.list_IDs)
+        return 22
         ### temporario ###
 
-        return int(np.floor(len(self.list_IDs) / self.batch_size))
+        # return int(np.floor(len(self.list_IDs) / self.batch_size))
 
     def __getitem__(self, index):
         'Generate one batch of data'
@@ -745,7 +746,11 @@ class DataGenerator(keras.utils.Sequence):
         # Find list of IDs
         # list_IDs_temp = [self.list_IDs[k] for k in indexes]
         list_IDs_temp = []
-        for i in range(0, 11):
+        menor = 10
+        if(len(indexes) < 10):
+            menor = len(indexes)
+
+        for i in range(0, menor):
             k = indexes[i]
             list_IDs_temp.append(self.list_IDs[k])
 
