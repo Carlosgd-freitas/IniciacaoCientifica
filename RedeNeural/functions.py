@@ -863,8 +863,8 @@ class DataGenerator(keras.utils.Sequence):
             x = x_data_2
             y = y_data_2
         
-        print(f'__data_generation - x.shape = {x.shape}')
-        print(f'__data_generation - y.shape = {y.shape}')
+        # print(f'__data_generation - x.shape = {x.shape}')
+        # print(f'__data_generation - y.shape = {y.shape}')
 
         # Updating last index used
         self.first_index = int(list_IDs_temp[-1].split("_")[2]) + 1

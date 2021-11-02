@@ -131,19 +131,134 @@ while option != 0:
     option = 3
 
     # Menu
-    print('=============== MENU ===============')
-    print('> Process the training, validation and testing data before running the model in Identification Mode!')
-    print('> Run the model in Identification Mode before running it in Verification Mode!\n')
-    print('Press [0] and [ENTER] to QUIT')
-    print('Press [1] and [ENTER] to process the training/validation data')
-    print('Press [2] and [ENTER] to process the testing data')
-    print('Press [3] and [ENTER] to run the model in Identification Mode')
-    print('Press [4] and [ENTER] to run the model in Verification Mode')
-    print('====================================')
+    print('============================== MENU ==============================')
+    print('Press [0] and [ENTER] to QUIT\n')
+
+    print('> Processing the data and running the model without the use of Data Generators')
+    print('Press [1] and [ENTER] to process the data and run the model directly (without Data Generators)\n')
+
+    print('> Using Data Generators that pre-processes and crop the data on the fly')
+    print('Press [2] and [ENTER] to process the data and run the model with Data Generators\n')
+
+    print('> Using Data Generators while saving the pre-processed data in .csv files')
+    print('Press [3] and [ENTER] to process the training/validation data and save it in files')
+    print('Press [4] and [ENTER] to process the testing data and save it in files')
+    print('Press [5] and [ENTER] to run the model in Identification Mode')
+    print('Press [6] and [ENTER] to run the model in Verification Mode')
+    print('==================================================================')
 
     option = int(input('Enter option: '))
     
     if(option == 1):  
+        # Loading the raw data
+        train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
+
+        # Filtering the raw data
+        train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+        test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+
+        # Normalize the filtered data
+        train_content = functions.normalize_data(train_content, 'sun', 1)
+        test_content = functions.normalize_data(test_content, 'sun', 1)
+
+        # Getting the training, validation and testing data
+        x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
+                                                            window_size, offset, split_ratio)
+        x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, full_signal_size,
+                                            full_signal_size)
+    
+        # Creating the model
+        model = models.create_model(window_size, num_channels, num_classes)
+        model.summary()                                         
+
+        # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
+        opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
+        model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+
+        fit_begin = time.time()
+
+        callback = LearningRateScheduler(models.scheduler, verbose=0)
+        results = model.fit(x_train,
+                            y_train,
+                            batch_size = batch_size,
+                            epochs = training_epochs,
+                            callbacks = [callback],
+                            validation_data = (x_val, y_val)
+                            )
+
+        fit_end = time.time()
+        print(f'Training time in seconds: {fit_end - fit_begin}')
+        print(f'Training time in minutes: {(fit_end - fit_begin)/60.0}')
+        print(f'Training time in hours: {(fit_end - fit_begin)/3600.0}\n')
+
+        # Saving model weights
+        model.save('model_weights.h5')
+
+        # Evaluate the model to see the accuracy
+        print('\nEvaluating on training set...')
+        (loss, accuracy) = model.evaluate(x_train, y_train, verbose = 0)
+        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+
+        print('Evaluating on validation set...')
+        (loss, accuracy) = model.evaluate(x_val, y_val, verbose = 0)
+        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+
+        print('Evaluating on testing set...')
+        test_begin = time.time()
+
+        (loss, accuracy) = model.evaluate(x_test, y_test, verbose = 0)
+        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+
+        test_end = time.time()
+        print(f'Evaluating on testing set time in miliseconds: {(test_end - test_begin) * 1000.0}')
+        print(f'Evaluating on testing set time in seconds: {test_end - test_begin}')
+        print(f'Evaluating on testing set time in minutes: {(test_end - test_begin)/60.0}\n')
+
+        # Summarize history for accuracy
+        plt.subplot(211)
+        plt.plot(results.history['accuracy'])
+        plt.plot(results.history['val_accuracy'])
+        plt.title('model accuracy')
+        plt.ylabel('accuracy')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'])
+
+        # Summarize history for loss
+        plt.subplot(212)
+        plt.plot(results.history['loss'])
+        plt.plot(results.history['val_loss'])
+        plt.title('model loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'])
+        plt.tight_layout()
+        plt.savefig(r'accuracy-loss.png', format='png')
+        plt.show()
+
+        max_loss = np.max(results.history['loss'])
+        min_loss = np.min(results.history['loss'])
+        print("Maximum Loss : {:.4f}".format(max_loss))
+        print("Minimum Loss : {:.4f}".format(min_loss))
+        print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
+
+        # Removing the last layers of the model and getting the features array
+        model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
+
+        model_for_verification.summary()
+        model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+        model_for_verification.load_weights('model_weights.h5', by_name=True)
+        x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
+
+        # Calculating EER and Decidability
+        y_test_classes = functions.one_hot_encoding_to_classes(y_test)
+        d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
+        print(f'EER: {eer*100.0} %')
+        print(f'Decidability: {d}')
+
+    elif(option == 2):  
+        print('soon...')
+
+    elif(option == 3):  
         if(os.path.exists('processed_train_data')):
             shutil.rmtree('processed_train_data', ignore_errors=True)
         os.mkdir('processed_train_data')
@@ -158,14 +273,11 @@ while option != 0:
         train_content = functions.normalize_data(train_content, 'sun', 1)
 
         # Getting the training, validation and testing data
-        # x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
-        #                                                      window_size, offset, split_ratio)
         x_train, y_train = functions.crop_data(train_content, train_tasks, num_classes, full_signal_size,
                                             full_signal_size, reshape='data_generator')
 
         counter = 1
         list = []
-        # list_2 = []
         for index in range(0, x_train.shape[0]):
             if(counter > num_classes):
                 counter = 1
@@ -176,16 +288,11 @@ while option != 0:
             list.append(string+'.csv')
             counter += 1
             
-            # data = y_train[index]
-            # string = 'y_train_' + str(index)
-            # savetxt('processed_train_data/'+string+'.csv', data, fmt='%d', delimiter=';')
-            # list_2.append(string+'.csv')
         print('saving file names to processed_train_data/x_train_list.csv ... ',end='')
         savetxt('processed_train_data/x_train_list.csv', [list], delimiter=',', fmt='%s')
         print('saved!')
-        # savetxt('processed_train_data/y_train_list.csv', [list_2], delimiter=',', fmt='%s')
 
-    elif(option == 2):  
+    elif(option == 4):  
         if(os.path.exists('processed_test_data')):
             shutil.rmtree('processed_test_data', ignore_errors=True)
         os.mkdir('processed_test_data')
@@ -200,14 +307,11 @@ while option != 0:
         test_content = functions.normalize_data(test_content, 'sun', 1)
 
         # Getting the training, validation and testing data
-        # x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
-        #                                                      window_size, offset, split_ratio)
         x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, full_signal_size,
                                             full_signal_size, reshape='data_generator')
         
         counter = 1
         list = []
-        # list_2 = []
         for index in range(0, x_test.shape[0]):
             if(counter > num_classes):
                 counter = 1
@@ -218,66 +322,29 @@ while option != 0:
             list.append(string+'.csv')
             counter += 1
             
-            # data = y_test[index]
-            # string = 'y_test_' + str(index)
-            # savetxt('processed_test_data/'+string+'.csv', data, fmt='%d', delimiter=';')
-            # list_2.append(string+'.csv')
         print('saving file names to processed_test_data/x_test_list.csv ... ',end='')
         savetxt('processed_test_data/x_test_list.csv', [list], delimiter=',', fmt='%s')
         print('saved!')
-        # savetxt('processed_test_data/y_test_list.csv', [list_2], delimiter=',', fmt='%s')
 
-    elif(option == 3):
+    elif(option == 5):
         # Creating the model
         model = models.create_model(window_size, num_channels, num_classes)
         model.summary()
 
         # Composing the dictionary
         x_train_list = []
-        # y_train_list = []
-        # x_val_list = []
-        # y_val_list = []
         x_test_list = []
-        # y_test_list = []
 
         x_train_list.append(loadtxt('processed_train_data/x_train_list.csv', delimiter=',', dtype='str'))
-        # y_train_list.append(loadtxt('processed_data/y_train_list.csv', delimiter=',', dtype='str'))
-        # x_val_list.append(loadtxt('processed_data/x_val_list.csv', delimiter=',', dtype='str'))
-        # y_val_list.append(loadtxt('processed_data/y_val_list.csv', delimiter=',', dtype='str'))
         x_test_list.append(loadtxt('processed_test_data/x_test_list.csv', delimiter=',', dtype='str'))
-        # y_test_list.append(loadtxt('processed_data/y_test_list.csv', delimiter=',', dtype='str'))
 
         x_train_list = np.asarray(x_train_list).astype('str')
         x_train_list = x_train_list.tolist()
         x_train_list = x_train_list[0]
 
-        # y_train_list = np.asarray(y_train_list).astype('str')
-        # y_train_list = y_train_list.tolist()
-        # y_train_list = y_train_list[0]
-
-        # x_val_list = np.asarray(x_val_list).astype('str')
-        # x_val_list = x_val_list.tolist()
-        # x_val_list = x_val_list[0]
-
-        # y_val_list = np.asarray(y_val_list).astype('str')
-        # y_val_list = y_val_list.tolist()
-        # y_val_list = y_val_list[0]
-
         x_test_list = np.asarray(x_test_list).astype('str')
         x_test_list = x_test_list.tolist()
         x_test_list = x_test_list[0]
-
-        # y_test_list = np.asarray(y_test_list).astype('str')
-        # y_test_list = y_test_list.tolist()
-        # y_test_list = y_test_list[0]
-
-        # data = {'train': x_train_list, 'validation': x_val_list, 'test': x_test_list}
-        # labels = {'train': y_train_list, 'validation': y_val_list, 'test': y_test_list}
-
-        # print('x_train_list:')
-        # print(x_train_list)
-        # print('\ny_train_list:')
-        # print(y_train_list)
 
         training_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, full_signal_size,
                                                 num_channels, num_classes, train_tasks, 'train', split_ratio)
@@ -288,7 +355,6 @@ while option != 0:
 
         # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
         opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
-        # opt = Adam(learning_rate = 0.0001)
 
         model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
 
@@ -300,14 +366,6 @@ while option != 0:
                             epochs = training_epochs,
                             callbacks = [callback],
                             )
-
-        # results = model.fit(x_train,
-        #                     y_train,
-        #                     batch_size = batch_size,
-        #                     epochs = training_epochs,
-        #                     callbacks = [callback],
-        #                     validation_data = (x_val, y_val)
-        #                     )
 
         fit_end = time.time()
         print(f'Training time in seconds: {fit_end - fit_begin}')
@@ -364,7 +422,7 @@ while option != 0:
         print("Minimum Loss : {:.4f}".format(min_loss))
         print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
-    elif(option == 4):
+    elif(option == 6):
         # List of files that contains x_test data
         x_test_list = []
         x_test_list.append(loadtxt('processed_test_data/x_test_list.csv', delimiter=',', dtype='str'))
@@ -411,7 +469,6 @@ while option != 0:
         model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
         model_for_verification.load_weights('model_weights.h5', by_name=True)
         x_pred = model_for_verification.predict_generator(testing_generator)
-        # x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
         # Calculating EER and Decidability
         y_test_classes = functions.one_hot_encoding_to_classes(y_test)
