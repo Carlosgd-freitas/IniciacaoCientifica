@@ -745,6 +745,8 @@ class DataGenerator(keras.utils.Sequence):
         # Find list of IDs
         list_IDs_temp = [self.list_IDs[k] for k in indexes]
 
+        print(f'__getitem__ : list_IDs_temp = {list_IDs_temp}')
+
         # Generate data
         (x, y) = self.__data_generation(list_IDs_temp)
 
