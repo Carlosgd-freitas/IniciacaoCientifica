@@ -639,7 +639,7 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
 
     # Separating distances from genuine pairs and impostor pairs
     print(f'len(label1) = {len(label1)}')
-    print(f'len(label2) = {len(label2)}')
+    print(f'len(feature1) = {len(feature1)}')
 
     same_list = []
     dif_list = []
