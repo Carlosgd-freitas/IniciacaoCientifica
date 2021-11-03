@@ -984,8 +984,8 @@ class DataGenerator(keras.utils.Sequence):
             print(f'__data_generation before stacking - x.shape = {x.shape}')
             print(f'__data_generation before stacking - y.shape = {y.shape}')
 
-            x = np.vstack(self.excess_x, x)
-            y = np.vstack(self.excess_y, y)
+            x = np.vstack((self.excess_x, x))
+            y = np.vstack((self.excess_y, y))
 
             print(f'__data_generation after stacking - self.excess_x.shape = {self.excess_x.shape}')
             print(f'__data_generation after stacking - self.excess_y.shape = {self.excess_y.shape}')
