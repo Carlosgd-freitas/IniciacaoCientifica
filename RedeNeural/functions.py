@@ -813,11 +813,13 @@ class DataGenerator(keras.utils.Sequence):
 
         # print(f'__getitem__ : index = {index}')
         # print(f'__getitem__ : self.batch_size = {self.batch_size}')
-        # print(f'__getitem__ : self.indexes = {self.indexes}')
+        print(f'__getitem__ : self.indexes = {self.indexes}')
         print(f'__getitem__ : indexes = {indexes}\n')
 
         # excess já tem uma batch pronta ?
         if(self.excess_x is not None):
+            print(f'__getitem__ : self.excess_x.shape = {self.excess_x.shape}\n')
+
             if(self.excess_x.shape[0] >= self.batch_size):
 
                 print('pegou um batch pronto.')

@@ -61,11 +61,8 @@ occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
 
 #################### TODO ####################
-# - Revisar método __getitem__(self, index), olhar ele na internet
-# - Talvez revisar o método __len__(self) ajude também
-# - Ambos são métodos de keras.utils.Sequence
-#
-# - Cada batch gerado pelo DataGenerator deve ter batch_size samples
+# - Consertar a opção 5 (identification mode)
+# - Fazer a opção 6 funcionar (verification mode)
 #################### Conversar com o Pedro ####################
 # - Já que tanto no 'crop_only' quanto no 'process_data' eu tenho que ler os dados de um .csv, é melhor
 #   salvar os dados já preprocessados, ou seja, não existe necessidade da fazer o 'process_data' DataGenerator.
