@@ -801,7 +801,8 @@ class DataGenerator(keras.utils.Sequence):
         """
         n_samples = self.samples_per_file * len(self.tasks) * self.n_classes
 
-        return math.ceil(n_samples / self.batch_size)
+        return math.floor(n_samples / self.batch_size)
+        # return math.ceil(n_samples / self.batch_size)
 
     def __getitem__(self, index):
         """
@@ -812,12 +813,14 @@ class DataGenerator(keras.utils.Sequence):
 
         # print(f'__getitem__ : index = {index}')
         # print(f'__getitem__ : self.batch_size = {self.batch_size}')
-        print(f'__getitem__ : self.indexes = {self.indexes}')
+        # print(f'__getitem__ : self.indexes = {self.indexes}')
         print(f'__getitem__ : indexes = {indexes}\n')
 
         # excess já tem uma batch pronta ?
         if(self.excess_x is not None):
             if(self.excess_x.shape[0] >= self.batch_size):
+
+                print('pegou um batch pronto.')
 
                 x = np.empty((self.batch_size, self.dim, self.n_channels))
                 y = np.empty((self.batch_size, self.n_classes))
@@ -878,7 +881,6 @@ class DataGenerator(keras.utils.Sequence):
 
         self.excess_x = None         # list that will store data that exceeds batch_size
         self.excess_y = None         # list that will store labels that exceeds batch_size
-        # self.excess_indexes = None   # list that will store the indexes of the batches stored in excess
         self.first_index = 0         # first index avaliable
 
         n_samples = self.samples_per_file * len(self.tasks) * self.n_classes
@@ -895,8 +897,6 @@ class DataGenerator(keras.utils.Sequence):
         # Initialization
         temp_x = []
         subjects = []
-
-        print(f'__data_generation : self.dataset_type = {self.dataset_type}')
 
         # Loading data from .csv files ('crop_only' DataGenerator)
         for i, ID in enumerate(list_IDs_temp):
@@ -961,20 +961,11 @@ class DataGenerator(keras.utils.Sequence):
 
             x = x_data_2
             y = y_data_2
-        
-        print(f'__data_generation - x.shape after cropping = {x.shape}')
-        print(f'__data_generation - y.shape after cropping = {y.shape}')
 
         # Is there any excess from the previous batch? If so, merge it first
         if(self.excess_x is not None):
-            print(f'__data_generation before stacking - x.shape = {x.shape}')
-            print(f'__data_generation before stacking - y.shape = {y.shape}')
-
             x = np.vstack((self.excess_x, x))
             y = np.vstack((self.excess_y, y))
-
-            print(f'__data_generation after stacking - x.shape = {x.shape}')
-            print(f'__data_generation after stacking - y.shape = {y.shape}')
 
         # Only (batch_size, dim, n_channels) data and (batch_size, num_classes) labels are returned
         if(x.shape[0] > self.batch_size):
@@ -984,24 +975,9 @@ class DataGenerator(keras.utils.Sequence):
         x = x[:self.batch_size]
         y = y[:self.batch_size]
 
-        print(f'__data_generation after excess - x.shape = {x.shape}')
-        print(f'__data_generation after excess - y.shape = {y.shape}')
-
         # Updating first index avaliable
         self.first_index += self.batch_size
 
-        # self.first_index = int(list_IDs_temp[-1].split("_")[2]) + 1
-        print(f'__data_generation - self.first_index = {self.first_index}')
-
-        # temporary : no files read
-        # if(x.shape[0] == 0):
-        #     x = np.zeros((self.batch_size, self.dim, self.n_channels))
-        #     y = np.zeros((self.batch_size, self.n_classes))
-
-        # print(f'\n{x.shape[0]} x samples were created.')
-        # print(f'{y.shape[0]} y samples were created.\n')
-
-        # print(f'\n x : {x}')
-        # print(f'y : {y}\n')
+        print(f'__data_generation - self.first_index = {self.first_index}') # 
 
         return (x, y)
