@@ -749,12 +749,12 @@ def stack_arrays(array_A, array_B, array_type):
     
     array_C = np.asarray(array_C, dtype = object).astype(array_type)
 
-    # if(a_2 is not None):
-    #     array_C.reshape(a_0 + b_0, a_1, a_2)
-    # elif(a_1 is not None):
-    #     array_C.reshape(a_0 + b_0, a_1)
-    # else:
-    #     array_C.reshape(a_0 + b_0)
+    if(a_2 is not None):
+        array_C.reshape(a_0 + b_0, a_1, a_2)
+    elif(a_1 is not None):
+        array_C.reshape(a_0 + b_0, a_1)
+    else:
+        array_C.reshape(a_0 + b_0)
 
     return array_C
 
@@ -984,8 +984,8 @@ class DataGenerator(keras.utils.Sequence):
             print(f'__data_generation before stacking - x.shape = {x.shape}')
             print(f'__data_generation before stacking - y.shape = {y.shape}')
 
-            x = stack_arrays(self.excess_x, x, 'float32')
-            y = stack_arrays(self.excess_y, y, 'int')
+            x = np.vstack(self.excess_x, x)
+            y = np.vstack(self.excess_y, y)
 
             print(f'__data_generation after stacking - self.excess_x.shape = {self.excess_x.shape}')
             print(f'__data_generation after stacking - self.excess_y.shape = {self.excess_y.shape}')
