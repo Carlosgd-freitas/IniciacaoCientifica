@@ -731,14 +731,15 @@ def stack_arrays(array_A, array_B, array_type):
     """
     array_C = []
 
-    b = None
-    c = None
+    a_1 = None
+    a_2 = None
 
-    a = array_A.shape[0]
+    a_0 = array_A.shape[0]
+    b_0 = array_B.shape[0]
     if(array_A.ndim > 1):
-        b = array_A.shape[1]
+        a_1 = array_A.shape[1]
     if(array_A.ndim > 2):
-        c = array_A.shape[2]
+        a_2 = array_A.shape[2]
 
     for i in range(0, array_A.shape[0]):
         array_C.append(array_A[i])
@@ -748,12 +749,12 @@ def stack_arrays(array_A, array_B, array_type):
     
     array_C = np.asarray(array_C, dtype = object).astype(array_type)
 
-    if(c is not None):
-        array_C.reshape(a, b, c)
-    elif(b is not None):
-        array_C.reshape(a, b)
+    if(a_2 is not None):
+        array_C.reshape(a_0 + b_0, a_1, a_2)
+    elif(a_1 is not None):
+        array_C.reshape(a_0 + b_0, a_1)
     else:
-        array_C.reshape(a)
+        array_C.reshape(a_0 + b_0)
 
     return array_C
 
