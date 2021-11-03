@@ -749,12 +749,12 @@ def stack_arrays(array_A, array_B, array_type):
     
     array_C = np.asarray(array_C, dtype = object).astype(array_type)
 
-    if(a_2 is not None):
-        array_C.reshape(a_0 + b_0, a_1, a_2)
-    elif(a_1 is not None):
-        array_C.reshape(a_0 + b_0, a_1)
-    else:
-        array_C.reshape(a_0 + b_0)
+    # if(a_2 is not None):
+    #     array_C.reshape(a_0 + b_0, a_1, a_2)
+    # elif(a_1 is not None):
+    #     array_C.reshape(a_0 + b_0, a_1)
+    # else:
+    #     array_C.reshape(a_0 + b_0)
 
     return array_C
 
