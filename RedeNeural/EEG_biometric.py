@@ -551,7 +551,7 @@ while option != 0:
         y_test = y_test.reshape(y_test.shape[0], y_test.shape[2])
 
         # Defining the generator
-        testing_generator = functions.DataGenerator('crop_only', batch_size, window_size, window_size, full_signal_size,
+        testing_generator = functions.DataGenerator('crop_only', 1, window_size, window_size, full_signal_size,
                                                     num_channels, num_classes, test_tasks, 'test', 1.0,
                                                     list_IDs = x_test_list)
 
@@ -562,7 +562,7 @@ while option != 0:
         model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
         model_for_verification.load_weights('model_weights.h5', by_name=True)
         # x_pred = model_for_verification.predict_generator(testing_generator)
-        x_pred = model_for_verification.predict(testing_generator, batch_size=batch_size)
+        x_pred = model_for_verification.predict(testing_generator, batch_size=1)
 
         ###
         print(f'\ny_test.shape = {y_test.shape}\n')
