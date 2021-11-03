@@ -727,34 +727,20 @@ def n_samples_with_sliding_window(full_signal_size, window_size, offset):
 def stack_arrays(array_A, array_B, array_type):
     """
     Auxiliar function for the __data_generation() function on the DataGenerator Class. Stacks two arrays
-    vertically: array_A on top of array_B. The data inside the arrays have the type array_type.
+    vertically: array_A on top of array_B. array_type is either 'data' or 'labels'.
     """
-    array_C = []
+    n_dim = array_A.ndim
 
-    a_1 = None
-    a_2 = None
-
-    a_0 = array_A.shape[0]
-    b_0 = array_B.shape[0]
-    if(array_A.ndim > 1):
-        a_1 = array_A.shape[1]
-    if(array_A.ndim > 2):
-        a_2 = array_A.shape[2]
+    if(n_dim == 2):
+        array_C = np.empty((array_A.shape[0] + array_B.shape[0], array_A.shape[1]))
+    else:
+        array_C = np.empty((array_A.shape[0] + array_B.shape[0], array_A.shape[1], array_A.shape[2]))
 
     for i in range(0, array_A.shape[0]):
-        array_C.append(array_A[i])
+        array_C[i] = array_A[i]
     
     for i in range(0, array_B.shape[0]):
-        array_C.append(array_B[i])
-    
-    array_C = np.asarray(array_C, dtype = object).astype(array_type)
-
-    if(a_2 is not None):
-        array_C.reshape(a_0 + b_0, a_1, a_2)
-    elif(a_1 is not None):
-        array_C.reshape(a_0 + b_0, a_1)
-    else:
-        array_C.reshape(a_0 + b_0)
+        array_C[i + array_A.shape[0]] = array_B[i]
 
     return array_C
 

@@ -71,40 +71,6 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 #   salvar os dados já preprocessados, ou seja, não existe necessidade da fazer o 'process_data' DataGenerator.
 ##############################################
 
-################ TEST ########################
-# A = np.array([1, 2, 3])
-# B = np.array([4, 5, 6])
-# C = functions.stack_arrays(A, B, 'int')
-# print(f'\nA.shape = {A.shape}')
-# print(f'B.shape = {B.shape}')
-# print(f'C.shape = {C.shape}')
-# print(f'C = {C}\n')
-
-# A = np.array([[1, 2, 3]])
-# B = np.array([[7, 8, 9]])
-# C = functions.stack_arrays(A, B, 'int')
-# print(f'\nA.shape = {A.shape}')
-# print(f'B.shape = {B.shape}')
-# print(f'C.shape = {C.shape}')
-# print(f'C = {C}\n')
-
-# A = np.array([[[1, 2, 3],
-#                [4, 5, 6],
-#                [7, 8, 9]],
-
-#               [[10, 11, 12]]])
-# A = np.array([[[13, 14, 15],
-#                [16, 17, 18],
-#                [19, 20, 21]]])
-# C = functions.stack_arrays(A, B, 'int')
-# print(f'\nA.shape = {A.shape}')
-# print(f'B.shape = {B.shape}')
-# print(f'C.shape = {C.shape}')
-# print(f'C = {C}\n')
-
-# input('quitaste ?')
-##############################################
-
 # Tasks:
 # Task 1 - EO
 # Task 2 - EC
