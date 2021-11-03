@@ -838,8 +838,8 @@ class DataGenerator(keras.utils.Sequence):
 
         list_temp = []
         for i in range(0, n_files):
-            k = indexes[first_file]
-            list_temp.append(self.list_IDs[k])
+            # k = indexes[first_file]
+            list_temp.append(self.list_IDs[first_file])
             first_file += 1
     
         if self.shuffle == True:
@@ -947,11 +947,14 @@ class DataGenerator(keras.utils.Sequence):
 
         # Is there any excess from the previous batch? If so, merge it first
         if(self.excess_x is not None):
+            print(f'__data_generation after stacking - x.shape = {x.shape}')
+            print(f'__data_generation after stacking - y.shape = {y.shape}')
+
             x = np.stack((self.excess_x, x))
             y = np.stack((self.excess_y, y))
 
-            print(f'__data_generation after stacking - x.shape = {x.shape}')
-            print(f'__data_generation after stacking - y.shape = {y.shape}')
+            print(f'__data_generation after stacking - self.excess_x.shape = {self.excess_x.shape}')
+            print(f'__data_generation after stacking - self.excess_y.shape = {self.excess_y.shape}')
 
         # Only (batch_size, dim, n_channels) data and (batch_size, num_classes) labels are returned
         if(x.shape[0] > self.batch_size):
