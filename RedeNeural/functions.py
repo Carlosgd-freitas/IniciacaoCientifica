@@ -886,8 +886,9 @@ class DataGenerator(keras.utils.Sequence):
         self.first_index = 0         # first index avaliable
 
         n_samples = self.samples_per_file * len(self.tasks) * self.n_classes
+        aux = math.floor(n_samples / self.batch_size)
 
-        self.indexes = np.arange(n_samples)
+        self.indexes = np.arange(aux * self.batch_size)
         # if self.shuffle == True:
         #     np.random.shuffle(self.indexes)
 
