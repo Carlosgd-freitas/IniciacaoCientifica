@@ -724,7 +724,7 @@ def n_samples_with_sliding_window(full_signal_size, window_size, offset):
 
     return n_samples
 
-def stack_arrays(array_A, array_B, array_type):
+def stack_arrays(array_A, array_B):
     """
     Auxiliar function for the __data_generation() function on the DataGenerator Class. Stacks two arrays
     vertically: array_A on top of array_B. array_type is either 'data' or 'labels'.
@@ -970,8 +970,8 @@ class DataGenerator(keras.utils.Sequence):
             print(f'__data_generation before stacking - x.shape = {x.shape}')
             print(f'__data_generation before stacking - y.shape = {y.shape}')
 
-            x = np.vstack((self.excess_x, x))
-            y = np.vstack((self.excess_y, y))
+            x = stack_arrays(self.excess_x, x)
+            y = stack_arrays(self.excess_y, y)
 
             print(f'__data_generation after stacking - self.excess_x.shape = {self.excess_x.shape}')
             print(f'__data_generation after stacking - self.excess_y.shape = {self.excess_y.shape}')
