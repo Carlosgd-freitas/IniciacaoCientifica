@@ -724,6 +724,39 @@ def n_samples_with_sliding_window(full_signal_size, window_size, offset):
 
     return n_samples
 
+def stack_arrays(array_A, array_B, array_type):
+    """
+    Auxiliar function for the __data_generation() function on the DataGenerator Class. Stacks two arrays
+    vertically: array_A on top of array_B. The data inside the arrays have the type array_type.
+    """
+    array_C = []
+
+    b = None
+    c = None
+
+    a = array_A.shape[0]
+    if(array_A.ndim > 1):
+        b = array_A.shape[1]
+    if(array_A.ndim > 2):
+        c = array_A.shape[2]
+
+    for i in range(0, len(array_A.shape[0])):
+        array_C.append(array_A[i])
+    
+    for i in range(0, len(array_B.shape[0])):
+        array_C.append(array_B[i])
+    
+    array_C = np.asarray(array_C, dtype = object).astype(array_type)
+
+    if(c is not None):
+        array_C.reshape(a, b, c)
+    elif(b is not None):
+        array_C.reshape(a, b)
+    else:
+        array_C.reshape(a)
+
+    return array_C
+
 class DataGenerator(keras.utils.Sequence):
     """
     Generates data for the model on the fly.
@@ -947,11 +980,11 @@ class DataGenerator(keras.utils.Sequence):
 
         # Is there any excess from the previous batch? If so, merge it first
         if(self.excess_x is not None):
-            print(f'__data_generation after stacking - x.shape = {x.shape}')
-            print(f'__data_generation after stacking - y.shape = {y.shape}')
+            print(f'__data_generation before stacking - x.shape = {x.shape}')
+            print(f'__data_generation before stacking - y.shape = {y.shape}')
 
-            x = np.stack((self.excess_x, x))
-            y = np.stack((self.excess_y, y))
+            x = stack_arrays(self.excess_x, x, 'float32')
+            y = stack_arrays(self.excess_y, y, 'int')
 
             print(f'__data_generation after stacking - self.excess_x.shape = {self.excess_x.shape}')
             print(f'__data_generation after stacking - self.excess_y.shape = {self.excess_y.shape}')
