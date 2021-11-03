@@ -1,5 +1,5 @@
 import os
-from re import X
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 # from pyedflib import EdfReader
@@ -771,22 +771,17 @@ class DataGenerator(keras.utils.Sequence):
         self.dataset_type = dataset_type
         self.split_ratio = split_ratio
         self.shuffle = shuffle
+
+        self.samples_per_file = n_samples_with_sliding_window(self.full_signal_size, self.dim, self.offset)
         self.on_epoch_end()
 
     def __len__(self):
         """
         Denotes the number of batches per epoch.
         """
-        samples_per_file = n_samples_with_sliding_window(self.full_signal_size, self.dim, self.offset)
-        n_samples = samples_per_file * len(self.tasks) * self.n_classes
+        n_samples = self.samples_per_file * len(self.tasks) * self.n_classes
 
-        ### temporario ###
-        # if (n_samples > len(self.list_IDs)):
-        #     return len(self.list_IDs)
-        return int(np.floor(len(self.list_IDs) / 10))
-        ### temporario ###
-
-        # return int(np.floor(len(self.list_IDs) / self.batch_size))
+        return math.ceil(n_samples / self.batch_size)
 
     def __getitem__(self, index):
         """
@@ -795,20 +790,60 @@ class DataGenerator(keras.utils.Sequence):
         # Generate indexes of the batch
         indexes = self.indexes[self.first_index:self.first_index + self.batch_size]
 
-        print(f'__getitem__ : index = {index}')
-        print(f'__getitem__ : self.batch_size = {self.batch_size}')
+        # print(f'__getitem__ : index = {index}')
+        # print(f'__getitem__ : self.batch_size = {self.batch_size}')
         print(f'__getitem__ : self.indexes = {self.indexes}')
         print(f'__getitem__ : indexes = {indexes}\n')
 
-        # Find list of IDs/indexes
-        list_temp = []
-        menor = 10
-        if(len(indexes) < 10):
-            menor = len(indexes)
+        # excess já tem uma batch pronta ?
+        if(self.excess_x is not None):
+            if(self.excess_x.shape[0] >= self.batch_size):
 
-        for i in range(0, menor):
-            k = indexes[i]
+                x = np.empty((self.batch_size, self.dim, self.n_channels))
+                y = np.empty((self.batch_size, self.n_classes))
+
+                aux_x = None
+                aux_y = None
+
+                if(self.excess_x.shape[0] != self.batch_size):
+                    aux_x = np.empty((self.excess_x.shape[0] - self.batch_size, self.dim, self.n_channels))
+                    aux_y = np.empty((self.excess_x.shape[0] - self.batch_size, self.n_classes))
+
+                for i in range(0, self.excess_x.shape[0]):
+                    # "transportando" a batch pronta que tá no excess
+                    if(i < self.batch_size):
+                        x[i] = self.excess_x[i]
+                        y[i] = self.excess_y[i]
+
+                    # restante do excess armazenado em aux
+                    else:
+                        aux_x[i] = self.excess_x[i]
+                        aux_y[i] = self.excess_y[i]
+                
+                self.excess_x = aux_x
+                self.excess_y = aux_y
+                self.first_index += self.batch_size # + 1
+
+                return (x, y)
+
+        # quais arquivos é pra ler nessa batch?
+
+        n_files = int(math.ceil(self.batch_size / self.samples_per_file))
+
+        first_file = 0
+        i = 0
+        while(i < self.first_index):
+            i += self.samples_per_file
+            first_file += 1
+
+        list_temp = []
+        for i in range(0, n_files):
+            k = indexes[first_file]
             list_temp.append(self.list_IDs[k])
+            first_file += 1
+    
+        if self.shuffle == True:
+            np.random.shuffle(list_temp)
 
         print(f'__getitem__ : list_temp = {list_temp}')
 
@@ -821,10 +856,16 @@ class DataGenerator(keras.utils.Sequence):
         Updates indexes after each epoch.
         """
 
-        self.first_index = 0
-        self.indexes = np.arange(len(self.list_IDs))
-        if self.shuffle == True:
-            np.random.shuffle(self.indexes)
+        self.excess_x = None         # list that will store data that exceeds batch_size
+        self.excess_y = None         # list that will store labels that exceeds batch_size
+        # self.excess_indexes = None   # list that will store the indexes of the batches stored in excess
+        self.first_index = 0         # first index avaliable
+
+        n_samples = self.samples_per_file * len(self.tasks) * self.n_classes
+
+        self.indexes = np.arange(n_samples)
+        # if self.shuffle == True:
+        #     np.random.shuffle(self.indexes)
 
     def __data_generation(self, list_IDs_temp):
         """
@@ -901,22 +942,43 @@ class DataGenerator(keras.utils.Sequence):
             x = x_data_2
             y = y_data_2
         
-        # print(f'__data_generation - x.shape = {x.shape}')
-        # print(f'__data_generation - y.shape = {y.shape}')
+        print(f'__data_generation - x.shape after cropping = {x.shape}')
+        print(f'__data_generation - y.shape after cropping = {y.shape}')
 
-        # Updating last index used
-        self.first_index = int(list_IDs_temp[-1].split("_")[2]) + 1
-        # print(f'__data_generation - self.first_index = {self.first_index}')
+        # Is there any excess from the previous batch? If so, merge it first
+        if(self.excess_x is not None):
+            x = np.stack((self.excess_x, x))
+            y = np.stack((self.excess_y, y))
+
+            print(f'__data_generation after stacking - x.shape = {x.shape}')
+            print(f'__data_generation after stacking - y.shape = {y.shape}')
+
+        # Only (batch_size, dim, n_channels) data and (batch_size, num_classes) labels are returned
+        if(x.shape[0] > self.batch_size):
+            self.excess_x = x[self.batch_size:]
+            self.excess_y = y[self.batch_size:]
+
+        x = x[:self.batch_size]
+        y = y[:self.batch_size]
+
+        print(f'__data_generation after excess - x.shape = {x.shape}')
+        print(f'__data_generation after excess - y.shape = {y.shape}')
+
+        # Updating first index avaliable
+        self.first_index += self.batch_size
+
+        # self.first_index = int(list_IDs_temp[-1].split("_")[2]) + 1
+        print(f'__data_generation - self.first_index = {self.first_index}')
 
         # temporary : no files read
-        if(x.shape[0] == 0):
-            x = np.zeros((self.batch_size, self.dim, self.n_channels))
-            y = np.zeros((self.batch_size, self.n_classes))
+        # if(x.shape[0] == 0):
+        #     x = np.zeros((self.batch_size, self.dim, self.n_channels))
+        #     y = np.zeros((self.batch_size, self.n_classes))
 
-        print(f'\n{x.shape[0]} x samples were created.')
-        print(f'{y.shape[0]} y samples were created.\n')
+        # print(f'\n{x.shape[0]} x samples were created.')
+        # print(f'{y.shape[0]} y samples were created.\n')
 
-        print(f'\n x : {x}')
-        print(f'y : {y}\n')
+        # print(f'\n x : {x}')
+        # print(f'y : {y}\n')
 
         return (x, y)
