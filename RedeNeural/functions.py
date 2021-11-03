@@ -818,6 +818,7 @@ class DataGenerator(keras.utils.Sequence):
         # excess já tem uma batch pronta ?
         if(self.excess_x is not None):
             if(self.excess_x.shape[0] >= self.batch_size):
+                print(f'self.excess_x.shape[0] = {self.excess_x.shape[0]}')
 
                 x = np.empty((self.batch_size, self.dim, self.n_channels))
                 y = np.empty((self.batch_size, self.n_classes))
@@ -832,11 +833,13 @@ class DataGenerator(keras.utils.Sequence):
                 for i in range(0, self.excess_x.shape[0]):
                     # "transportando" a batch pronta que tá no excess
                     if(i < self.batch_size):
+                        print(f'i = {i}')
                         x[i] = self.excess_x[i]
                         y[i] = self.excess_y[i]
 
                     # restante do excess armazenado em aux
                     else:
+                        print(f'i = {i}')
                         aux_x[i] = self.excess_x[i]
                         aux_y[i] = self.excess_y[i]
                 
@@ -970,11 +973,11 @@ class DataGenerator(keras.utils.Sequence):
             print(f'__data_generation before stacking - x.shape = {x.shape}')
             print(f'__data_generation before stacking - y.shape = {y.shape}')
 
-            x = stack_arrays(self.excess_x, x)
-            y = stack_arrays(self.excess_y, y)
+            x = np.vstack((self.excess_x, x))
+            y = np.vstack((self.excess_y, y))
 
-            print(f'__data_generation after stacking - self.excess_x.shape = {self.excess_x.shape}')
-            print(f'__data_generation after stacking - self.excess_y.shape = {self.excess_y.shape}')
+            print(f'__data_generation after stacking - x.shape = {x.shape}')
+            print(f'__data_generation after stacking - y.shape = {y.shape}')
 
         # Only (batch_size, dim, n_channels) data and (batch_size, num_classes) labels are returned
         if(x.shape[0] > self.batch_size):
