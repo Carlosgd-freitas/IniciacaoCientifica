@@ -740,10 +740,10 @@ def stack_arrays(array_A, array_B, array_type):
     if(array_A.ndim > 2):
         c = array_A.shape[2]
 
-    for i in range(0, len(array_A.shape[0])):
+    for i in range(0, array_A.shape[0]):
         array_C.append(array_A[i])
     
-    for i in range(0, len(array_B.shape[0])):
+    for i in range(0, array_B.shape[0]):
         array_C.append(array_B[i])
     
     array_C = np.asarray(array_C, dtype = object).astype(array_type)
