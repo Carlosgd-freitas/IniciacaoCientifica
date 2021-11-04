@@ -847,7 +847,7 @@ class DataGenerator(keras.utils.Sequence):
         # print(f'__getitem__ : self.indexes = {self.indexes}')
         print(f'\nself.dataset_type = {self.dataset_type}')
 
-        if indexes.all():
+        if len(indexes):
             print(f'indexes da vez = {indexes[0]} - {indexes[-1]}\n')
 
         # excess já tem uma batch pronta ?
