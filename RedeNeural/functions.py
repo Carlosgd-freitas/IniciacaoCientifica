@@ -1041,10 +1041,21 @@ class DataGenerator(keras.utils.Sequence):
             self.excess_x = x[self.batch_size:]
             self.excess_y = y[self.batch_size:]
 
-        x = x[:self.batch_size]
-        y = y[:self.batch_size]
+        elif(x.shape[0] < self.batch_size):
+            self.excess_x = x
+            self.excess_y = y
+
+            # Updating first index avaliable
+            self.first_index += x.shape[0]
+
+        if(x.shape[0] >= self.batch_size):
+            x = x[:self.batch_size]
+            y = y[:self.batch_size]
+
+            # Updating first index avaliable
+            self.first_index += self.batch_size
 
         # Updating first index avaliable
-        self.first_index += self.batch_size
+        # self.first_index += self.batch_size
 
         return (x, y)
