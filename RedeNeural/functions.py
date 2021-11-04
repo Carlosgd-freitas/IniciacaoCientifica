@@ -935,6 +935,8 @@ class DataGenerator(keras.utils.Sequence):
 
         if(self.dataset_type == 'train'):
             self.indexes = np.arange((aux * self.batch_size) - self.batch_size)
+        elif(self.dataset_type == 'validation'):
+            self.indexes = np.arange((aux * self.batch_size) - 2*self.batch_size)
         else:
             self.indexes = np.arange(aux * self.batch_size)
 
