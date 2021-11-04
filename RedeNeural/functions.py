@@ -644,11 +644,11 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
 
     lesser1 = len(label1)
     if(len(feature1) < len(label1)):
-        lesser1 = label1
+        lesser1 = len(feature1)
     
     lesser2 = len(label2)
     if(len(feature2) < len(label2)):
-        lesser2 = label2
+        lesser2 = len(feature2)
 
     same_list = []
     dif_list = []
@@ -930,7 +930,8 @@ class DataGenerator(keras.utils.Sequence):
 
         aux = math.floor(n_samples / self.batch_size)
 
-        self.indexes = np.arange((aux * self.batch_size) - self.batch_size)
+        # self.indexes = np.arange((aux * self.batch_size) - self.batch_size)
+        self.indexes = np.arange(aux * self.batch_size)
 
         print(f'\nself.samples_per_file = {self.samples_per_file}')
         print(f'len(self.tasks) = {len(self.tasks)}')
