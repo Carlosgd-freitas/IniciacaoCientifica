@@ -802,7 +802,7 @@ class DataGenerator(keras.utils.Sequence):
         n_samples = self.samples_per_file * len(self.tasks) * self.n_classes
         aux = math.floor(n_samples / self.batch_size)
 
-        return math.floor(aux / self.batch_size)
+        return aux * self.batch_size
         # return math.ceil(n_samples / self.batch_size)
 
     def __getitem__(self, index):
