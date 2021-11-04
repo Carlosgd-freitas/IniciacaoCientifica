@@ -130,6 +130,8 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 
 # functions.create_csv_database_from_edf('./Dataset/','./All_Channels_Yang/', num_classes, channels = all_channels_yang)
 
+print(f'\nlol : {functions.n_samples_with_sliding_window(100, 80, 5)}\n')
+
 option = 3
 while option != 0:
     option = 3

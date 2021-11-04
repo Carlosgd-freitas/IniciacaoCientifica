@@ -724,25 +724,25 @@ def n_samples_with_sliding_window(full_signal_size, window_size, offset):
 
     return n_samples
 
-def stack_arrays(array_A, array_B):
-    """
-    Auxiliar function for the __data_generation() function on the DataGenerator Class. Stacks two arrays
-    vertically: array_A on top of array_B. array_type is either 'data' or 'labels'.
-    """
-    n_dim = array_A.ndim
+# def stack_arrays(array_A, array_B):
+#     """
+#     Auxiliar function for the __data_generation() function on the DataGenerator Class. Stacks two arrays
+#     vertically: array_A on top of array_B. array_type is either 'data' or 'labels'.
+#     """
+#     n_dim = array_A.ndim
 
-    if(n_dim == 2):
-        array_C = np.empty((array_A.shape[0] + array_B.shape[0], array_A.shape[1]))
-    else:
-        array_C = np.empty((array_A.shape[0] + array_B.shape[0], array_A.shape[1], array_A.shape[2]))
+#     if(n_dim == 2):
+#         array_C = np.empty((array_A.shape[0] + array_B.shape[0], array_A.shape[1]))
+#     else:
+#         array_C = np.empty((array_A.shape[0] + array_B.shape[0], array_A.shape[1], array_A.shape[2]))
 
-    for i in range(0, array_A.shape[0]):
-        array_C[i] = array_A[i]
+#     for i in range(0, array_A.shape[0]):
+#         array_C[i] = array_A[i]
     
-    for i in range(0, array_B.shape[0]):
-        array_C[i + array_A.shape[0]] = array_B[i]
+#     for i in range(0, array_B.shape[0]):
+#         array_C[i + array_A.shape[0]] = array_B[i]
 
-    return array_C
+#     return array_C
 
 class DataGenerator(keras.utils.Sequence):
     """
@@ -813,16 +813,13 @@ class DataGenerator(keras.utils.Sequence):
 
         # print(f'__getitem__ : index = {index}')
         # print(f'__getitem__ : self.batch_size = {self.batch_size}')
-        print(f'__getitem__ : self.indexes = {self.indexes}')
-        print(f'__getitem__ : indexes = {indexes}\n')
+        # print(f'__getitem__ : self.indexes = {self.indexes}')
+        print(f'indexes da vez = {indexes}')
 
         # excess já tem uma batch pronta ?
         if(self.excess_x is not None):
-            print(f'__getitem__ : self.excess_x.shape = {self.excess_x.shape}\n')
-
             if(self.excess_x.shape[0] >= self.batch_size):
-
-                print('pegou um batch pronto.')
+                print(f'por excesso: excess_x era {self.excess_x.shape} - ', end='') #####
 
                 x = np.empty((self.batch_size, self.dim, self.n_channels))
                 y = np.empty((self.batch_size, self.n_classes))
@@ -849,6 +846,8 @@ class DataGenerator(keras.utils.Sequence):
                 self.excess_y = aux_y
                 self.first_index += self.batch_size # + 1
 
+                print(f'excess_x ficou {self.excess_x.shape} - x tem tamanho {x.shape} -') #####
+
                 return (x, y)
 
         # quais arquivos é pra ler nessa batch?
@@ -870,9 +869,19 @@ class DataGenerator(keras.utils.Sequence):
         if self.shuffle == True:
             np.random.shuffle(list_temp)
 
-        print(f'__getitem__ : list_temp = {list_temp}')
+        print(f'por arquivo: arquivo eh {list_temp} - ', end='') #####
 
         (x, y) = self.__data_generation(list_temp)
+
+        #########################################################
+        print(f'x tem tamanho {x.shape} - ', end='') #
+        if(self.excess_x == None):
+            print('sem excesso.\n')
+        else:
+            print(f'excess_x tem tamanho {self.excess_x.shape}')
+        
+        print('\n')
+        #########################################################
 
         return (x, y)
 
@@ -980,7 +989,5 @@ class DataGenerator(keras.utils.Sequence):
 
         # Updating first index avaliable
         self.first_index += self.batch_size
-
-        print(f'__data_generation - self.first_index = {self.first_index}') # 
 
         return (x, y)
