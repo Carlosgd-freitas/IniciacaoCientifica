@@ -72,6 +72,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # - Data Generator começa a carregar os batches pro fit a partir do 4o batch, aí fica faltando 3 batches do início.
 #   Na segunda época, isso acontece a partir do 3o batch.
 #   Solução temporária: variável lag_counter.
+# - Quando os dados de tamanho batch_size acabam, pode alimentar a rede com dados de tamanhos menores?
 ##############################################
 
 # Tasks:

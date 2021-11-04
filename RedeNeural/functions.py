@@ -642,10 +642,18 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
     print(f'len(label1) = {len(label1)}')
     print(f'len(feature1) = {len(feature1)}')
 
+    lesser1 = len(label1)
+    if(len(feature1) < len(label1)):
+        lesser1 = label1
+    
+    lesser2 = len(label2)
+    if(len(feature2) < len(label2)):
+        lesser2 = label2
+
     same_list = []
     dif_list = []
-    for row in range(len(label1)):
-        for col in range(row+1, len(label2)):
+    for row in range(lesser1):
+        for col in range(row+1, lesser2):
             if (label1[row] == label2[col]):
                 same_list.append(dist[row, col])
             else:
@@ -919,11 +927,17 @@ class DataGenerator(keras.utils.Sequence):
         self.first_index = 0         # first index avaliable
 
         n_samples = self.samples_per_file * len(self.tasks) * self.n_classes
+
         aux = math.floor(n_samples / self.batch_size)
 
         self.indexes = np.arange((aux * self.batch_size) - self.batch_size)
 
-        print(f'\nself.indexes = {self.indexes}')
+        print(f'\nself.samples_per_file = {self.samples_per_file}')
+        print(f'len(self.tasks) = {len(self.tasks)}')
+        print(f'self.n_classes = {self.n_classes}')
+        print(f'n_samples = {n_samples}')
+        print(f'aux = {aux}')
+        print(f'self.indexes = {self.indexes}')
 
         # if self.shuffle == True:
         #     np.random.shuffle(self.indexes)
