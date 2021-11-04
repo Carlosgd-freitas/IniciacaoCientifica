@@ -898,7 +898,7 @@ class DataGenerator(keras.utils.Sequence):
 
         list_temp = []
         for i in range(0, n_files):
-            if(first_file > len(self.tasks) * self.n_classes):
+            if(first_file >= len(self.tasks) * self.n_classes):
                 first_file = 0
 
             # k = indexes[first_file]
