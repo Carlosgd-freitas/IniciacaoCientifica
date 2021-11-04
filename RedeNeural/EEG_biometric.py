@@ -60,12 +60,6 @@ motor_cortex_yang = ['C1..', 'Cz..', 'C2..']
 occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
 
-#################### TODO ####################
-# - Consertar a opção 5 (identification mode)
-#   - alternativa: no penúltimo batch, olhar se n tem nenhum file na list_IDs "sobrando" e se n dá pra catar
-#     batch_size samples do excess. Alterar diretamente os indexes de acordo.
-#
-# - Rodar a opção 6 primeiro (verification mode), se der errado, fazer ela funcionar
 #################### Conversar com o Pedro ####################
 # - Já que tanto no 'crop_only' quanto no 'process_data' eu tenho que ler os dados de um .csv, é melhor
 #   salvar os dados já preprocessados, ou seja, não existe necessidade da fazer o 'process_data' DataGenerator.
