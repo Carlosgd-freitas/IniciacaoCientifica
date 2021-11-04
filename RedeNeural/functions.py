@@ -819,7 +819,7 @@ class DataGenerator(keras.utils.Sequence):
         # excess já tem uma batch pronta ?
         if(self.excess_x is not None):
             if(self.excess_x.shape[0] >= self.batch_size):
-                print(f'por excesso: excess_x era {self.excess_x.shape} - ', end='') #####
+                print(f'\npor excesso: excess_x era {self.excess_x.shape} - ', end='') #####
 
                 x = np.empty((self.batch_size, self.dim, self.n_channels))
                 y = np.empty((self.batch_size, self.n_classes))
@@ -848,9 +848,9 @@ class DataGenerator(keras.utils.Sequence):
 
                 ###################################
                 if(self.excess_x is not None):
-                    print(f'excess_x ficou {self.excess_x.shape} - x tem tamanho {x.shape} -') 
+                    print(f'excess_x ficou {self.excess_x.shape} - x tem tamanho {x.shape}\n') 
                 else:
-                    print(f'sem excesso - x tem tamanho {x.shape} -')
+                    print(f'sem excesso - x tem tamanho {x.shape}\n')
                 ###################################
 
                 return (x, y)
@@ -884,8 +884,6 @@ class DataGenerator(keras.utils.Sequence):
             print(f'excess_x tem tamanho {self.excess_x.shape}')
         else:
             print('sem excesso.\n')
-        
-        print('\n')
         #########################################################
 
         return (x, y)
@@ -978,6 +976,8 @@ class DataGenerator(keras.utils.Sequence):
 
             x = x_data_2
             y = y_data_2
+        
+        print(f'samples produzidas no cropping {x.shape} - ', end='') #####
 
         # Is there any excess from the previous batch? If so, merge it first
         if(self.excess_x is not None):
