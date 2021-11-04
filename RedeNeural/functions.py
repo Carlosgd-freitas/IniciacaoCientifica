@@ -930,8 +930,10 @@ class DataGenerator(keras.utils.Sequence):
 
         aux = math.floor(n_samples / self.batch_size)
 
-        # self.indexes = np.arange((aux * self.batch_size) - self.batch_size)
-        self.indexes = np.arange(aux * self.batch_size)
+        if(self.dataset_type == 'train' or self.dataset_type == 'validation'):
+            self.indexes = np.arange((aux * self.batch_size) - self.batch_size)
+        else:
+            self.indexes = np.arange(aux * self.batch_size)
 
         # print(f'\nself.samples_per_file = {self.samples_per_file}')
         # print(f'len(self.tasks) = {len(self.tasks)}')

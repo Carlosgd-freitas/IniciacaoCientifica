@@ -18,7 +18,7 @@ tf.random.set_seed(1051)
 
 # Hyperparameters
 batch_size = 100                # Batch Size
-training_epochs = 2 #40            # Total number of training epochs
+training_epochs = 10 #40        # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
@@ -60,6 +60,7 @@ motor_cortex_yang = ['C1..', 'Cz..', 'C2..']
 occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
 
+# RODAR A OPÇÃO 5
 #################### Conversar com o Pedro ####################
 # - Já que tanto no 'crop_only' quanto no 'process_data' eu tenho que ler os dados de um .csv, é melhor
 #   salvar os dados já preprocessados, ou seja, não existe necessidade da fazer o 'process_data' DataGenerator.
