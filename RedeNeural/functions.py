@@ -812,9 +812,12 @@ class DataGenerator(keras.utils.Sequence):
         Generate one batch of data.
         """
 
+        # First three batches generated are ignored by model.fit, god knows why
         if(self.lag_counter < 3):
+            x = np.zeros((self.batch_size, self.dim, self.n_channels))
+            y = np.zeros((self.batch_size, self.n_classes))
             self.lag_counter += 1
-            return (None, None)
+            return (x, y)
 
         # Generate indexes of the batch
         indexes = self.indexes[self.first_index:self.first_index + self.batch_size]
