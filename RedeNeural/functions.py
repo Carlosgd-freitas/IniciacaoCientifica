@@ -793,21 +793,9 @@ class DataGenerator(keras.utils.Sequence):
         self.split_ratio = split_ratio
         self.shuffle = shuffle
 
+        self.lag_counter = 0
         self.samples_per_file = n_samples_with_sliding_window(self.full_signal_size, self.dim, self.offset)
-        
-        # self.on_epoch_end()
-        self.excess_x = None         # list that will store data that exceeds batch_size
-        self.excess_y = None         # list that will store labels that exceeds batch_size
-        self.first_index = 0         # first index avaliable
-
-        n_samples = self.samples_per_file * len(self.tasks) * self.n_classes
-        aux = math.floor(n_samples / self.batch_size)
-
-        self.indexes = np.arange((aux * self.batch_size) - self.batch_size)
-
-        print(f'\nself.indexes = {self.indexes}')
-
-        time.sleep(10)               # waiting for the system to load packages, etc.
+        self.on_epoch_end()
 
     def __len__(self):
         """
@@ -823,6 +811,11 @@ class DataGenerator(keras.utils.Sequence):
         """
         Generate one batch of data.
         """
+
+        if(self.lag_counter < 3):
+            self.lag_counter += 1
+            return (None, None)
+
         # Generate indexes of the batch
         indexes = self.indexes[self.first_index:self.first_index + self.batch_size]
 

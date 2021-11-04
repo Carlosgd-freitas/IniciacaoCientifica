@@ -70,6 +70,8 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 #################### Conversar com o Pedro ####################
 # - Já que tanto no 'crop_only' quanto no 'process_data' eu tenho que ler os dados de um .csv, é melhor
 #   salvar os dados já preprocessados, ou seja, não existe necessidade da fazer o 'process_data' DataGenerator.
+# - Data Generator começa a carregar os batches pro fit a partir do 4o batch, aí fica faltando 3 batches do início.
+#   Solução temporária: variável lag_counter.
 ##############################################
 
 # Tasks:
@@ -453,11 +455,11 @@ while option != 0:
 
         fit_begin = time.time()
 
-        callback = LearningRateScheduler(models.scheduler, verbose=0)
+        lr_scheduler = LearningRateScheduler(models.scheduler, verbose=0)
         results = model.fit(training_generator,
                             validation_data=validation_generator,
                             epochs = training_epochs,
-                            callbacks = [callback],
+                            callbacks = [lr_scheduler],
                             )
         # results = model.fit_generator(generator = training_generator,
         #                     validation_data = validation_generator,
