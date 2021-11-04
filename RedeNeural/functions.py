@@ -875,10 +875,10 @@ class DataGenerator(keras.utils.Sequence):
 
         #########################################################
         print(f'x tem tamanho {x.shape} - ', end='') #
-        if(self.excess_x == None):
-            print('sem excesso.\n')
-        else:
+        if(self.excess_x is not None):
             print(f'excess_x tem tamanho {self.excess_x.shape}')
+        else:
+            print('sem excesso.\n')
         
         print('\n')
         #########################################################
