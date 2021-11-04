@@ -454,11 +454,16 @@ while option != 0:
         fit_begin = time.time()
 
         callback = LearningRateScheduler(models.scheduler, verbose=0)
-        results = model.fit_generator(generator = training_generator,
-                            validation_data = validation_generator,
+        results = model.fit(training_generator,
+                            validation_data=validation_generator,
                             epochs = training_epochs,
                             callbacks = [callback],
                             )
+        # results = model.fit_generator(generator = training_generator,
+        #                     validation_data = validation_generator,
+        #                     epochs = training_epochs,
+        #                     callbacks = [callback],
+        #                     )
 
         fit_end = time.time()
         print(f'Training time in seconds: {fit_end - fit_begin}')
