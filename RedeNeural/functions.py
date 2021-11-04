@@ -1,4 +1,5 @@
 import os
+import time
 import math
 import numpy as np
 import matplotlib.pyplot as plt
@@ -805,6 +806,8 @@ class DataGenerator(keras.utils.Sequence):
         self.indexes = np.arange((aux * self.batch_size) - self.batch_size)
 
         print(f'\nself.indexes = {self.indexes}')
+
+        time.sleep(10)               # waiting for the system to load packages, etc.
 
     def __len__(self):
         """
