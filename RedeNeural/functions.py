@@ -445,7 +445,9 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
             return x_data, y_data
         
         while i <= content.shape[1]:
-            if(mode != 'first_data_only'):
+            print(f'i = {i}')
+            
+            if(mode != 'second_data_only'):
                 if(mode != 'labels_only'):
                     arr = content[: , (i-window_size):i]
                     x_data_2.append(arr)
@@ -899,6 +901,8 @@ class DataGenerator(keras.utils.Sequence):
 
         list_temp = []
         for i in range(0, n_files):
+            print(f'first_file = {first_file}')
+
             # k = indexes[first_file]
             list_temp.append(self.list_IDs[first_file])
             first_file += 1
@@ -935,8 +939,6 @@ class DataGenerator(keras.utils.Sequence):
 
         if(self.dataset_type == 'train'):
             self.indexes = np.arange((aux * self.batch_size) - self.batch_size)
-        elif(self.dataset_type == 'validation'):
-            self.indexes = np.arange((aux * self.batch_size) - 2*self.batch_size)
         else:
             self.indexes = np.arange(aux * self.batch_size)
 
