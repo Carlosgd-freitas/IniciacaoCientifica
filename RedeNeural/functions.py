@@ -814,7 +814,7 @@ class DataGenerator(keras.utils.Sequence):
         # print(f'__getitem__ : index = {index}')
         # print(f'__getitem__ : self.batch_size = {self.batch_size}')
         # print(f'__getitem__ : self.indexes = {self.indexes}')
-        print(f'indexes da vez = {indexes}')
+        print(f'\nindexes da vez = {indexes}')
 
         # excess já tem uma batch pronta ?
         if(self.excess_x is not None):
@@ -846,7 +846,12 @@ class DataGenerator(keras.utils.Sequence):
                 self.excess_y = aux_y
                 self.first_index += self.batch_size # + 1
 
-                print(f'excess_x ficou {self.excess_x.shape} - x tem tamanho {x.shape} -') #####
+                ###################################
+                if(self.excess_x is not None):
+                    print(f'excess_x ficou {self.excess_x.shape} - x tem tamanho {x.shape} -') 
+                else:
+                    print(f'sem excesso - x tem tamanho {x.shape} -')
+                ###################################
 
                 return (x, y)
 
