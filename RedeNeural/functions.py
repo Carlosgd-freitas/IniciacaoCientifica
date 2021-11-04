@@ -446,8 +446,6 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
         
         while i <= content.shape[1]:
             if(mode != 'first_data_only'):
-                print(f'i = {i}')
-
                 if(mode != 'labels_only'):
                     arr = content[: , (i-window_size):i]
                     x_data_2.append(arr)
@@ -713,17 +711,17 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
 
     return d, eer, thresholds
 
-def n_samples_with_sliding_window(full_signal_size, window_size, offset):
+def n_samples_with_sliding_window(full_signal_size, start, offset):
     """
     Returns the number of samples in a signal, generated after applying a sliding window.
 
     Parameters:
         - full_signal_size: full size of the signal;
-        - window_size: size of the sliding window;
+        - start: sliding window position after the first cropping;
         - offset: amount of samples the window will slide in each iteration.
     """
     n_samples = 1
-    i = window_size
+    i = start
 
     if(offset == 0):
         print('ERROR: An offset equal to 0 would result in "infinite" equal windows.')
@@ -805,15 +803,14 @@ class DataGenerator(keras.utils.Sequence):
 
         # self.lag_counter = 0
 
-        aux = math.floor(n_samples_with_sliding_window(self.full_signal_size, self.dim, self.offset))
-        aux_2 = math.floor(n_samples_with_sliding_window(self.full_signal_size * self.split_ratio, self.dim, self.offset))
-
         if(self.dataset_type == 'train'):
-            self.samples_per_file = aux_2 
+            self.samples_per_file = math.floor(n_samples_with_sliding_window(self.full_signal_size * self.split_ratio, self.dim, self.offset))
         elif(self.dataset_type == 'validation'):
-            self.samples_per_file = aux - aux_2
+            self.samples_per_file = math.floor(n_samples_with_sliding_window(self.full_signal_size, (full_signal_size * self.split_ratio) + self.offset, self.offset))
         elif(self.dataset_type == 'test'):
-            self.samples_per_file = aux
+            self.samples_per_file = math.floor(n_samples_with_sliding_window(self.full_signal_size, self.dim, self.offset))
+
+        print(f'{self.dataset_type}, self.samples_per_file = {self.samples_per_file}')
 
         self.on_epoch_end()
 
@@ -901,7 +898,8 @@ class DataGenerator(keras.utils.Sequence):
 
         list_temp = []
         for i in range(0, n_files):
-            print(f'first_file = {first_file}')
+            if(first_file > len(self.tasks) * self.n_classes):
+                first_file = 0
 
             # k = indexes[first_file]
             list_temp.append(self.list_IDs[first_file])
