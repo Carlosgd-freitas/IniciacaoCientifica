@@ -62,7 +62,6 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 
 #################### TODO ####################
 # - Consertar a opção 5 (identification mode)
-#   - rever: self.indexes = np.arange(n_samples)
 #   - alternativa: no penúltimo batch, olhar se n tem nenhum file na list_IDs "sobrando" e se n dá pra catar
 #     batch_size samples do excess. Alterar diretamente os indexes de acordo.
 #
@@ -71,6 +70,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # - Já que tanto no 'crop_only' quanto no 'process_data' eu tenho que ler os dados de um .csv, é melhor
 #   salvar os dados já preprocessados, ou seja, não existe necessidade da fazer o 'process_data' DataGenerator.
 # - Data Generator começa a carregar os batches pro fit a partir do 4o batch, aí fica faltando 3 batches do início.
+#   Na segunda época, isso acontece a partir do 3o batch.
 #   Solução temporária: variável lag_counter.
 ##############################################
 
@@ -131,10 +131,6 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 #                                          2 min for training ; 3,53 seconds for testing
 
 # functions.create_csv_database_from_edf('./Dataset/','./All_Channels_Yang/', num_classes, channels = all_channels_yang)
-
-print(f'coe : {functions.n_samples_with_sliding_window(9600, 1920, 35)}')
-print(f'coe 2: {functions.n_samples_with_sliding_window(8640, 1920, 35)}')
-print(f'coe 3: {functions.n_samples_with_sliding_window(960, 1920, 35)}')
 
 option = 3
 while option != 0:

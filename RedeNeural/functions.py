@@ -795,15 +795,15 @@ class DataGenerator(keras.utils.Sequence):
 
         # self.lag_counter = 0
 
+        aux = math.floor(n_samples_with_sliding_window(self.full_signal_size, self.dim, self.offset))
+        aux_2 = math.floor(n_samples_with_sliding_window(self.full_signal_size * self.split_ratio, self.dim, self.offset))
+
         if(self.dataset_type == 'train'):
-            aux = self.full_signal_size * self.split_ratio
-        if(self.dataset_type == 'validation'):
-            aux = self.full_signal_size * (1 - self.split_ratio)
-        if(self.dataset_type == 'test'):
-            aux = self.full_signal_size
-
-        self.samples_per_file = n_samples_with_sliding_window(aux, self.dim, self.offset)
-
+            self.samples_per_file = aux_2
+        elif(self.dataset_type == 'validation'):
+            self.samples_per_file = aux - aux_2
+        elif(self.dataset_type == 'test'):
+            self.samples_per_file = aux
 
         self.on_epoch_end()
 
@@ -822,7 +822,7 @@ class DataGenerator(keras.utils.Sequence):
         Generate one batch of data.
         """
 
-        # First three batches generated are ignored by model.fit, god knows why
+        # First three batches generated are ignored by model.fit
         # if(self.lag_counter < 3):
         #     x = np.zeros((self.batch_size, self.dim, self.n_channels))
         #     y = np.zeros((self.batch_size, self.n_classes))
