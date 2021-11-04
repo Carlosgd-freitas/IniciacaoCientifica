@@ -793,8 +793,18 @@ class DataGenerator(keras.utils.Sequence):
         self.split_ratio = split_ratio
         self.shuffle = shuffle
 
-        self.lag_counter = 0
-        self.samples_per_file = n_samples_with_sliding_window(self.full_signal_size, self.dim, self.offset)
+        # self.lag_counter = 0
+
+        if(self.dataset_type == 'train'):
+            aux = self.full_signal_size * self.split_ratio
+        if(self.dataset_type == 'validation'):
+            aux = self.full_signal_size * (1 - self.split_ratio)
+        if(self.dataset_type == 'test'):
+            aux = self.full_signal_size
+
+        self.samples_per_file = n_samples_with_sliding_window(aux, self.dim, self.offset)
+
+
         self.on_epoch_end()
 
     def __len__(self):
@@ -813,11 +823,11 @@ class DataGenerator(keras.utils.Sequence):
         """
 
         # First three batches generated are ignored by model.fit, god knows why
-        if(self.lag_counter < 3):
-            x = np.zeros((self.batch_size, self.dim, self.n_channels))
-            y = np.zeros((self.batch_size, self.n_classes))
-            self.lag_counter += 1
-            return (x, y)
+        # if(self.lag_counter < 3):
+        #     x = np.zeros((self.batch_size, self.dim, self.n_channels))
+        #     y = np.zeros((self.batch_size, self.n_classes))
+        #     self.lag_counter += 1
+        #     return (x, y)
 
         # Generate indexes of the batch
         indexes = self.indexes[self.first_index:self.first_index + self.batch_size]
