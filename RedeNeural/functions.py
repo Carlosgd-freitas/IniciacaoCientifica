@@ -430,13 +430,14 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
     else:
         i = window_size
         while i <= content.shape[1] * split_ratio:
-            if(mode != 'labels_only'):
-                arr = content[: , (i-window_size):i]
-                x_data.append(arr)
+            if(mode != 'second_data_only'):
+                if(mode != 'labels_only'):
+                    arr = content[: , (i-window_size):i]
+                    x_data.append(arr)
 
-            arr2 = np.zeros((1,num_classes))
-            arr2[0, num_subject] = 1
-            y_data.append(arr2)
+                arr2 = np.zeros((1,num_classes))
+                arr2[0, num_subject] = 1
+                y_data.append(arr2)
 
             i += offset
 
@@ -444,13 +445,14 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
             return x_data, y_data
         
         while i <= content.shape[1]:
-            if(mode != 'labels_only'):
-                arr = content[: , (i-window_size):i]
-                x_data_2.append(arr)
+            if(mode != 'first_data_only'):
+                if(mode != 'labels_only'):
+                    arr = content[: , (i-window_size):i]
+                    x_data_2.append(arr)
 
-            arr2 = np.zeros((1,num_classes))
-            arr2[0, num_subject] = 1
-            y_data_2.append(arr2)
+                arr2 = np.zeros((1,num_classes))
+                arr2[0, num_subject] = 1
+                y_data_2.append(arr2)
 
             i += offset
 
@@ -843,7 +845,8 @@ class DataGenerator(keras.utils.Sequence):
         # print(f'__getitem__ : index = {index}')
         # print(f'__getitem__ : self.batch_size = {self.batch_size}')
         # print(f'__getitem__ : self.indexes = {self.indexes}')
-        print(f'\nindexes da vez = {indexes}')
+        print(f'self.dataset_type = {self.dataset_type}')
+        print(f'indexes da vez = {indexes[0]} - {indexes[-1]}\n')
 
         # excess já tem uma batch pronta ?
         if(self.excess_x is not None):
@@ -978,12 +981,20 @@ class DataGenerator(keras.utils.Sequence):
         y_dataL = list()
         y_dataL_2 = list()
 
-        if(self.dataset_type == 'train' or self.dataset_type == 'validation'):
+        if(self.dataset_type == 'train'):
             pos = 0
             for data in temp_x:
                 x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, data, self.dim,
                                                         self.offset, subjects[pos], self.n_classes,
-                                                        self.split_ratio, x_dataL_2, y_dataL_2)
+                                                        self.split_ratio, x_dataL_2, y_dataL_2, 'first_data_only')
+                pos += 1
+        
+        elif(self.dataset_type == 'validation'):
+            pos = 0
+            for data in temp_x:
+                x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, data, self.dim,
+                                                        self.offset, subjects[pos], self.n_classes,
+                                                        self.split_ratio, x_dataL_2, y_dataL_2, 'second_data_only')
                 pos += 1
 
         elif(self.dataset_type == 'test'):
