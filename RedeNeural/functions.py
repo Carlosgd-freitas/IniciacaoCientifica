@@ -445,9 +445,9 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
             return x_data, y_data
         
         while i <= content.shape[1]:
-            print(f'i = {i}')
-            
-            if(mode != 'second_data_only'):
+            if(mode != 'first_data_only'):
+                print(f'i = {i}')
+
                 if(mode != 'labels_only'):
                     arr = content[: , (i-window_size):i]
                     x_data_2.append(arr)
