@@ -718,7 +718,7 @@ def n_samples_with_sliding_window(full_signal_size, window_size, offset):
         print('ERROR: An offset equal to 0 would result in "infinite" equal windows.')
         return 0
 
-    while(i <= full_signal_size):
+    while(i < full_signal_size):
         n_samples += 1
         i += offset
 
