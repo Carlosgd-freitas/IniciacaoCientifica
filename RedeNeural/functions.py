@@ -806,12 +806,10 @@ class DataGenerator(keras.utils.Sequence):
         aux = math.floor(n_samples_with_sliding_window(self.full_signal_size, self.dim, self.offset))
         aux_2 = math.floor(n_samples_with_sliding_window(self.full_signal_size * self.split_ratio, self.dim, self.offset))
 
-        # real amount of samples per file in a validation scenario:
-        # self.samples_per_file = aux - aux_2
-        # the amount was set to another value to adequate to the logic of the DataGenerator
-
-        if(self.dataset_type == 'train' or self.dataset_type == 'validation'):
+        if(self.dataset_type == 'train'):
             self.samples_per_file = aux_2 
+        elif(self.dataset_type == 'validation'):
+            self.samples_per_file = aux - aux_2
         elif(self.dataset_type == 'test'):
             self.samples_per_file = aux
 
@@ -935,7 +933,7 @@ class DataGenerator(keras.utils.Sequence):
 
         aux = math.floor(n_samples / self.batch_size)
 
-        if(self.dataset_type == 'train' or self.dataset_type == 'validation'):
+        if(self.dataset_type == 'train'):
             self.indexes = np.arange((aux * self.batch_size) - self.batch_size)
         else:
             self.indexes = np.arange(aux * self.batch_size)
@@ -1031,7 +1029,7 @@ class DataGenerator(keras.utils.Sequence):
             x = x_data_2
             y = y_data_2
         
-        # print(f'samples produzidas no cropping {x.shape} - ', end='') #####
+        print(f'samples produzidas no cropping {x.shape}\n') #####
 
         # Is there any excess from the previous batch? If so, merge it first
         if(self.excess_x is not None):
