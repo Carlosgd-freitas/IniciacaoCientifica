@@ -881,12 +881,15 @@ class DataGenerator(keras.utils.Sequence):
                 subject = self.subjects[file_index]
 
                 label = np.zeros((1, self.n_classes))
-                label[0, subject] = 1
+                label[0, subject-1] = 1
 
                 y[i] = label
 
                 print(f'subject = {subject}')
 
+                print(f'label.shape = {label.shape}')
+                print(f'label = {label}')
+                
                 print(f'y[i].shape = {y[i].shape}')
                 print(f'y[i] = {y[i]}')
 
@@ -919,7 +922,7 @@ class DataGenerator(keras.utils.Sequence):
                 subject = self.subjects[file_index]
 
                 label = np.zeros((1, self.n_classes))
-                label[0, subject] = 1
+                label[0, subject-1] = 1
 
                 y.append(label)
 
