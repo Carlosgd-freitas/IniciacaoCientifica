@@ -871,7 +871,7 @@ class DataGenerator(keras.utils.Sequence):
                 file_index = crop_positions[i][0]
                 crop_end = crop_positions[i][1]
 
-                x[i] = self.list_files[file_index][(crop_end-self.dim):crop_end]
+                x[i] = self.data[file_index][(crop_end-self.dim):crop_end]
 
                 print(f'x[i].shape = {x[i].shape}')
                 print(f'x[i] = {x[i]}')
@@ -907,7 +907,7 @@ class DataGenerator(keras.utils.Sequence):
             for i in range(0, 100):
                 file_index = crop_positions[i][0]
                 crop_end = crop_positions[i][1]
-                sample = self.list_files[file_index][(crop_end-self.dim):crop_end]
+                sample = self.data[file_index][(crop_end-self.dim):crop_end]
 
                 x.append(sample)
 
