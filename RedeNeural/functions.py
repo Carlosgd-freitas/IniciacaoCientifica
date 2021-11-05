@@ -829,7 +829,7 @@ class DataGenerator(keras.utils.Sequence):
         elif(self.dataset_type == 'validation'):
             signal_index = 0
             while(signal_index < data.shape[0]):
-                i = data[0].shape[0] * self.split_ratio
+                i = math.floor(data[0].shape[0] * self.split_ratio) + self.offset
 
                 while(i <= data[0].shape[0]):
                     one_crop_position = (signal_index, i)
