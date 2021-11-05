@@ -737,13 +737,13 @@ class DataGenerator(keras.utils.Sequence):
     """
     Generates data for the model on the fly, using a sliding window for data augmentation.
     """
-    def __init__(self, list_IDs, batch_size, dim, offset, full_signal_size, n_channels,
+    def __init__(self, list_files, batch_size, dim, offset, full_signal_size, n_channels,
                 n_classes, tasks, dataset_type, split_ratio, shuffle=False):
         """
         Initialization function of the class.
         
         Parameters:
-            - list_IDs: a list of csv file names, in which the preprocessed data are stored;
+            - list_files: a list of csv file names, in which the preprocessed data are stored;
             - batch_size: while training, the processed data will be split into groups of shape
             (batch_size, dim, n_channels), which will be fed into the model;
             - dim: size of the sliding window;
@@ -761,7 +761,8 @@ class DataGenerator(keras.utils.Sequence):
             - shuffle: if the data being fed into the model will be shuffled or not at each epoch. Default value is
             False.
         """
-        self.list_IDs = list_IDs
+        # Intializing variables
+        self.list_files = list_files
         self.batch_size = batch_size
         self.dim = dim
         self.offset = offset
@@ -773,8 +774,7 @@ class DataGenerator(keras.utils.Sequence):
         self.split_ratio = split_ratio
         self.shuffle = shuffle
 
-        # self.lag_counter = 0
-
+        # Calculating the number of samples per file
         if(self.dataset_type == 'train'):
             self.samples_per_file = math.floor(n_samples_with_sliding_window(self.full_signal_size * self.split_ratio, self.dim, self.offset))
         elif(self.dataset_type == 'validation'):
@@ -783,6 +783,63 @@ class DataGenerator(keras.utils.Sequence):
             self.samples_per_file = math.floor(n_samples_with_sliding_window(self.full_signal_size, self.dim, self.offset))
 
         print(f'{self.dataset_type}, self.samples_per_file = {self.samples_per_file}')
+
+        # Loading all files from list_files
+        data = []
+        subjects = []
+
+        for i, ID in enumerate(list_files):
+            if(self.dataset_type == 'train' or self.dataset_type == 'validation'):
+                file_x = np.loadtxt('processed_train_data/' + list_files[i], delimiter=';', usecols=range(self.n_channels))
+                string = 'processed_train_data/' + list_files[i]
+
+            elif(self.dataset_type == 'test'):
+                file_x = np.loadtxt('processed_test_data/' + list_files[i], delimiter=';', usecols=range(self.n_channels))
+                string = 'processed_test_data/' + list_files[i]
+
+            file_x = np.asarray(file_x, dtype = object).astype('float32')
+            data.append(file_x)
+
+            string = string.split("_subject_")[1]      # 'X.csv'
+            subject = int(string.split(".csv")[0])     # X
+            subjects.append(subject)
+        data = np.asarray(data, dtype = object).astype('float32')
+        
+        print(f'len(self.list_files) = {len(self.list_files)}')
+        print(f'data.shape = {data.shape}')
+        print(f'subjects = {subjects}')
+
+        # Storing the information of all cropping that will be done in the EEG signals
+        crop_positions = []
+
+        if(self.dataset_type == 'train' or self.dataset_type == 'test'):
+
+            for signal in len(data.shape[0]):
+                i = self.dim
+
+                while(i <= data[0].shape[0] * self.split_ratio):
+                    one_crop_position = (signal, i)
+                    crop_positions.append(one_crop_position)
+
+                    i += self.offset
+
+        elif(self.dataset_type == 'validation'):
+            for signal in len(data.shape[0]):
+                i = data[0].shape[0] * self.split_ratio
+
+                while(i <= data[0].shape[0]):
+                    one_crop_position = (signal, i)
+                    crop_positions.append(one_crop_position)
+
+                    i += self.offset
+
+        print(f'crop_positions = {crop_positions}')
+
+        # arr = content[: , (i-window_size):i]
+        # i = window_size
+        # while i <= content.shape[1] * split_ratio:
+
+        input('quitaste?')
 
         self.on_epoch_end()
 
@@ -874,7 +931,7 @@ class DataGenerator(keras.utils.Sequence):
                 first_file = 0
 
             # k = indexes[first_file]
-            list_temp.append(self.list_IDs[first_file])
+            list_temp.append(self.list_files[first_file])
             first_file += 1
     
         if self.shuffle == True:
@@ -922,7 +979,7 @@ class DataGenerator(keras.utils.Sequence):
         # if self.shuffle == True:
         #     np.random.shuffle(self.indexes)
 
-    def __data_generation(self, list_IDs_temp):
+    def __data_generation(self, list_files_temp):
         """
         Generates data containing batch_size samples.
         """
@@ -932,14 +989,14 @@ class DataGenerator(keras.utils.Sequence):
         subjects = []
 
         # Loading data from .csv files ('crop_only' DataGenerator)
-        for i, ID in enumerate(list_IDs_temp):
+        for i, ID in enumerate(list_files_temp):
             if(self.dataset_type == 'train' or self.dataset_type == 'validation'):
-                file_x = np.loadtxt('processed_train_data/' + list_IDs_temp[i], delimiter=';', usecols=range(self.n_channels))
-                string = 'processed_train_data/' + list_IDs_temp[i]
+                file_x = np.loadtxt('processed_train_data/' + list_files_temp[i], delimiter=';', usecols=range(self.n_channels))
+                string = 'processed_train_data/' + list_files_temp[i]
 
             elif(self.dataset_type == 'test'):
-                file_x = np.loadtxt('processed_test_data/' + list_IDs_temp[i], delimiter=';', usecols=range(self.n_channels))
-                string = 'processed_test_data/' + list_IDs_temp[i]
+                file_x = np.loadtxt('processed_test_data/' + list_files_temp[i], delimiter=';', usecols=range(self.n_channels))
+                string = 'processed_test_data/' + list_files_temp[i]
 
             file_x = np.asarray(file_x, dtype = object).astype('float32')
             file_x = file_x.T
