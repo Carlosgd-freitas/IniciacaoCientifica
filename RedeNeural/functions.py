@@ -813,8 +813,8 @@ class DataGenerator(keras.utils.Sequence):
         crop_positions = []
 
         if(self.dataset_type == 'train' or self.dataset_type == 'test'):
-
-            for signal_index, signal in enumerate(data.shape[0]):
+            signal_index = 0
+            while(signal_index < data.shape[0]):
                 i = self.dim
 
                 while(i <= data[0].shape[0] * self.split_ratio):
@@ -822,9 +822,12 @@ class DataGenerator(keras.utils.Sequence):
                     crop_positions.append(one_crop_position)
 
                     i += self.offset
+                
+                signal_index += 1
 
         elif(self.dataset_type == 'validation'):
-            for signal_index, signal in enumerate(data.shape[0]):
+            signal_index = 0
+            while(signal_index < data.shape[0]):
                 i = data[0].shape[0] * self.split_ratio
 
                 while(i <= data[0].shape[0]):
@@ -832,6 +835,8 @@ class DataGenerator(keras.utils.Sequence):
                     crop_positions.append(one_crop_position)
 
                     i += self.offset
+                    
+                signal_index += 1
 
         print(f'crop_positions = {crop_positions}')
 
