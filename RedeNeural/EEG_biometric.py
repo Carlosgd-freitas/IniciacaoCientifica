@@ -341,7 +341,7 @@ while option != 0:
 
         # Defining the data generators
         training_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, full_signal_size,
-                                                    num_channels, num_classes, train_tasks, 'validation', split_ratio)
+                                                    num_channels, num_classes, train_tasks, 'train', split_ratio)
         validation_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, full_signal_size,
                                                     num_channels, num_classes, train_tasks, 'validation', split_ratio)
         testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size, full_signal_size,

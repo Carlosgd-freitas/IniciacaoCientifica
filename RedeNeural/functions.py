@@ -807,7 +807,7 @@ class DataGenerator(keras.utils.Sequence):
         
         print(f'len(self.list_files) = {len(self.list_files)}')
         print(f'data.shape = {data.shape}')
-        print(f'subjects = {subjects}')
+        print(f'len(subjects) = {len(subjects)}')
 
         # Storing the information of all cropping that will be done in the EEG signals
         crop_positions = []
@@ -839,12 +839,12 @@ class DataGenerator(keras.utils.Sequence):
 
                 signal_index += 1
 
-        print(f'crop_positions = {crop_positions}')
-
         # arr = content[: , (i-window_size):i]
-        # i = window_size
-        # while i <= content.shape[1] * split_ratio:
 
+        self.data = data
+        self.subjects = subjects
+        self.crop_positions = crop_positions
+        
         input('quitaste?')
 
         self.on_epoch_end()
