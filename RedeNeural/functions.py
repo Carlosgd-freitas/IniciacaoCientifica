@@ -733,42 +733,17 @@ def n_samples_with_sliding_window(full_signal_size, start, offset):
 
     return n_samples
 
-# def stack_arrays(array_A, array_B):
-#     """
-#     Auxiliar function for the __data_generation() function on the DataGenerator Class. Stacks two arrays
-#     vertically: array_A on top of array_B. array_type is either 'data' or 'labels'.
-#     """
-#     n_dim = array_A.ndim
-
-#     if(n_dim == 2):
-#         array_C = np.empty((array_A.shape[0] + array_B.shape[0], array_A.shape[1]))
-#     else:
-#         array_C = np.empty((array_A.shape[0] + array_B.shape[0], array_A.shape[1], array_A.shape[2]))
-
-#     for i in range(0, array_A.shape[0]):
-#         array_C[i] = array_A[i]
-    
-#     for i in range(0, array_B.shape[0]):
-#         array_C[i + array_A.shape[0]] = array_B[i]
-
-#     return array_C
-
 class DataGenerator(keras.utils.Sequence):
     """
-    Generates data for the model on the fly.
+    Generates data for the model on the fly, using a sliding window for data augmentation.
     """
-    def __init__(self, data_generator_type, batch_size, dim, offset, full_signal_size, n_channels,
-                n_classes, tasks, dataset_type, split_ratio, list_IDs=None, shuffle=False):
+    def __init__(self, list_IDs, batch_size, dim, offset, full_signal_size, n_channels,
+                n_classes, tasks, dataset_type, split_ratio, shuffle=False):
         """
         Initialization function of the class.
         
         Parameters:
-            - data_generator_type: what kind of input does the data generator expects, and what it will do before
-            feeding the data into the model;
-                * 'process_data': the data generator will load, filter, normalize and crop the data, using a
-                sliding window in the last method.
-                * 'crop_only': the data generator will take preprocessed data, stored in csv files, and crop
-                them using a sliding window.
+            - list_IDs: a list of csv file names, in which the preprocessed data are stored;
             - batch_size: while training, the processed data will be split into groups of shape
             (batch_size, dim, n_channels), which will be fed into the model;
             - dim: size of the sliding window;
@@ -783,12 +758,9 @@ class DataGenerator(keras.utils.Sequence):
             stored separetly from the other [100 - (split_ratio * 100)]%.
         
         Optional Parameters:
-            - list_IDs: used if the data_generator_type is 'crop_only'. A list of csv file names, in which the
-            preprocessed data are stored. Default value is None;
             - shuffle: if the data being fed into the model will be shuffled or not at each epoch. Default value is
             False.
         """
-        self.data_generator_type = data_generator_type
         self.list_IDs = list_IDs
         self.batch_size = batch_size
         self.dim = dim
