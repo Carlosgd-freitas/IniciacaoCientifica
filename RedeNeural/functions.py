@@ -720,7 +720,7 @@ def n_samples_with_sliding_window(full_signal_size, start, offset):
         - start: sliding window position after the first cropping;
         - offset: amount of samples the window will slide in each iteration.
     """
-    n_samples = 1
+    n_samples = 0
     i = start
 
     if(offset == 0):
