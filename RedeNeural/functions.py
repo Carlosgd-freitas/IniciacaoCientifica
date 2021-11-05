@@ -814,7 +814,7 @@ class DataGenerator(keras.utils.Sequence):
 
         if(self.dataset_type == 'train' or self.dataset_type == 'test'):
 
-            for signal in len(data.shape[0]):
+            for signal in data.shape[0]:
                 i = self.dim
 
                 while(i <= data[0].shape[0] * self.split_ratio):
@@ -824,7 +824,7 @@ class DataGenerator(keras.utils.Sequence):
                     i += self.offset
 
         elif(self.dataset_type == 'validation'):
-            for signal in len(data.shape[0]):
+            for signal in data.shape[0]:
                 i = data[0].shape[0] * self.split_ratio
 
                 while(i <= data[0].shape[0]):
