@@ -805,10 +805,6 @@ class DataGenerator(keras.utils.Sequence):
             subjects.append(subject)
         data = np.asarray(data, dtype = object).astype('float32')
         
-        print(f'len(self.list_files) = {len(self.list_files)}')
-        print(f'data.shape = {data.shape}')
-        print(f'len(subjects) = {len(subjects)}')
-
         # Storing the information of all cropping that will be done in the EEG signals
         crop_positions = []
 
@@ -839,6 +835,8 @@ class DataGenerator(keras.utils.Sequence):
 
                 signal_index += 1
 
+        print(f'crop_positions = {crop_positions}')
+
         # arr = content[: , (i-window_size):i]
 
         self.data = data
@@ -854,10 +852,8 @@ class DataGenerator(keras.utils.Sequence):
         Denotes the number of batches per epoch.
         """
         n_samples = self.samples_per_file * len(self.tasks) * self.n_classes
-        aux = math.floor(n_samples / self.batch_size) * self.batch_size
 
-        return math.floor((aux / self.batch_size) - 1)
-        # return math.ceil(n_samples / self.batch_size)
+        return math.ceil(n_samples / self.batch_size)
 
     def __getitem__(self, index):
         """
