@@ -835,15 +835,9 @@ class DataGenerator(keras.utils.Sequence):
 
                 signal_index += 1
 
-        print(f'crop_positions = {crop_positions}')
-
-        # arr = content[: , (i-window_size):i]
-
         self.data = data
         self.subjects = subjects
         self.crop_positions = crop_positions
-        
-        input('quitaste?')
 
         self.on_epoch_end()
 
@@ -860,235 +854,95 @@ class DataGenerator(keras.utils.Sequence):
         Generate one batch of data.
         """
 
-        # First three batches generated are ignored by model.fit
-        # if(self.lag_counter < 3):
-        #     x = np.zeros((self.batch_size, self.dim, self.n_channels))
-        #     y = np.zeros((self.batch_size, self.n_classes))
-        #     self.lag_counter += 1
-        #     return (x, y)
+        print(f'n_batches = {len(self)}')
+        print(f'index = {index}')
 
-        # Generate indexes of the batch
-        indexes = self.indexes[self.first_index:self.first_index + self.batch_size]
+        x = None
+        y = None
 
-        # print(f'__getitem__ : index = {index}')
-        # print(f'__getitem__ : self.batch_size = {self.batch_size}')
-        # print(f'__getitem__ : self.indexes = {self.indexes}')
-        print(f'\nself.dataset_type = {self.dataset_type}')
+        # If the batch being generated isn't the last one
+        if(index < len(self) - 1):
+            x = np.empty((self.batch_size, self.dim, self.n_channels))
+            y = np.empty((self.batch_size, self.n_classes))
 
-        if len(indexes):
-            print(f'indexes da vez = {indexes[0]} - {indexes[-1]}\n')
+            crop_positions = self.crop_positions[index*self.batch_size : (index+1)*self.batch_size]
 
-        # excess já tem uma batch pronta ?
-        if(self.excess_x is not None):
-            if(self.excess_x.shape[0] >= self.batch_size):
-                # print(f'\npor excesso: excess_x era {self.excess_x.shape} - ', end='') #####
+            for i in range(0, 100):
+                file_index = crop_positions[i][0]
+                crop_end = crop_positions[i][1]
 
-                x = np.empty((self.batch_size, self.dim, self.n_channels))
-                y = np.empty((self.batch_size, self.n_classes))
+                x[i] = self.list_files[file_index][(crop_end-self.dim):crop_end]
 
-                aux_x = None
-                aux_y = None
+                print(f'x[i].shape = {x[i].shape}')
+                print(f'x[i] = {x[i]}')
 
-                if(self.excess_x.shape[0] != self.batch_size):
-                    aux_x = np.empty((self.excess_x.shape[0] - self.batch_size, self.dim, self.n_channels))
-                    aux_y = np.empty((self.excess_x.shape[0] - self.batch_size, self.n_classes))
 
-                for i in range(0, self.excess_x.shape[0]):
-                    # "transportando" a batch pronta que tá no excess
-                    if(i < self.batch_size):
-                        x[i] = self.excess_x[i]
-                        y[i] = self.excess_y[i]
 
-                    # restante do excess armazenado em aux
-                    else:
-                        aux_x[i - self.batch_size] = self.excess_x[i]
-                        aux_y[i - self.batch_size] = self.excess_y[i]
+                subject = self.subjects[file_index]
+
+                label = np.zeros((1, self.n_classes))
+                label[0, subject] = 1
+
+                y[i] = label
+
+                print(f'subject = {subject}')
+
+                print(f'y[i].shape = {y[i].shape}')
+                print(f'y[i] = {y[i]}')
+
+            
+            print(f'x.shape = {x.shape}')
+            print(f'x = {x}')
+
+            print(f'y.shape = {y.shape}')
+            print(f'y = {y}')
+
+        # If the batch being generated is the last one
+        else:
+            x = []
+            y = []
+
+            crop_positions = self.crop_positions[index*self.batch_size : (index+1)*self.batch_size]
+
+            for i in range(0, 100):
+                file_index = crop_positions[i][0]
+                crop_end = crop_positions[i][1]
+                sample = self.list_files[file_index][(crop_end-self.dim):crop_end]
+
+                x.append(sample)
+
+                print(f'sample.shape = {sample.shape}')
+                print(f'sample = {sample}')
+
                 
-                self.excess_x = aux_x
-                self.excess_y = aux_y
-                self.first_index += self.batch_size # + 1
 
-                ###################################
-                # if(self.excess_x is not None):
-                #     print(f'excess_x ficou {self.excess_x.shape} - x tem tamanho {x.shape}\n') 
-                # else:
-                #     print(f'sem excesso - x tem tamanho {x.shape}\n')
-                ###################################
+                subject = self.subjects[file_index]
 
-                return (x, y)
+                label = np.zeros((1, self.n_classes))
+                label[0, subject] = 1
 
-        # quais arquivos é pra ler nessa batch?
+                y.append(label)
 
-        n_files = int(math.ceil(self.batch_size / self.samples_per_file))
+                print(f'subject = {subject}')
 
-        first_file = 0
-        i = 0
-        while(i < self.first_index):
-            i += self.samples_per_file
-            first_file += 1
+                print(f'label.shape = {label.shape}')
+                print(f'label = {label}')
+            
+            x = np.asarray(x, dtype = object).astype('float32')
+            y = np.asarray(y, dtype = object).astype('float32')
 
-        list_temp = []
-        for i in range(0, n_files):
-            if(first_file >= len(self.tasks) * self.n_classes):
-                first_file = 0
+            print(f'x.shape = {x.shape}')
+            print(f'x = {x}')
 
-            # k = indexes[first_file]
-            list_temp.append(self.list_files[first_file])
-            first_file += 1
-    
-        if self.shuffle == True:
-            np.random.shuffle(list_temp)
+            print(f'y.shape = {y.shape}')
+            print(f'y = {y}')
 
-        # print(f'por arquivo: arquivo eh {list_temp} - ', end='') #####
-
-        (x, y) = self.__data_generation(list_temp)
-
-        #########################################################
-        # print(f'x tem tamanho {x.shape} - ', end='') #
-        # if(self.excess_x is not None):
-        #     print(f'excess_x tem tamanho {self.excess_x.shape}')
-        # else:
-        #     print('sem excesso.\n')
-        #########################################################
-
+        # arr = content[: , (i-window_size):i]
+        
         return (x, y)
 
     def on_epoch_end(self):
         """
         Updates indexes after each epoch.
         """
-
-        self.excess_x = None         # list that will store data that exceeds batch_size
-        self.excess_y = None         # list that will store labels that exceeds batch_size
-        self.first_index = 0         # first index avaliable
-
-        n_samples = self.samples_per_file * len(self.tasks) * self.n_classes
-
-        aux = math.floor(n_samples / self.batch_size)
-
-        if(self.dataset_type == 'train'):
-            self.indexes = np.arange((aux * self.batch_size) - self.batch_size)
-        else:
-            self.indexes = np.arange(aux * self.batch_size)
-
-        # print(f'\nself.samples_per_file = {self.samples_per_file}')
-        # print(f'len(self.tasks) = {len(self.tasks)}')
-        # print(f'self.n_classes = {self.n_classes}')
-        # print(f'n_samples = {n_samples}')
-        # print(f'aux = {aux}')
-        # print(f'self.indexes = {self.indexes}')
-
-        # if self.shuffle == True:
-        #     np.random.shuffle(self.indexes)
-
-    def __data_generation(self, list_files_temp):
-        """
-        Generates data containing batch_size samples.
-        """
-
-        # Initialization
-        temp_x = []
-        subjects = []
-
-        # Loading data from .csv files ('crop_only' DataGenerator)
-        for i, ID in enumerate(list_files_temp):
-            if(self.dataset_type == 'train' or self.dataset_type == 'validation'):
-                file_x = np.loadtxt('processed_train_data/' + list_files_temp[i], delimiter=';', usecols=range(self.n_channels))
-                string = 'processed_train_data/' + list_files_temp[i]
-
-            elif(self.dataset_type == 'test'):
-                file_x = np.loadtxt('processed_test_data/' + list_files_temp[i], delimiter=';', usecols=range(self.n_channels))
-                string = 'processed_test_data/' + list_files_temp[i]
-
-            file_x = np.asarray(file_x, dtype = object).astype('float32')
-            file_x = file_x.T
-            temp_x.append(file_x)
-
-            string = string.split("_subject_")[1]      # 'X.csv'
-            subject = int(string.split(".csv")[0])     # X
-            subjects.append(subject)
-
-        # Cropping Data
-        x_dataL = list()
-        x_dataL_2 = list()
-        y_dataL = list()
-        y_dataL_2 = list()
-
-        if(self.dataset_type == 'train'):
-            pos = 0
-            for data in temp_x:
-                x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, data, self.dim,
-                                                        self.offset, subjects[pos], self.n_classes,
-                                                        self.split_ratio, x_dataL_2, y_dataL_2, 'first_data_only')
-                pos += 1
-        
-        elif(self.dataset_type == 'validation'):
-            pos = 0
-            for data in temp_x:
-                x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, data, self.dim,
-                                                        self.offset, subjects[pos], self.n_classes,
-                                                        self.split_ratio, x_dataL_2, y_dataL_2, 'second_data_only')
-                pos += 1
-
-        elif(self.dataset_type == 'test'):
-            pos = 0
-            for data in temp_x:
-                x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, data, self.dim, self.offset, subjects[pos],
-                                    self.n_classes)
-                pos += 1
-        
-        x = None
-        y = None
-
-        if(self.dataset_type == 'train' or self.dataset_type == 'test'):
-            x_data = np.asarray(x_dataL, dtype = object).astype('float32')
-            y_data = np.asarray(y_dataL, dtype = object).astype('float32')
-
-            if(x_data.shape[0] != 0):
-                x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
-                y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
-
-            x = x_data
-            y = y_data
-
-        elif(self.dataset_type == 'validation'):
-            x_data_2 = np.asarray(x_dataL_2, dtype = object).astype('float32')
-            y_data_2 = np.asarray(y_dataL_2, dtype = object).astype('float32')
-
-            if(x_data_2.shape[0] != 0):
-                x_data_2 = x_data_2.reshape(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
-                y_data_2 = y_data_2.reshape(y_data_2.shape[0], y_data_2.shape[2])
-
-            x = x_data_2
-            y = y_data_2
-        
-        print(f'samples produzidas no cropping {x.shape}\n') #####
-
-        # Is there any excess from the previous batch? If so, merge it first
-        if(self.excess_x is not None):
-            x = np.vstack((self.excess_x, x))
-            y = np.vstack((self.excess_y, y))
-
-        # Only (batch_size, dim, n_channels) data and (batch_size, num_classes) labels are returned
-        if(x.shape[0] > self.batch_size):
-            self.excess_x = x[self.batch_size:]
-            self.excess_y = y[self.batch_size:]
-
-        elif(x.shape[0] < self.batch_size):
-            self.excess_x = x
-            self.excess_y = y
-
-            # Updating first index avaliable
-            self.first_index += x.shape[0]
-
-        if(x.shape[0] >= self.batch_size):
-            x = x[:self.batch_size]
-            y = y[:self.batch_size]
-
-            # Updating first index avaliable
-            self.first_index += self.batch_size
-
-        # Updating first index avaliable
-        # self.first_index += self.batch_size
-
-        return (x, y)
+        pass
