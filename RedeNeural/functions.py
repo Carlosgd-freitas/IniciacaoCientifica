@@ -818,6 +818,7 @@ class DataGenerator(keras.utils.Sequence):
                 i = self.dim
 
                 while(i <= data[0].shape[0] * self.split_ratio):
+                    # Each crop position is a tuple: (file in which the crop will take place, end of the cropping)
                     one_crop_position = (signal_index, i)
                     crop_positions.append(one_crop_position)
 
@@ -835,7 +836,7 @@ class DataGenerator(keras.utils.Sequence):
                     crop_positions.append(one_crop_position)
 
                     i += self.offset
-                    
+
                 signal_index += 1
 
         print(f'crop_positions = {crop_positions}')
