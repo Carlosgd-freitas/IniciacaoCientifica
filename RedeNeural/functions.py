@@ -826,7 +826,7 @@ class DataGenerator(keras.utils.Sequence):
 
         elif(self.dataset_type == 'validation'):
             signal_index = 0
-            while(signal_index < data.shape[0]):
+            while(signal_index <= data.shape[0]):
                 i = math.floor(data[0].shape[0] * self.split_ratio) + self.offset
 
                 while(i <= data[0].shape[0]):
@@ -858,6 +858,7 @@ class DataGenerator(keras.utils.Sequence):
         """
         Generate one batch of data.
         """
+        index = self.next_index
 
         print(f'n_batches = {len(self)}')
         print(f'index = {index}')
@@ -944,10 +945,12 @@ class DataGenerator(keras.utils.Sequence):
         print(f'y.shape = {y.shape}')
         # print(f'y = {y}')
 
+        self.next_index += 1
+
         return (x, y)
 
     def on_epoch_end(self):
         """
         Updates indexes after each epoch.
         """
-        pass
+        self.next_index = 0
