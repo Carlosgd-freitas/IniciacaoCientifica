@@ -877,12 +877,12 @@ class DataGenerator(keras.utils.Sequence):
             crop_positions = self.crop_positions[index*self.batch_size : (index+1)*self.batch_size]
 
             for i in range(0, 100):
-                print(f'i = {i}, ', end='')
+                # print(f'i = {i}, ', end='')
 
                 file_index = crop_positions[i][0]
                 crop_end = crop_positions[i][1]
 
-                print(f'file_index = {file_index}, crop_end = {crop_end}')
+                # print(f'file_index = {file_index}, crop_end = {crop_end}')
 
                 x[i] = self.data[file_index][(crop_end-self.dim):crop_end]
 
@@ -900,6 +900,7 @@ class DataGenerator(keras.utils.Sequence):
             
             # Storing the N first batches for later use, if needed
             if(index < self.cache_size):
+                print('storing in cache.')
                 print(f'x[i].shape = {x[i].shape}')
                 print(f'label.shape = {label.shape}')
 
@@ -942,8 +943,11 @@ class DataGenerator(keras.utils.Sequence):
             x = np.asarray(x, dtype = object).astype('float32')
             y = np.asarray(y, dtype = object).astype('float32')
 
-            x = np.reshape(count, self.dim, self.n_channels)
-            y = np.reshape(count, self.n_classes)
+            print(f'x.shape = {x.shape}')
+            print(f'y.shape = {y.shape}')
+
+            # x = np.reshape(count, self.dim, self.n_channels)
+            # y = np.reshape(count, self.n_classes)
 
             self.last_sample_used += count
         
@@ -968,6 +972,8 @@ class DataGenerator(keras.utils.Sequence):
         # print(f'y = {y}')
 
         self.next_index += 1
+
+        print('\n')
 
         return (x, y)
 
