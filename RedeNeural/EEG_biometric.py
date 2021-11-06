@@ -1,6 +1,7 @@
 import models
 import functions
 
+import argparse
 import shutil
 import os
 import time
@@ -124,6 +125,16 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 #                                          2 min for training ; 3,53 seconds for testing
 
 # functions.create_csv_database_from_edf('./Dataset/','./All_Channels_Yang/', num_classes, channels = all_channels_yang)
+
+# Argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--noimode', metavar='identification mode',
+                    action='store_false', help='runs the model in Identification Mode')
+parser.add_argument('--novmode', metavar='verification mode',
+                    action='store_false', help='runs the model in Verification Mode')
+
+args = parser.parse_args()
+print(f'args = {args}')
 
 option = 3
 while option != 0:
