@@ -130,73 +130,50 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 parser = argparse.ArgumentParser()
 parser.add_argument('--datagen', action='store_true',
                     help='the model will use Data Generators to crop data on the fly')
+parser.add_argument('--noptrain', action='store_true',
+                    help='train/validation data will not be preprocessed and stored. This argument can only be specified if --datagen was also specified')
+parser.add_argument('--noptest', action='store_true',
+                    help='test data will not be preprocessed and stored. This argument can only be specified if --datagen was also specified')
 parser.add_argument('--noimode', action='store_true',
                     help='the model won\'t run in Identification Mode')
 parser.add_argument('--novmode', action='store_true',
                     help='the model won\'t run in Verification Mode')
-
 args = parser.parse_args()
-print(f'args = {args}')
 
-if(args.datagen):
-    print('--datagen foi especificado na linha de comando.')
-else:
-    print('--datagen nao foi especificado na linha de comando.')
+if(not args.datagen and (args.noptrain or args.noptest)):
+    print('WARNING: When not using Data Generators, both training/validation and testing data will be ' +
+    'processed, so there isn\'t a option to use the --noptrain or --noptest flags.')
 
-if(args.noimode):
-    print('--noimode foi especificado na linha de comando.')
-else:
-    print('--noimode nao foi especificado na linha de comando.')
+# Defining the optimizer
+opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
 
-if(args.novmode):
-    print('--novmode foi especificado na linha de comando.')
-else:
-    print('--novmode nao foi especificado na linha de comando.')
+# Not using Data Generators
+if(not args.datagen):
+    # Loading the raw data
+    train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
 
-option = 3
-while option != 0:
-    option = 3
+    # Filtering the raw data
+    train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+    test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
 
-    # Menu
-    print('============================== MENU ==============================')
-    print('Press [0] and [ENTER] to QUIT\n')
+    # Normalize the filtered data
+    train_content = functions.normalize_data(train_content, 'sun', 1)
+    test_content = functions.normalize_data(test_content, 'sun', 1)
 
-    print('> Processing the data and running the model without the use of Data Generators')
-    print('Press [1] and [ENTER] to process the data and run the model directly (without Data Generators)\n')
+    # Getting the training, validation and testing data
+    x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
+                                                        window_size, offset, split_ratio)
+    x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, full_signal_size,
+                                        full_signal_size)
 
-    print('> Using Data Generators while saving the pre-processed data in .csv files')
-    print('Press [2] and [ENTER] to process the training/validation data and save it in files')
-    print('Press [3] and [ENTER] to process the testing data and save it in files')
-    print('Press [4] and [ENTER] to run the model in Identification Mode')
-    print('Press [5] and [ENTER] to run the model in Verification Mode')
-    print('==================================================================')
+    # Running the model in Identification Mode
+    if(not args.noimode):
 
-    option = int(input('Enter option: '))
-    
-    if(option == 1):  
-        # Loading the raw data
-        train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
-
-        # Filtering the raw data
-        train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
-        test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
-
-        # Normalize the filtered data
-        train_content = functions.normalize_data(train_content, 'sun', 1)
-        test_content = functions.normalize_data(test_content, 'sun', 1)
-
-        # Getting the training, validation and testing data
-        x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
-                                                            window_size, offset, split_ratio)
-        x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, full_signal_size,
-                                            full_signal_size)
-    
         # Creating the model
         model = models.create_model(window_size, num_channels, num_classes)
         model.summary()                                         
 
-        # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
-        opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
+        # Compiling, defining the LearningRateScheduler and training the model
         model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
 
         fit_begin = time.time()
@@ -265,6 +242,9 @@ while option != 0:
         print("Minimum Loss : {:.4f}".format(min_loss))
         print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
 
+    # Running the model in Verification Mode
+    if(not args.novmode):
+
         # Removing the last layers of the model and getting the features array
         model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
 
@@ -279,7 +259,11 @@ while option != 0:
         print(f'EER: {eer*100.0} %')
         print(f'Decidability: {d}')
 
-    elif(option == 2):  
+# Using Data Generators
+else:
+
+    # Processing train/validation data
+    if(not args.noptrain):
         if(os.path.exists('processed_train_data')):
             shutil.rmtree('processed_train_data', ignore_errors=True)
         os.mkdir('processed_train_data')
@@ -312,8 +296,9 @@ while option != 0:
         print('saving file names to processed_train_data/x_train_list.csv ... ',end='')
         savetxt('processed_train_data/x_train_list.csv', [list], delimiter=',', fmt='%s')
         print('saved!')
-
-    elif(option == 3):  
+    
+    # Processing test data
+    if(not args.noptest):
         if(os.path.exists('processed_test_data')):
             shutil.rmtree('processed_test_data', ignore_errors=True)
         os.mkdir('processed_test_data')
@@ -347,7 +332,9 @@ while option != 0:
         savetxt('processed_test_data/x_test_list.csv', [list], delimiter=',', fmt='%s')
         print('saved!')
 
-    elif(option == 4):
+    # Running the model in Identification Mode
+    if(not args.noimode):
+
         # Creating the model
         model = models.create_model(window_size, num_channels, num_classes)
         model.summary()
@@ -375,9 +362,7 @@ while option != 0:
         testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size, full_signal_size,
                                                     num_channels, num_classes, test_tasks, 'test', 1.0)
 
-        # Defining the optimizer, compiling, defining the LearningRateScheduler and training the model
-        opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
-
+        # Compiling, defining the LearningRateScheduler and training the model
         model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
 
         fit_begin = time.time()
@@ -388,11 +373,6 @@ while option != 0:
                             epochs = training_epochs,
                             callbacks = [lr_scheduler],
                             )
-        # results = model.fit_generator(generator = training_generator,
-        #                     validation_data = validation_generator,
-        #                     epochs = training_epochs,
-        #                     callbacks = [callback],
-        #                     )
 
         fit_end = time.time()
         print(f'Training time in seconds: {fit_end - fit_begin}')
@@ -448,9 +428,9 @@ while option != 0:
         print("Maximum Loss : {:.4f}".format(max_loss))
         print("Minimum Loss : {:.4f}".format(min_loss))
         print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
-
-    elif(option == 5):
-        opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
+    
+    # Running the model in Verification Mode
+    if(not args.novmode):
 
         # List of files that contains x_test data
         x_test_list = []
@@ -509,7 +489,4 @@ while option != 0:
         y_test_classes = functions.one_hot_encoding_to_classes(y_test)
         d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
         print(f'EER: {eer*100.0} %')
-        print(f'Decidability: {d}')
-
-    elif(option != 0):
-        print('ERROR: Enter a valid option.')
+        print(f'Decidability: {d}')    
