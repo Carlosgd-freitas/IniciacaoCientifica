@@ -909,7 +909,7 @@ class DataGenerator(keras.utils.Sequence):
 
         # If the batch being generated doesn't have batch_size samples
         elif(self.last_sample_used < len(self.crop_positions) - 1):
-            print(f'batch quebrada.')
+            # print(f'batch quebrada.')
 
             x = []
             y = []
@@ -918,7 +918,7 @@ class DataGenerator(keras.utils.Sequence):
 
             count = 0
             for i in range(0, 100):
-                print(f'i = {i}, ', end='')
+                # print(f'i = {i}, ', end='')
 
                 if(self.last_sample_used + count == len(self.crop_positions) - 1):
                     break
@@ -927,7 +927,7 @@ class DataGenerator(keras.utils.Sequence):
                 crop_end = crop_positions[i][1]
                 sample = self.data[file_index][(crop_end-self.dim):crop_end]
 
-                print(f'file_index = {file_index}, crop_end = {crop_end}')
+                # print(f'file_index = {file_index}, crop_end = {crop_end}')
 
                 x.append(sample)
 
@@ -943,11 +943,9 @@ class DataGenerator(keras.utils.Sequence):
             x = np.asarray(x, dtype = object).astype('float32')
             y = np.asarray(y, dtype = object).astype('float32')
 
-            print(f'x.shape = {x.shape}')
-            print(f'y.shape = {y.shape}')
-
-            # x = np.reshape(count, self.dim, self.n_channels)
-            # y = np.reshape(count, self.n_classes)
+            # The initial format of "y" (label) is "a x 1 x num_classes", but the correct format
+            # is "a x num_classes".
+            y = y.reshape(y.shape[0], y.shape[2])
 
             self.last_sample_used += count
         
