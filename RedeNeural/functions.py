@@ -873,8 +873,8 @@ class DataGenerator(keras.utils.Sequence):
 
                 x[i] = self.data[file_index][(crop_end-self.dim):crop_end]
 
-                print(f'x[i].shape = {x[i].shape}')
-                print(f'x[i] = {x[i]}')
+                # print(f'x[i].shape = {x[i].shape}')
+                # print(f'x[i] = {x[i]}')
 
 
 
@@ -885,20 +885,13 @@ class DataGenerator(keras.utils.Sequence):
 
                 y[i] = label
 
-                print(f'subject = {subject}')
+                # print(f'subject = {subject}')
 
-                print(f'label.shape = {label.shape}')
-                print(f'label = {label}')
-                
-                print(f'y[i].shape = {y[i].shape}')
-                print(f'y[i] = {y[i]}')
+                # print(f'label.shape = {label.shape}')
+                # print(f'label = {label}')
 
-            
-            print(f'x.shape = {x.shape}')
-            print(f'x = {x}')
-
-            print(f'y.shape = {y.shape}')
-            print(f'y = {y}')
+                # print(f'y[i].shape = {y[i].shape}')
+                # print(f'y[i] = {y[i]}')
 
         # If the batch being generated is the last one
         else:
@@ -914,8 +907,8 @@ class DataGenerator(keras.utils.Sequence):
 
                 x.append(sample)
 
-                print(f'sample.shape = {sample.shape}')
-                print(f'sample = {sample}')
+                # print(f'sample.shape = {sample.shape}')
+                # print(f'sample = {sample}')
 
                 
 
@@ -926,22 +919,22 @@ class DataGenerator(keras.utils.Sequence):
 
                 y.append(label)
 
-                print(f'subject = {subject}')
+                # print(f'subject = {subject}')
 
-                print(f'label.shape = {label.shape}')
-                print(f'label = {label}')
+                # print(f'label.shape = {label.shape}')
+                # print(f'label = {label}')
             
             x = np.asarray(x, dtype = object).astype('float32')
             y = np.asarray(y, dtype = object).astype('float32')
 
-            print(f'x.shape = {x.shape}')
-            print(f'x = {x}')
-
-            print(f'y.shape = {y.shape}')
-            print(f'y = {y}')
-
         # arr = content[: , (i-window_size):i]
         
+        print(f'x.shape = {x.shape}')
+        print(f'x = {x}')
+
+        print(f'y.shape = {y.shape}')
+        print(f'y = {y}')
+
         return (x, y)
 
     def on_epoch_end(self):
