@@ -877,11 +877,12 @@ class DataGenerator(keras.utils.Sequence):
             crop_positions = self.crop_positions[index*self.batch_size : (index+1)*self.batch_size]
 
             for i in range(0, 100):
+                print(f'i = {i}', end='')
+
                 file_index = crop_positions[i][0]
                 crop_end = crop_positions[i][1]
 
-                print(f'file_index = {file_index}')
-                print(f'crop_end = {crop_end}')
+                print(f'file_index = {file_index}, crop_end = {crop_end}')
 
                 x[i] = self.data[file_index][(crop_end-self.dim):crop_end]
 

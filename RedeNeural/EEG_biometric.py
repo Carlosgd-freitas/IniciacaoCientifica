@@ -363,8 +363,6 @@ else:
         model = models.create_model(window_size, num_channels, num_classes)
         model.summary()
 
-        print('teste')
-
         # Getting the file names that contains the preprocessed data
         x_train_list = []
         x_test_list = []
