@@ -3,6 +3,7 @@ import functions
 
 import argparse
 import shutil
+import sys
 import os
 import time
 import random
@@ -25,8 +26,6 @@ initial_learning_rate = 0.01    # Initial learning rate
 # Parameters used in functions.load_data()
 # folder_path = './Dataset_CSV/'
 folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
-train_tasks = [1, 2]            # Tasks used for training and validation
-test_tasks = [2]                # Tasks used for testing
 num_classes = 109               # Total number of classes (individuals)
 
 # Parameters used in functions.filter_data()
@@ -138,11 +137,31 @@ parser.add_argument('--noimode', action='store_true',
                     help='the model won\'t run in Identification Mode')
 parser.add_argument('--novmode', action='store_true',
                     help='the model won\'t run in Verification Mode')
+
+parser.add_argument('-train', nargs="+", type=int, required=True, 
+                    help='list of tasks used for training and validation. Specifying only a 0 means the application\n'+
+                    'will not process train/validation data, although this is only possible if --datagen was also'+
+                    'specified.\n This is a REQUIRED flag')
+parser.add_argument('-test', nargs="+", type=int, required=True, 
+                    help='list of tasks used for testing. Specifying only a 0 means the application will not process\n'+
+                    'testing data, although this is only possible if --datagen was also specified.\n This is a REQUIRED flag')
 args = parser.parse_args()
 
-if(not args.datagen and (args.noptrain or args.noptest)):
-    print('WARNING: When not using Data Generators, both training/validation and testing data will be ' +
-    'processed, so there isn\'t a option to use the --noptrain or --noptest flags.')
+train_tasks = args.train
+test_tasks = args.test
+
+print(f'train_tasks = {train_tasks}')
+print(f'test_tasks = {test_tasks}')
+
+input('quita')
+
+if(not args.datagen):
+    if(args.noptrain or args.noptest):
+        print('WARNING: When not using Data Generators, both training/validation and testing data will be ' +
+        'processed, so there isn\'t a option to use the --noptrain or --noptest flags.\n')
+    if(test_tasks.isAll() == 0 or test_tasks.isAll() == 0):
+        print('ERROR: When not using Data Generators, both training/validation and testing tasks need to be specified.\n')
+        sys.exit()
 
 # Defining the optimizer
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
