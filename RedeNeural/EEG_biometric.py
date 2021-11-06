@@ -159,7 +159,7 @@ if(not args.datagen):
     if(args.noptrain or args.noptest):
         print('WARNING: When not using Data Generators, both training/validation and testing data will be ' +
         'processed, so there isn\'t a option to use the --noptrain or --noptest flags.\n')
-    if(test_tasks.isAll() == 0 or test_tasks.isAll() == 0):
+    if(test_tasks == [0] or test_tasks == [0]):
         print('ERROR: When not using Data Generators, both training/validation and testing tasks need to be specified.\n')
         sys.exit()
 
