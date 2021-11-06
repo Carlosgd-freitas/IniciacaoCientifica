@@ -156,16 +156,16 @@ if(not args.datagen):
     if(args.noptrain or args.noptest):
         print('WARNING: When not using Data Generators, both training/validation and testing data will be ' +
         'processed, so there isn\'t a option to use the --noptrain or --noptest flags.\n')
-    
-    for i in len(train_tasks):
-        if(train_tasks[i] <= 0 or train_tasks[i] >= 15):
-            print('ERROR: When not using Data Generators, both training/validation and testing tasks need to be specified.\n')
-            sys.exit()
-    
-    for i in len(test_tasks):
-        if(test_tasks[i] <= 0 or test_tasks[i] >= 15):
-            print('ERROR: When not using Data Generators, both training/validation and testing tasks need to be specified.\n')
-            sys.exit()
+
+for i in len(train_tasks):
+    if(train_tasks[i] <= 0 or train_tasks[i] >= 15):
+        print('ERROR: When not using Data Generators, both training/validation and testing tasks need to be specified.\n')
+        sys.exit()
+
+for i in len(test_tasks):
+    if(test_tasks[i] <= 0 or test_tasks[i] >= 15):
+        print('ERROR: When not using Data Generators, both training/validation and testing tasks need to be specified.\n')
+        sys.exit()
 
 # Defining the optimizer
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
