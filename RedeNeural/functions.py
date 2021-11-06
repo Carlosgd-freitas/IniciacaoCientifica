@@ -813,7 +813,7 @@ class DataGenerator(keras.utils.Sequence):
 
         if(self.dataset_type == 'train' or self.dataset_type == 'test'):
             signal_index = 0
-            while(signal_index <= data.shape[0]):
+            while(signal_index < data.shape[0]):
                 i = self.dim
 
                 while(i <= data[0].shape[0] * self.split_ratio):
@@ -827,7 +827,7 @@ class DataGenerator(keras.utils.Sequence):
 
         elif(self.dataset_type == 'validation'):
             signal_index = 0
-            while(signal_index <= data.shape[0]):
+            while(signal_index < data.shape[0]):
                 i = math.floor(data[0].shape[0] * self.split_ratio) + self.offset
 
                 while(i <= data[0].shape[0]):
@@ -842,8 +842,8 @@ class DataGenerator(keras.utils.Sequence):
         self.subjects = subjects
         self.crop_positions = crop_positions
 
-        print(f'\n{self.dataset_type}, self.samples_per_file = {self.samples_per_file}')
-        print(f'self.crop_positions = {self.crop_positions}')
+        print(f'self.crop_positions = {self.crop_positions}\n')
+        print(f'\n{self.dataset_type}, self.samples_per_file = {self.samples_per_file}', end='')
         print(f'len(self.crop_positions) = {len(self.crop_positions)}\n')
 
         self.on_epoch_end()
@@ -863,6 +863,8 @@ class DataGenerator(keras.utils.Sequence):
 
         print(f'n_batches = {len(self)}')
         print(f'index = {index}')
+        print(f'index*self.batch_size = {index*self.batch_size}')
+        print(f'(index+1)*self.batch_size = {(index+1)*self.batch_size}')
 
         x = None
         y = None
@@ -878,12 +880,10 @@ class DataGenerator(keras.utils.Sequence):
                 file_index = crop_positions[i][0]
                 crop_end = crop_positions[i][1]
 
+                print(f'file_index = {file_index}')
+                print(f'crop_end = {crop_end}')
+
                 x[i] = self.data[file_index][(crop_end-self.dim):crop_end]
-
-                # print(f'x[i].shape = {x[i].shape}')
-                # print(f'x[i] = {x[i]}')
-
-
 
                 subject = self.subjects[file_index]
 
@@ -891,14 +891,14 @@ class DataGenerator(keras.utils.Sequence):
                 label[0, subject-1] = 1
 
                 y[i] = label
+            
+            # Storing the N first batches for later use, if needed
+            if(index < self.cache_size):
+                print(f'x[i].shape = {x[i].shape}')
+                print(f'label.shape = {label.shape}')
 
-                # print(f'subject = {subject}')
-
-                # print(f'label.shape = {label.shape}')
-                # print(f'label = {label}')
-
-                # print(f'y[i].shape = {y[i].shape}')
-                # print(f'y[i] = {y[i]}')
+                self.cache_x[index] = x[i]
+                self.cache_y[index] = label
 
         # If the batch being generated is the last one
         else:
@@ -907,15 +907,15 @@ class DataGenerator(keras.utils.Sequence):
             x = []
             y = []
 
-            print(f'index*self.batch_size = {index*self.batch_size}')
-            print(f'(index+1)*self.batch_size = {(index+1)*self.batch_size}')
-
             crop_positions = self.crop_positions[index*self.batch_size : (index+1)*self.batch_size]
 
             for i in range(0, 100):
                 file_index = crop_positions[i][0]
                 crop_end = crop_positions[i][1]
                 sample = self.data[file_index][(crop_end-self.dim):crop_end]
+
+                print(f'file_index = {file_index}')
+                print(f'crop_end = {crop_end}')
 
                 x.append(sample)
 
@@ -957,4 +957,10 @@ class DataGenerator(keras.utils.Sequence):
         """
         Updates indexes after each epoch.
         """
-        self.next_index = 0
+        self.next_index = 0   # Index of the next batch
+
+        # Cache: stores the N first batches, that can be used later if the asynchronous behavior of Data Generators
+        # make no use of them at first
+        self.cache_size = 10  
+        self.cache_x = np.empty((self.cache_size, self.dim, self.n_channels))
+        self.cache_y = np.empty((self.cache_size, self.n_classes))
