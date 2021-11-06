@@ -128,10 +128,10 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 
 # Argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('--noimode', action='store_false', metavar='identification mode',
-                    help='runs the model in Identification Mode')
-parser.add_argument('--novmode', action='store_false', metavar='verification mode',
-                    help='runs the model in Verification Mode')
+parser.add_argument('--noimode', action='store_false',
+                    help='the model won\'t run in Identification Mode')
+parser.add_argument('--novmode', action='store_false',
+                    help='the model won\'t run in Verification Mode')
 
 args = parser.parse_args()
 print(f'args = {args}')
