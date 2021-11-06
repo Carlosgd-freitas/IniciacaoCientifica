@@ -720,7 +720,7 @@ def n_samples_with_sliding_window(full_signal_size, start, offset):
         - start: sliding window position after the first cropping;
         - offset: amount of samples the window will slide in each iteration.
     """
-    n_samples = 0
+    n_samples = 1
     i = start
 
     if(offset == 0):
@@ -812,7 +812,7 @@ class DataGenerator(keras.utils.Sequence):
 
         if(self.dataset_type == 'train' or self.dataset_type == 'test'):
             signal_index = 0
-            while(signal_index < data.shape[0]):
+            while(signal_index <= data.shape[0]):
                 i = self.dim
 
                 while(i <= data[0].shape[0] * self.split_ratio):
@@ -840,6 +840,9 @@ class DataGenerator(keras.utils.Sequence):
         self.data = data
         self.subjects = subjects
         self.crop_positions = crop_positions
+
+        print(f'self.samples_per_file = {self.samples_per_file}')
+        print(f'self.crop_positions = {self.crop_positions}')
 
         self.on_epoch_end()
 

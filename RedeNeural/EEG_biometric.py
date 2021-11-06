@@ -60,11 +60,12 @@ motor_cortex_yang = ['C1..', 'Cz..', 'C2..']
 occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
 
-#################### Conversar com o Pedro ####################
-# - Data Generator começa a carregar os batches pro fit a partir do 4o batch, aí fica faltando 3 batches do início.
-#   Na segunda época, isso acontece a partir do 3o batch.
-#   Solução temporária: variável lag_counter.
-# - Quando os dados de tamanho batch_size acabam, pode alimentar a rede com dados de tamanhos menores? sim
+#################### TODO ####################
+# - Rever e consertar n_samples_with_sliding_window()
+# - Rever e consertar crop_positions
+# - Porque os indexes estão em sequência aleatória? Eles devem vir em ordem crescente (0, 1, 2, ...)!
+#   - on_epoch_end() deve voltar a produzir self.indexes? juntamente usar o first_index se for o caso, mas
+#   lembrar que isso pode ocasionar o "lag" (batches carregam assincronamente)
 ##############################################
 
 # Tasks:
