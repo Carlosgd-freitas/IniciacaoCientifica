@@ -139,12 +139,11 @@ parser.add_argument('--novmode', action='store_true',
                     help='the model won\'t run in Verification Mode')
 
 parser.add_argument('-train', nargs="+", type=int, required=True, 
-                    help='list of tasks used for training and validation. Specifying only a 0 means the application\n'+
-                    'will not process train/validation data, although this is only possible if --datagen was also'+
-                    'specified.\n This is a REQUIRED flag')
+                    help='list of tasks used for training and validation. All specified tasks need to be higher than\n'+
+                    ' 0 and lower than 15. This is a REQUIRED flag')
 parser.add_argument('-test', nargs="+", type=int, required=True, 
-                    help='list of tasks used for testing. Specifying only a 0 means the application will not process\n'+
-                    'testing data, although this is only possible if --datagen was also specified.\n This is a REQUIRED flag')
+                    help='list of tasks used for testing. All specified tasks need to be higher than 0 and lower than\n'+
+                    ' 15. This is a REQUIRED flag')
 args = parser.parse_args()
 
 train_tasks = args.train
@@ -153,15 +152,20 @@ test_tasks = args.test
 print(f'train_tasks = {train_tasks}')
 print(f'test_tasks = {test_tasks}')
 
-input('quita')
-
 if(not args.datagen):
     if(args.noptrain or args.noptest):
         print('WARNING: When not using Data Generators, both training/validation and testing data will be ' +
         'processed, so there isn\'t a option to use the --noptrain or --noptest flags.\n')
-    if(test_tasks == [0] or test_tasks == [0]):
-        print('ERROR: When not using Data Generators, both training/validation and testing tasks need to be specified.\n')
-        sys.exit()
+    
+    for i in len(train_tasks):
+        if(train_tasks[i] <= 0 or train_tasks[i] >= 15):
+            print('ERROR: When not using Data Generators, both training/validation and testing tasks need to be specified.\n')
+            sys.exit()
+    
+    for i in len(test_tasks):
+        if(test_tasks[i] <= 0 or test_tasks[i] >= 15):
+            print('ERROR: When not using Data Generators, both training/validation and testing tasks need to be specified.\n')
+            sys.exit()
 
 # Defining the optimizer
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
