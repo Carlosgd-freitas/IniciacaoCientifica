@@ -20,7 +20,7 @@ tf.random.set_seed(1051)
 
 # Hyperparameters
 batch_size = 100                # Batch Size
-training_epochs = 10 #40        # Total number of training epochs
+training_epochs = 40            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
@@ -59,14 +59,6 @@ frontal_lobe_yang = ['Af3.', 'Afz.', 'Af4.']
 motor_cortex_yang = ['C1..', 'Cz..', 'C2..']
 occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
-
-#################### TODO ####################
-# - Rever e consertar n_samples_with_sliding_window()
-# - Rever e consertar crop_positions
-# - Porque os indexes estão em sequência aleatória? Eles devem vir em ordem crescente (0, 1, 2, ...)!
-#   - on_epoch_end() deve voltar a produzir self.indexes? juntamente usar o first_index se for o caso, mas
-#   lembrar que isso pode ocasionar o "lag" (batches carregam assincronamente)
-##############################################
 
 # Tasks:
 # Task 1 - EO
@@ -194,7 +186,7 @@ if(not args.datagen):
     if(not args.noimode):
 
         # Creating the model
-        model = models.create_model(window_size, num_channels, num_classes)
+        model = models.create_model_mixed(window_size, num_channels, num_classes)
         model.summary()                                         
 
         # Compiling, defining the LearningRateScheduler and training the model
@@ -270,7 +262,7 @@ if(not args.datagen):
     if(not args.novmode):
 
         # Removing the last layers of the model and getting the features array
-        model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
+        model_for_verification = models.create_model_mixed(window_size, num_channels, num_classes, True)
 
         model_for_verification.summary()
         model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
@@ -360,7 +352,7 @@ else:
     if(not args.noimode):
 
         # Creating the model
-        model = models.create_model(window_size, num_channels, num_classes)
+        model = models.create_model_mixed(window_size, num_channels, num_classes)
         model.summary()
 
         # Getting the file names that contains the preprocessed data
@@ -496,7 +488,7 @@ else:
                                                     num_channels, num_classes, test_tasks, 'test', 1.0)
 
         # Removing the last layers of the model and getting the features array
-        model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
+        model_for_verification = models.create_model_mixed(window_size, num_channels, num_classes, True)
 
         model_for_verification.summary()
         model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])

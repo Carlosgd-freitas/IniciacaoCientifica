@@ -861,10 +861,10 @@ class DataGenerator(keras.utils.Sequence):
         """
         index = self.next_index
 
-        print(f'n_batches = {len(self)}')
-        print(f'index = {index}')
-        print(f'index*self.batch_size = {index*self.batch_size}')
-        print(f'(index+1)*self.batch_size = {(index+1)*self.batch_size}')
+        # print(f'n_batches = {len(self)}')
+        # print(f'index = {index}')
+        # print(f'index*self.batch_size = {index*self.batch_size}')
+        # print(f'(index+1)*self.batch_size = {(index+1)*self.batch_size}')
 
         x = None
         y = None
@@ -900,9 +900,9 @@ class DataGenerator(keras.utils.Sequence):
             
             # Storing the N first batches for later use, if needed
             if(index < self.cache_size):
-                print('storing in cache.')
-                print(f'x[i].shape = {x[i].shape}')
-                print(f'label.shape = {label.shape}')
+                # print('storing in cache.')
+                # print(f'x[i].shape = {x[i].shape}')
+                # print(f'label.shape = {label.shape}')
 
                 self.cache_x[index] = x[i]
                 self.cache_y[index] = label
@@ -951,7 +951,7 @@ class DataGenerator(keras.utils.Sequence):
         
         # Taking data from cache
         else:
-            print('tirando da cache.')
+            # print('tirando da cache.')
 
             if(self.cache_next_index == self.cache_size):
                 self.cache_next_index = 0
@@ -963,15 +963,15 @@ class DataGenerator(keras.utils.Sequence):
 
         # arr = content[: , (i-window_size):i]
         
-        print(f'x.shape = {x.shape}')
+        # print(f'x.shape = {x.shape}')
         # print(f'x = {x}')
 
-        print(f'y.shape = {y.shape}')
+        # print(f'y.shape = {y.shape}')
         # print(f'y = {y}')
 
         self.next_index += 1
 
-        print('\n')
+        # print('\n')
 
         return (x, y)
 
