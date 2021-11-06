@@ -128,13 +128,30 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 
 # Argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('--noimode', action='store_false',
+parser.add_argument('--datagen', action='store_true',
+                    help='the model will use Data Generators to crop data on the fly')
+parser.add_argument('--noimode', action='store_true',
                     help='the model won\'t run in Identification Mode')
-parser.add_argument('--novmode', action='store_false',
+parser.add_argument('--novmode', action='store_true',
                     help='the model won\'t run in Verification Mode')
 
 args = parser.parse_args()
 print(f'args = {args}')
+
+if(args.datagen):
+    print('--datagen foi especificado na linha de comando.')
+else:
+    print('--datagen nao foi especificado na linha de comando.')
+
+if(args.noimode):
+    print('--noimode foi especificado na linha de comando.')
+else:
+    print('--noimode nao foi especificado na linha de comando.')
+
+if(args.novmode):
+    print('--novmode foi especificado na linha de comando.')
+else:
+    print('--novmode nao foi especificado na linha de comando.')
 
 option = 3
 while option != 0:
