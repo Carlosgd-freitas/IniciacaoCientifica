@@ -159,12 +159,12 @@ if(not args.datagen):
 
 for task in train_tasks:
     if(task <= 0 or task >= 15):
-        print('ERROR: When not using Data Generators, both training/validation and testing tasks need to be specified.\n')
+        print('ERROR: All training/validation and testing tasks need to be higher than 0 and lower than 15.\n')
         sys.exit()
 
 for task in test_tasks:
     if(task <= 0 or task >= 15):
-        print('ERROR: When not using Data Generators, both training/validation and testing tasks need to be specified.\n')
+        print('ERROR: All training/validation and testing tasks need to be higher than 0 and lower than 15.\n')
         sys.exit()
 
 # Defining the optimizer
