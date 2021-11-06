@@ -783,11 +783,9 @@ class DataGenerator(keras.utils.Sequence):
         if(self.dataset_type == 'train'):
             self.samples_per_file = n_samples_with_sliding_window(0, self.full_signal_size * self.split_ratio, self.dim, self.offset)
         elif(self.dataset_type == 'validation'):
-            self.samples_per_file = n_samples_with_sliding_window(self.full_signal_size * self.split_ratio, self.full_signal_size, self.offset, self.offset)
+            self.samples_per_file = n_samples_with_sliding_window(self.full_signal_size * self.split_ratio, self.full_signal_size, self.offset, self.offset) - 1
         elif(self.dataset_type == 'test'):
             self.samples_per_file = n_samples_with_sliding_window(0, self.full_signal_size, self.dim, self.offset)
-
-        print(f'{self.dataset_type}, self.samples_per_file = {self.samples_per_file}')
 
         # Loading all files from list_files
         data = []
@@ -844,7 +842,7 @@ class DataGenerator(keras.utils.Sequence):
         self.subjects = subjects
         self.crop_positions = crop_positions
 
-        print(f'\nself.samples_per_file = {self.samples_per_file}')
+        print(f'\n{self.dataset_type}, self.samples_per_file = {self.samples_per_file}')
         print(f'self.crop_positions = {self.crop_positions}')
         print(f'len(self.crop_positions) = {len(self.crop_positions)}\n')
 
@@ -854,9 +852,8 @@ class DataGenerator(keras.utils.Sequence):
         """
         Denotes the number of batches per epoch.
         """
-        n_samples = self.samples_per_file * len(self.tasks) * self.n_classes
 
-        return math.ceil(n_samples / self.batch_size)
+        return math.ceil(len(self.crop_positions) / self.batch_size)
 
     def __getitem__(self, index):
         """
@@ -909,6 +906,9 @@ class DataGenerator(keras.utils.Sequence):
 
             x = []
             y = []
+
+            print(f'index*self.batch_size = {index*self.batch_size}')
+            print(f'(index+1)*self.batch_size = {(index+1)*self.batch_size}')
 
             crop_positions = self.crop_positions[index*self.batch_size : (index+1)*self.batch_size]
 
