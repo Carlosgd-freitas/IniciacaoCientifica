@@ -774,6 +774,8 @@ class DataGenerator(keras.utils.Sequence):
         self.split_ratio = split_ratio
         self.shuffle = shuffle
 
+        print('1')
+
         # Calculating the number of samples per file
         if(self.dataset_type == 'train'):
             self.samples_per_file = math.floor(n_samples_with_sliding_window(self.full_signal_size * self.split_ratio, self.dim, self.offset))
