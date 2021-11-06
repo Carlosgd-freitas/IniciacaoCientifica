@@ -895,6 +895,8 @@ class DataGenerator(keras.utils.Sequence):
 
         # If the batch being generated is the last one
         else:
+            print(f'ultima batch.')
+
             x = []
             y = []
 
@@ -927,13 +929,15 @@ class DataGenerator(keras.utils.Sequence):
             x = np.asarray(x, dtype = object).astype('float32')
             y = np.asarray(y, dtype = object).astype('float32')
 
+            y = np.reshape()
+
         # arr = content[: , (i-window_size):i]
         
         print(f'x.shape = {x.shape}')
-        print(f'x = {x}')
+        # print(f'x = {x}')
 
         print(f'y.shape = {y.shape}')
-        print(f'y = {y}')
+        # print(f'y = {y}')
 
         return (x, y)
 
