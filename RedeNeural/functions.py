@@ -1,6 +1,7 @@
 import os
 import time
 import math
+import random
 import numpy as np
 import matplotlib.pyplot as plt
 # from pyedflib import EdfReader
@@ -797,8 +798,6 @@ class DataGenerator(keras.utils.Sequence):
             i = 0
 
             while(i < self.n_classes):
-                print(f'i = {i}') #
-
                 file_x = np.loadtxt(processed_data_path + 'processed_data/task' + str(task) + '/' + list_files[i], delimiter=';', usecols=range(self.n_channels))
                 string = processed_data_path + 'processed_data/task' + str(task) + '/' + list_files[i]
 
@@ -812,8 +811,6 @@ class DataGenerator(keras.utils.Sequence):
                 i += 1
                 
         data = np.asarray(data, dtype = object).astype('float32')
-
-        print(f'data.shape = {data.shape}') #
         
         # Storing the information of all cropping that will be done in the EEG signals
         crop_positions = []
@@ -848,10 +845,6 @@ class DataGenerator(keras.utils.Sequence):
         self.data = data
         self.subjects = subjects
         self.crop_positions = crop_positions
-
-        # print(f'self.crop_positions = {self.crop_positions}\n')
-        # print(f'\n{self.dataset_type}, self.samples_per_file = {self.samples_per_file}, ', end='')
-        # print(f'len(self.crop_positions) = {len(self.crop_positions)}\n')
 
         self.on_epoch_end()
 
@@ -986,6 +979,11 @@ class DataGenerator(keras.utils.Sequence):
         """
         Updates indexes after each epoch.
         """
+        if self.shuffle == True:
+            random.shuffle(self.crop_positions)
+
+        print(f'self.crop_positions = {self.crop_positions}')
+
         self.next_index = 0       # Index of the next batch
         self.last_sample_used = 0 # Index of the last sample used
 

@@ -369,14 +369,11 @@ else:
         x_test_list = x_test_list.reshape(-1)
         x_test_list = x_test_list.tolist()
 
-        print(f'x_train_list = {x_train_list}') #
-        print(f'x_test_list = {x_test_list}') #
-
         # Defining the data generators
         training_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, full_signal_size,
-                                                    num_channels, num_classes, train_tasks, 'train', split_ratio)
+                                                    num_channels, num_classes, train_tasks, 'train', split_ratio, True)
         validation_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, full_signal_size,
-                                                    num_channels, num_classes, train_tasks, 'validation', split_ratio)
+                                                    num_channels, num_classes, train_tasks, 'validation', split_ratio, True)
         testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size, full_signal_size,
                                                     num_channels, num_classes, test_tasks, 'test', 1.0)
 
@@ -497,7 +494,6 @@ else:
         model_for_verification.summary()
         model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
         model_for_verification.load_weights('model_weights.h5', by_name=True)
-        # x_pred = model_for_verification.predict_generator(testing_generator)
         x_pred = model_for_verification.predict(testing_generator, batch_size=batch_size)
 
         ###
