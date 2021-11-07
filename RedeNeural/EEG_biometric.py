@@ -143,9 +143,6 @@ args = parser.parse_args()
 train_tasks = args.train
 test_tasks = args.test
 
-print(f'train_tasks = {train_tasks}')
-print(f'test_tasks = {test_tasks}')
-
 if(not args.datagen):
     if(args.noptrain or args.noptest):
         print('WARNING: When not using Data Generators, both training/validation and testing data will be ' +

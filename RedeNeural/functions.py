@@ -861,11 +861,6 @@ class DataGenerator(keras.utils.Sequence):
         """
         index = self.next_index
 
-        # print(f'n_batches = {len(self)}')
-        # print(f'index = {index}')
-        # print(f'index*self.batch_size = {index*self.batch_size}')
-        # print(f'(index+1)*self.batch_size = {(index+1)*self.batch_size}')
-
         x = None
         y = None
 
@@ -877,12 +872,8 @@ class DataGenerator(keras.utils.Sequence):
             crop_positions = self.crop_positions[index*self.batch_size : (index+1)*self.batch_size]
 
             for i in range(0, 100):
-                # print(f'i = {i}, ', end='')
-
                 file_index = crop_positions[i][0]
                 crop_end = crop_positions[i][1]
-
-                # print(f'file_index = {file_index}, crop_end = {crop_end}')
 
                 x[i] = self.data[file_index][(crop_end-self.dim):crop_end]
 
@@ -900,17 +891,11 @@ class DataGenerator(keras.utils.Sequence):
             
             # Storing the N first batches for later use, if needed
             if(index < self.cache_size):
-                # print('storing in cache.')
-                # print(f'x[i].shape = {x[i].shape}')
-                # print(f'label.shape = {label.shape}')
-
                 self.cache_x[index] = x[i]
                 self.cache_y[index] = label
 
         # If the batch being generated doesn't have batch_size samples
         elif(self.last_sample_used < len(self.crop_positions) - 1):
-            # print(f'batch quebrada.')
-
             x = []
             y = []
 
@@ -918,7 +903,6 @@ class DataGenerator(keras.utils.Sequence):
 
             count = 0
             for i in range(0, 100):
-                # print(f'i = {i}, ', end='')
 
                 if(self.last_sample_used + count == len(self.crop_positions) - 1):
                     break
@@ -926,8 +910,6 @@ class DataGenerator(keras.utils.Sequence):
                 file_index = crop_positions[i][0]
                 crop_end = crop_positions[i][1]
                 sample = self.data[file_index][(crop_end-self.dim):crop_end]
-
-                # print(f'file_index = {file_index}, crop_end = {crop_end}')
 
                 x.append(sample)
 
@@ -951,7 +933,6 @@ class DataGenerator(keras.utils.Sequence):
         
         # Taking data from cache
         else:
-            # print('tirando da cache.')
 
             if(self.cache_next_index == self.cache_size):
                 self.cache_next_index = 0
@@ -961,17 +942,7 @@ class DataGenerator(keras.utils.Sequence):
 
             self.cache_next_index += 1
 
-        # arr = content[: , (i-window_size):i]
-        
-        # print(f'x.shape = {x.shape}')
-        # print(f'x = {x}')
-
-        # print(f'y.shape = {y.shape}')
-        # print(f'y = {y}')
-
         self.next_index += 1
-
-        # print('\n')
 
         return (x, y)
 
@@ -981,8 +952,6 @@ class DataGenerator(keras.utils.Sequence):
         """
         if self.shuffle == True:
             random.shuffle(self.crop_positions)
-
-        print(f'self.crop_positions = {self.crop_positions}')
 
         self.next_index = 0       # Index of the next batch
         self.last_sample_used = 0 # Index of the last sample used
