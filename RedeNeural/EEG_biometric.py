@@ -283,7 +283,6 @@ else:
     if(not args.noptrain):
 
         for task in train_tasks:
-            print(f'task = {task}') #
 
             if(not os.path.exists(processed_data_path + 'processed_data/task'+str(task))):
                 folder = Path(processed_data_path + 'processed_data/task'+str(task))
@@ -311,12 +310,11 @@ else:
                     list.append(string+'.csv')
                     
                 savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
-                print(f'file names were saved to processed_data/task{task}/x_list.csv ... ',end='')
+                print(f'file names were saved to processed_data/task{task}/x_list.csv')
     
     # Processing test data
     if(not args.noptest):
         for task in test_tasks:
-            print(f'task = {task}') #
 
             if(not os.path.exists(processed_data_path + 'processed_data/task'+str(task))):
                 folder = Path(processed_data_path + 'processed_data/task'+str(task))
@@ -344,7 +342,7 @@ else:
                     list.append(string+'.csv')
                     
                 savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
-                print(f'file names were saved to processed_data/task{task}/x_list.csv ... ',end='')
+                print(f'file names were saved to processed_data/task{task}/x_list.csv')
 
     # Running the model in Identification Mode
     if(not args.noimode):
