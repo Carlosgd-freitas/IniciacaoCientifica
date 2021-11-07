@@ -793,22 +793,24 @@ class DataGenerator(keras.utils.Sequence):
         data = []
         subjects = []
 
-        i = 0
         for task in self.tasks:
-            if(i == len(list_files)):
-                break
+            i = 0
 
-            file_x = np.loadtxt(processed_data_path + 'processed_data/task' + str(task) + '/' + list_files[i], delimiter=';', usecols=range(self.n_channels))
-            string = processed_data_path + 'processed_data/task' + str(task) + '/' + list_files[i]
+            while(i < self.n_classes):
+                print(f'i = {i}') #
 
-            file_x = np.asarray(file_x, dtype = object).astype('float32')
-            data.append(file_x)
+                file_x = np.loadtxt(processed_data_path + 'processed_data/task' + str(task) + '/' + list_files[i], delimiter=';', usecols=range(self.n_channels))
+                string = processed_data_path + 'processed_data/task' + str(task) + '/' + list_files[i]
 
-            string = string.split("_subject_")[1]      # 'X.csv'
-            subject = int(string.split(".csv")[0])     # X
-            subjects.append(subject)
+                file_x = np.asarray(file_x, dtype = object).astype('float32')
+                data.append(file_x)
 
-            i += 1
+                string = string.split("_subject_")[1]      # 'X.csv'
+                subject = int(string.split(".csv")[0])     # X
+                subjects.append(subject)
+
+                i += 1
+                
         data = np.asarray(data, dtype = object).astype('float32')
 
         print(f'data.shape = {data.shape}') #
