@@ -464,7 +464,7 @@ else:
                 file_x = file_x.T
                 temp_x.append(file_x)
 
-                string = string.split("_train_")[1]      # 'X.csv'
+                string = string.split("_subject_")[1]    # 'X.csv'
                 subject = int(string.split(".csv")[0])   # X
                 subjects.append(subject)
 
