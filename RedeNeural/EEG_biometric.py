@@ -124,9 +124,15 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--datagen', action='store_true',
                     help='the model will use Data Generators to crop data on the fly')
 parser.add_argument('--noptrain', action='store_true',
-                    help='train/validation data will not be preprocessed and stored. This argument can only be specified if --datagen was also specified')
+                    help='train/validation data will not be preprocessed and stored. This argument can only be'+
+                    ' specified if --datagen was also specified')
 parser.add_argument('--noptest', action='store_true',
-                    help='test data will not be preprocessed and stored. This argument can only be specified if --datagen was also specified')
+                    help='test data will not be preprocessed and stored. This argument can only be specified if'+
+                    ' --datagen was also specified')
+parser.add_argument('--nofit', action='store_true',
+                    help='model.fit will not be executed. The weights will be gathered from the file'+
+                    ' \'model_weights.h5\', that is generated if you have ran the model in Identification mode'
+                    ' at least once')
 parser.add_argument('--noimode', action='store_true',
                     help='the model won\'t run in Identification Mode')
 parser.add_argument('--novmode', action='store_true',
@@ -158,8 +164,9 @@ for task in test_tasks:
         print('ERROR: All training/validation and testing tasks need to be higher than 0 and lower than 15.\n')
         sys.exit()
 
-# Defining the optimizer
+# Defining the optimizer and the learning rate scheduler
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
+lr_scheduler = LearningRateScheduler(models.scheduler, verbose=0)
 
 # Not using Data Generators
 if(not args.datagen):
@@ -177,27 +184,26 @@ if(not args.datagen):
     # Getting the training, validation and testing data
     x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
                                                         window_size, offset, split_ratio)
-    x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, full_signal_size,
-                                        full_signal_size)
+    x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, window_size,
+                                        window_size)
 
-    # Running the model in Identification Mode
-    if(not args.noimode):
+    # Training the model
+    if(not args.nofit):
 
         # Creating the model
         model = models.create_model_mixed(window_size, num_channels, num_classes)
-        model.summary()                                         
+        model.summary()
 
         # Compiling, defining the LearningRateScheduler and training the model
         model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
 
         fit_begin = time.time()
 
-        callback = LearningRateScheduler(models.scheduler, verbose=0)
         results = model.fit(x_train,
                             y_train,
                             batch_size = batch_size,
                             epochs = training_epochs,
-                            callbacks = [callback],
+                            callbacks = [lr_scheduler],
                             validation_data = (x_val, y_val)
                             )
 
@@ -205,29 +211,6 @@ if(not args.datagen):
         print(f'Training time in seconds: {fit_end - fit_begin}')
         print(f'Training time in minutes: {(fit_end - fit_begin)/60.0}')
         print(f'Training time in hours: {(fit_end - fit_begin)/3600.0}\n')
-
-        # Saving model weights
-        model.save('model_weights.h5')
-
-        # Evaluate the model to see the accuracy
-        print('\nEvaluating on training set...')
-        (loss, accuracy) = model.evaluate(x_train, y_train, verbose = 0)
-        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
-
-        print('Evaluating on validation set...')
-        (loss, accuracy) = model.evaluate(x_val, y_val, verbose = 0)
-        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
-
-        print('Evaluating on testing set...')
-        test_begin = time.time()
-
-        (loss, accuracy) = model.evaluate(x_test, y_test, verbose = 0)
-        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
-
-        test_end = time.time()
-        print(f'Evaluating on testing set time in miliseconds: {(test_end - test_begin) * 1000.0}')
-        print(f'Evaluating on testing set time in seconds: {test_end - test_begin}')
-        print(f'Evaluating on testing set time in minutes: {(test_end - test_begin)/60.0}\n')
 
         # Summarize history for accuracy
         plt.subplot(211)
@@ -255,6 +238,37 @@ if(not args.datagen):
         print("Maximum Loss : {:.4f}".format(max_loss))
         print("Minimum Loss : {:.4f}".format(min_loss))
         print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
+
+        # Saving model weights
+        model.save('model_weights.h5')
+
+    # Running the model in Identification Mode
+    if(not args.noimode):
+
+        # Evaluate the model to see the accuracy
+        model = models.create_model_mixed(window_size, num_channels, num_classes)
+        model.summary()
+        model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+        model.load_weights('model_weights.h5', by_name=True)
+
+        print('\nEvaluating on training set...')
+        (loss, accuracy) = model.evaluate(x_train, y_train, verbose = 0)
+        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+
+        print('Evaluating on validation set...')
+        (loss, accuracy) = model.evaluate(x_val, y_val, verbose = 0)
+        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+
+        print('Evaluating on testing set...')
+        test_begin = time.time()
+
+        (loss, accuracy) = model.evaluate(x_test, y_test, verbose = 0)
+        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+
+        test_end = time.time()
+        print(f'Evaluating on testing set time in miliseconds: {(test_end - test_begin) * 1000.0}')
+        print(f'Evaluating on testing set time in seconds: {test_end - test_begin}')
+        print(f'Evaluating on testing set time in minutes: {(test_end - test_begin)/60.0}\n')
 
     # Running the model in Verification Mode
     if(not args.novmode):
@@ -341,8 +355,8 @@ else:
                 savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
                 print(f'file names were saved to processed_data/task{task}/x_list.csv')
 
-    # Running the model in Identification Mode
-    if(not args.noimode):
+    # Training the model
+    if(not args.nofit):
 
         # Creating the model
         model = models.create_model_mixed(window_size, num_channels, num_classes)
@@ -379,7 +393,6 @@ else:
 
         fit_begin = time.time()
 
-        lr_scheduler = LearningRateScheduler(models.scheduler, verbose=0)
         results = model.fit(training_generator,
                             validation_data = validation_generator,
                             epochs = training_epochs,
@@ -390,29 +403,6 @@ else:
         print(f'Training time in seconds: {fit_end - fit_begin}')
         print(f'Training time in minutes: {(fit_end - fit_begin)/60.0}')
         print(f'Training time in hours: {(fit_end - fit_begin)/3600.0}\n')
-
-        # Saving model weights
-        model.save('model_weights.h5')
-
-        # Evaluate the model to see the accuracy
-        print('\nEvaluating on training set...')
-        (loss, accuracy) = model.evaluate(training_generator, verbose = 0)
-        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
-
-        print('Evaluating on validation set...')
-        (loss, accuracy) = model.evaluate(validation_generator, verbose = 0)
-        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
-
-        print('Evaluating on testing set...')
-        test_begin = time.time()
-
-        (loss, accuracy) = model.evaluate(testing_generator, verbose = 0)
-        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
-
-        test_end = time.time()
-        print(f'Evaluating on testing set time in miliseconds: {(test_end - test_begin) * 1000.0}')
-        print(f'Evaluating on testing set time in seconds: {test_end - test_begin}')
-        print(f'Evaluating on testing set time in minutes: {(test_end - test_begin)/60.0}\n')
 
         # Summarize history for accuracy
         plt.subplot(211)
@@ -440,6 +430,37 @@ else:
         print("Maximum Loss : {:.4f}".format(max_loss))
         print("Minimum Loss : {:.4f}".format(min_loss))
         print("Loss difference : {:.4f}\n".format((max_loss - min_loss)))
+        
+        # Saving model weights
+        model.save('model_weights.h5')
+
+    # Running the model in Identification Mode
+    if(not args.noimode):
+
+        # Evaluate the model to see the accuracy
+        model = models.create_model_mixed(window_size, num_channels, num_classes)
+        model.summary()
+        model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+        model.load_weights('model_weights.h5', by_name=True)
+
+        print('\nEvaluating on training set...')
+        (loss, accuracy) = model.evaluate(training_generator, verbose = 0)
+        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+
+        print('Evaluating on validation set...')
+        (loss, accuracy) = model.evaluate(validation_generator, verbose = 0)
+        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+
+        print('Evaluating on testing set...')
+        test_begin = time.time()
+
+        (loss, accuracy) = model.evaluate(testing_generator, verbose = 0)
+        print('loss={:.4f}, accuracy: {:.4f}%\n'.format(loss,accuracy * 100))
+
+        test_end = time.time()
+        print(f'Evaluating on testing set time in miliseconds: {(test_end - test_begin) * 1000.0}')
+        print(f'Evaluating on testing set time in seconds: {test_end - test_begin}')
+        print(f'Evaluating on testing set time in minutes: {(test_end - test_begin)/60.0}\n')
     
     # Running the model in Verification Mode
     if(not args.novmode):
