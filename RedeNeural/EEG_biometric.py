@@ -280,73 +280,68 @@ else:
 
     # Processing train/validation data
     if(not args.noptrain):
-        if(os.path.exists('processed_train_data')):
-            shutil.rmtree('processed_train_data', ignore_errors=True)
-        os.mkdir('processed_train_data')
 
-        # Loading the raw data
-        train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
+        for task in train_tasks:
+            print(f'task = {task}') #
 
-        # Filtering the raw data
-        train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+            if(not os.path.exists('processed_data/task'+str(task))):
+                os.mkdir('processed_data/task'+str(task))
 
-        # Normalize the filtered data
-        train_content = functions.normalize_data(train_content, 'sun', 1)
+                # Loading the raw data
+                train_content, test_content = functions.load_data(folder_path, [task], [], 'csv', num_classes)   
 
-        # Getting the training, validation and testing data
-        x_train, y_train = functions.crop_data(train_content, train_tasks, num_classes, full_signal_size,
-                                            full_signal_size, reshape='data_generator')
+                # Filtering the raw data
+                train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
 
-        counter = 1
-        list = []
-        for index in range(0, x_train.shape[0]):
-            if(counter > num_classes):
-                counter = 1
-            data = x_train[index]
-            string = 'x_train_' + str(index) + '_subject_' + str(counter)
-            savetxt('processed_train_data/'+string+'.csv', data, fmt='%f', delimiter=';')
-            print('processed_train_data/'+string+'.csv was saved.')
-            list.append(string+'.csv')
-            counter += 1
-            
-        print('saving file names to processed_train_data/x_train_list.csv ... ',end='')
-        savetxt('processed_train_data/x_train_list.csv', [list], delimiter=',', fmt='%s')
-        print('saved!')
+                # Normalize the filtered data
+                train_content = functions.normalize_data(train_content, 'sun')
+
+                # Getting the training, validation and testing data
+                x_train, y_train = functions.crop_data(train_content, [task], num_classes, full_signal_size,
+                                                    full_signal_size, reshape='data_generator')
+
+                list = []
+                for index in range(0, x_train.shape[0]):
+                    data = x_train[index]
+                    string = 'x_subject_' + str(index+1)
+                    savetxt('processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
+                    print('processed_data/task' + str(task) + '/' + string + '.csv was saved.')
+                    list.append(string+'.csv')
+                    
+                savetxt('processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
+                print(f'file names were saved to processed_data/task{task}/x_list.csv ... ',end='')
     
     # Processing test data
     if(not args.noptest):
-        if(os.path.exists('processed_test_data')):
-            shutil.rmtree('processed_test_data', ignore_errors=True)
-        os.mkdir('processed_test_data')
+        for task in test_tasks:
+            print(f'task = {task}') #
 
-        # Loading the raw data
-        train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
+            if(not os.path.exists('processed_data/task'+str(task))):
+                os.mkdir('processed_data/task'+str(task))
 
-        # Filtering the raw data
-        test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+                # Loading the raw data
+                train_content, test_content = functions.load_data(folder_path, [], [task], 'csv', num_classes)   
 
-        # Normalize the filtered data
-        test_content = functions.normalize_data(test_content, 'sun', 1)
+                # Filtering the raw data
+                test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
 
-        # Getting the training, validation and testing data
-        x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, full_signal_size,
-                                            full_signal_size, reshape='data_generator')
-        
-        counter = 1
-        list = []
-        for index in range(0, x_test.shape[0]):
-            if(counter > num_classes):
-                counter = 1
-            data = x_test[index]
-            string = 'x_test_' + str(index) + '_subject_' + str(counter)
-            savetxt('processed_test_data/'+string+'.csv', data, fmt='%f', delimiter=';')
-            print('processed_test_data/'+string+'.csv was saved.')
-            list.append(string+'.csv')
-            counter += 1
-            
-        print('saving file names to processed_test_data/x_test_list.csv ... ',end='')
-        savetxt('processed_test_data/x_test_list.csv', [list], delimiter=',', fmt='%s')
-        print('saved!')
+                # Normalize the filtered data
+                test_content = functions.normalize_data(test_content, 'sun')
+
+                # Getting the training, validation and testing data
+                x_test, y_test = functions.crop_data(test_content, [task], num_classes, full_signal_size,
+                                                    full_signal_size, reshape='data_generator')
+
+                list = []
+                for index in range(0, x_test.shape[0]):
+                    data = x_test[index]
+                    string = 'x_subject_' + str(index+1)
+                    savetxt('processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
+                    print('processed_data/task' + str(task) + '/' + string + '.csv was saved.')
+                    list.append(string+'.csv')
+                    
+                savetxt('processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
+                print(f'file names were saved to processed_data/task{task}/x_list.csv ... ',end='')
 
     # Running the model in Identification Mode
     if(not args.noimode):
@@ -359,16 +354,22 @@ else:
         x_train_list = []
         x_test_list = []
 
-        x_train_list.append(loadtxt('processed_train_data/x_train_list.csv', delimiter=',', dtype='str'))
-        x_test_list.append(loadtxt('processed_test_data/x_test_list.csv', delimiter=',', dtype='str'))
+        for task in train_tasks:
+            x_train_list.append(loadtxt('processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
+
+        for task in test_tasks:
+            x_test_list.append(loadtxt('processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
 
         x_train_list = np.asarray(x_train_list).astype('str')
+        x_train_list = x_train_list.reshape(-1)
         x_train_list = x_train_list.tolist()
-        x_train_list = x_train_list[0]
 
         x_test_list = np.asarray(x_test_list).astype('str')
+        x_test_list = x_test_list.reshape(-1)
         x_test_list = x_test_list.tolist()
-        x_test_list = x_test_list[0]
+
+        print(f'x_train_list = {x_train_list}') #
+        print(f'x_test_list = {x_test_list}') #
 
         # Defining the data generators
         training_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, full_signal_size,
@@ -385,7 +386,7 @@ else:
 
         lr_scheduler = LearningRateScheduler(models.scheduler, verbose=0)
         results = model.fit(training_generator,
-                            validation_data=validation_generator,
+                            validation_data = validation_generator,
                             epochs = training_epochs,
                             callbacks = [lr_scheduler],
                             )
@@ -450,25 +451,27 @@ else:
 
         # List of files that contains x_test data
         x_test_list = []
-        x_test_list.append(loadtxt('processed_test_data/x_test_list.csv', delimiter=',', dtype='str'))
+        for task in test_tasks:
+            x_test_list.append(loadtxt('processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
         x_test_list = np.asarray(x_test_list).astype('str')
+        x_test_list = x_test_list.reshape(-1)
         x_test_list = x_test_list.tolist()
-        x_test_list = x_test_list[0]
 
         # Loading x_test data
         temp_x = []
         subjects = []
-        for i, ID in enumerate(x_test_list):
-            file_x = np.loadtxt('processed_test_data/' + x_test_list[i], delimiter=';', usecols=range(num_channels))
-            string = 'processed_test_data/' + x_test_list[i]
+        for task in test_tasks:
+            for i, ID in enumerate(x_test_list):
+                file_x = np.loadtxt('processed_data/task' + str(task) + '/' + x_test_list[i], delimiter=';', usecols=range(num_channels))
+                string = 'processed_data/task' + str(task) + '/' + x_test_list[i]
 
-            file_x = np.asarray(file_x, dtype = object).astype('float32')
-            file_x = file_x.T
-            temp_x.append(file_x)
+                file_x = np.asarray(file_x, dtype = object).astype('float32')
+                file_x = file_x.T
+                temp_x.append(file_x)
 
-            string = string.split("_subject_")[1]      # 'X.csv'
-            subject = int(string.split(".csv")[0])     # X
-            subjects.append(subject)
+                string = string.split("_train_")[1]      # 'X.csv'
+                subject = int(string.split(".csv")[0])   # X
+                subjects.append(subject)
 
         # Cropping y_test data
         x_dataL = list()

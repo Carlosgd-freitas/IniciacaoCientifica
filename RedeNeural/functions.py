@@ -791,14 +791,13 @@ class DataGenerator(keras.utils.Sequence):
         data = []
         subjects = []
 
-        for i, ID in enumerate(list_files):
-            if(self.dataset_type == 'train' or self.dataset_type == 'validation'):
-                file_x = np.loadtxt('processed_train_data/' + list_files[i], delimiter=';', usecols=range(self.n_channels))
-                string = 'processed_train_data/' + list_files[i]
+        i = 0
+        for task in self.tasks:
+            if(i == len(list_files)):
+                break
 
-            elif(self.dataset_type == 'test'):
-                file_x = np.loadtxt('processed_test_data/' + list_files[i], delimiter=';', usecols=range(self.n_channels))
-                string = 'processed_test_data/' + list_files[i]
+            file_x = np.loadtxt('processed_data/task' + str(task) + '/' + list_files[i], delimiter=';', usecols=range(self.n_channels))
+            string = 'processed_data/task' + str(task) + '/' + list_files[i]
 
             file_x = np.asarray(file_x, dtype = object).astype('float32')
             data.append(file_x)
@@ -806,7 +805,11 @@ class DataGenerator(keras.utils.Sequence):
             string = string.split("_subject_")[1]      # 'X.csv'
             subject = int(string.split(".csv")[0])     # X
             subjects.append(subject)
+
+            i += 1
         data = np.asarray(data, dtype = object).astype('float32')
+
+        print(f'data.shape = {data.shape}') #
         
         # Storing the information of all cropping that will be done in the EEG signals
         crop_positions = []
