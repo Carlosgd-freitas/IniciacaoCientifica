@@ -2,7 +2,6 @@ import models
 import functions
 
 import argparse
-import shutil
 import sys
 import os
 import time
@@ -10,8 +9,9 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
+from pathlib import Path
 from tensorflow.keras.callbacks import LearningRateScheduler
-from tensorflow.keras.optimizers import SGD, Adam
+from tensorflow.keras.optimizers import SGD
 from numpy import savetxt, loadtxt
 
 random.seed(1051)
@@ -26,7 +26,7 @@ initial_learning_rate = 0.01    # Initial learning rate
 # Parameters used in functions.load_data()
 # folder_path = './Dataset_CSV/'
 folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
-path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
+processed_data_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
 num_classes = 109               # Total number of classes (individuals)
 
 # Parameters used in functions.filter_data()
@@ -285,8 +285,9 @@ else:
         for task in train_tasks:
             print(f'task = {task}') #
 
-            if(not os.path.exists(path + 'processed_data/task'+str(task))):
-                os.mkdir(path + 'processed_data/task'+str(task))
+            if(not os.path.exists(processed_data_path + 'processed_data/task'+str(task))):
+                folder = Path(processed_data_path + 'processed_data/task'+str(task))
+                folder.mkdir(parents=True)
 
                 # Loading the raw data
                 train_content, test_content = functions.load_data(folder_path, [task], [], 'csv', num_classes)   
@@ -305,11 +306,11 @@ else:
                 for index in range(0, x_train.shape[0]):
                     data = x_train[index]
                     string = 'x_subject_' + str(index+1)
-                    savetxt(path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
-                    print(path + 'processed_data/task' + str(task) + '/' + string + '.csv was saved.')
+                    savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
+                    print(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv was saved.')
                     list.append(string+'.csv')
                     
-                savetxt(path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
+                savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
                 print(f'file names were saved to processed_data/task{task}/x_list.csv ... ',end='')
     
     # Processing test data
@@ -317,8 +318,9 @@ else:
         for task in test_tasks:
             print(f'task = {task}') #
 
-            if(not os.path.exists(path + 'processed_data/task'+str(task))):
-                os.mkdir(path + 'processed_data/task'+str(task))
+            if(not os.path.exists(processed_data_path + 'processed_data/task'+str(task))):
+                folder = Path(processed_data_path + 'processed_data/task'+str(task))
+                folder.mkdir(parents=True)
 
                 # Loading the raw data
                 train_content, test_content = functions.load_data(folder_path, [], [task], 'csv', num_classes)   
@@ -337,11 +339,11 @@ else:
                 for index in range(0, x_test.shape[0]):
                     data = x_test[index]
                     string = 'x_subject_' + str(index+1)
-                    savetxt(path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
-                    print(path + 'processed_data/task' + str(task) + '/' + string + '.csv was saved.')
+                    savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
+                    print(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv was saved.')
                     list.append(string+'.csv')
                     
-                savetxt(path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
+                savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
                 print(f'file names were saved to processed_data/task{task}/x_list.csv ... ',end='')
 
     # Running the model in Identification Mode
@@ -356,10 +358,10 @@ else:
         x_test_list = []
 
         for task in train_tasks:
-            x_train_list.append(loadtxt(path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
+            x_train_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
 
         for task in test_tasks:
-            x_test_list.append(loadtxt(path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
+            x_test_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
 
         x_train_list = np.asarray(x_train_list).astype('str')
         x_train_list = x_train_list.reshape(-1)
@@ -453,7 +455,7 @@ else:
         # List of files that contains x_test data
         x_test_list = []
         for task in test_tasks:
-            x_test_list.append(loadtxt(path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
+            x_test_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
         x_test_list = np.asarray(x_test_list).astype('str')
         x_test_list = x_test_list.reshape(-1)
         x_test_list = x_test_list.tolist()
@@ -463,8 +465,8 @@ else:
         subjects = []
         for task in test_tasks:
             for i, ID in enumerate(x_test_list):
-                file_x = np.loadtxt(path + 'processed_data/task' + str(task) + '/' + x_test_list[i], delimiter=';', usecols=range(num_channels))
-                string = path + 'processed_data/task' + str(task) + '/' + x_test_list[i]
+                file_x = np.loadtxt(processed_data_path + 'processed_data/task' + str(task) + '/' + x_test_list[i], delimiter=';', usecols=range(num_channels))
+                string = processed_data_path + 'processed_data/task' + str(task) + '/' + x_test_list[i]
 
                 file_x = np.asarray(file_x, dtype = object).astype('float32')
                 file_x = file_x.T
