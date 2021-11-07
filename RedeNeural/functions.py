@@ -738,6 +738,8 @@ def n_samples_with_sliding_window(start, end, window_size, offset):
 
     return n_samples
 
+processed_data_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
+
 class DataGenerator(keras.utils.Sequence):
     """
     Generates data for the model on the fly, using a sliding window for data augmentation.
@@ -796,8 +798,8 @@ class DataGenerator(keras.utils.Sequence):
             if(i == len(list_files)):
                 break
 
-            file_x = np.loadtxt('processed_data/task' + str(task) + '/' + list_files[i], delimiter=';', usecols=range(self.n_channels))
-            string = 'processed_data/task' + str(task) + '/' + list_files[i]
+            file_x = np.loadtxt(processed_data_path + 'processed_data/task' + str(task) + '/' + list_files[i], delimiter=';', usecols=range(self.n_channels))
+            string = processed_data_path + 'processed_data/task' + str(task) + '/' + list_files[i]
 
             file_x = np.asarray(file_x, dtype = object).astype('float32')
             data.append(file_x)
