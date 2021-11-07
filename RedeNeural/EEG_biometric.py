@@ -493,11 +493,6 @@ else:
         model_for_verification.load_weights('model_weights.h5', by_name=True)
         x_pred = model_for_verification.predict(testing_generator, batch_size=batch_size)
 
-        ###
-        print(f'\ny_test.shape = {y_test.shape}\n')
-        print(f'\nx_pred.shape = {x_pred.shape}\n')
-        ###
-
         # Calculating EER and Decidability
         y_test_classes = functions.one_hot_encoding_to_classes(y_test)
         d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
