@@ -382,11 +382,11 @@ else:
 
         # Defining the data generators
         training_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, full_signal_size,
-                                                    num_channels, num_classes, train_tasks, 'train', split_ratio, True)
+                                                    num_channels, num_classes, train_tasks, 'train', split_ratio)
         validation_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, full_signal_size,
-                                                    num_channels, num_classes, train_tasks, 'validation', split_ratio, True)
+                                                    num_channels, num_classes, train_tasks, 'validation', split_ratio)
         testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size, full_signal_size,
-                                                    num_channels, num_classes, test_tasks, 'test', 1.0, True)
+                                                    num_channels, num_classes, test_tasks, 'test', 1.0)
 
         # Compiling, defining the LearningRateScheduler and training the model
         model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
