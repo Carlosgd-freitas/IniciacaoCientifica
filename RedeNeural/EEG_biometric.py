@@ -1,5 +1,8 @@
 import models
-import functions
+import preprocessing
+import utils
+import data_manipulation
+import loader
 
 import argparse
 import sys
@@ -171,20 +174,20 @@ lr_scheduler = LearningRateScheduler(models.scheduler, verbose=0)
 # Not using Data Generators
 if(not args.datagen):
     # Loading the raw data
-    train_content, test_content = functions.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
+    train_content, test_content = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
 
     # Filtering the raw data
-    train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
-    test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+    train_content = preprocessing.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+    test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
 
     # Normalize the filtered data
-    train_content = functions.normalize_data(train_content, 'sun', 1)
-    test_content = functions.normalize_data(test_content, 'sun', 1)
+    train_content = preprocessing.normalize_data(train_content, 'sun', 1)
+    test_content = preprocessing.normalize_data(test_content, 'sun', 1)
 
     # Getting the training, validation and testing data
-    x_train, y_train, x_val, y_val = functions.crop_data(train_content, train_tasks, num_classes,
+    x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, train_tasks, num_classes,
                                                         window_size, offset, split_ratio)
-    x_test, y_test = functions.crop_data(test_content, test_tasks, num_classes, window_size,
+    x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_classes, window_size,
                                         window_size)
 
     # Training the model
@@ -282,8 +285,8 @@ if(not args.datagen):
         x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
         # Calculating EER and Decidability
-        y_test_classes = functions.one_hot_encoding_to_classes(y_test)
-        d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
+        y_test_classes = utils.one_hot_encoding_to_classes(y_test)
+        d, eer, thresholds = utils.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
         print(f'EER: {eer*100.0} %')
         print(f'Decidability: {d}')
 
@@ -300,16 +303,16 @@ else:
                 folder.mkdir(parents=True)
 
                 # Loading the raw data
-                train_content, test_content = functions.load_data(folder_path, [task], [], 'csv', num_classes)   
+                train_content, test_content = loader.load_data(folder_path, [task], [], 'csv', num_classes)   
 
                 # Filtering the raw data
-                train_content = functions.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
+                train_content = preprocessing.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
 
                 # Normalize the filtered data
-                train_content = functions.normalize_data(train_content, 'sun')
+                train_content = preprocessing.normalize_data(train_content, 'sun')
 
                 # Getting the training, validation and testing data
-                x_train, y_train = functions.crop_data(train_content, [task], num_classes, full_signal_size,
+                x_train, y_train = data_manipulation.crop_data(train_content, [task], num_classes, full_signal_size,
                                                     full_signal_size, reshape='data_generator')
 
                 list = []
@@ -332,16 +335,16 @@ else:
                 folder.mkdir(parents=True)
 
                 # Loading the raw data
-                train_content, test_content = functions.load_data(folder_path, [], [task], 'csv', num_classes)   
+                train_content, test_content = loader.load_data(folder_path, [], [task], 'csv', num_classes)   
 
                 # Filtering the raw data
-                test_content = functions.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
+                test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
 
                 # Normalize the filtered data
-                test_content = functions.normalize_data(test_content, 'sun')
+                test_content = preprocessing.normalize_data(test_content, 'sun')
 
                 # Getting the training, validation and testing data
-                x_test, y_test = functions.crop_data(test_content, [task], num_classes, full_signal_size,
+                x_test, y_test = data_manipulation.crop_data(test_content, [task], num_classes, full_signal_size,
                                                     full_signal_size, reshape='data_generator')
 
                 list = []
@@ -381,11 +384,11 @@ else:
         x_test_list = x_test_list.tolist()
 
         # Defining the data generators
-        training_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, full_signal_size,
+        training_generator = data_manipulation.DataGenerator(x_train_list, batch_size, window_size, offset, full_signal_size,
                                                     num_channels, num_classes, train_tasks, 'train', split_ratio)
-        validation_generator = functions.DataGenerator(x_train_list, batch_size, window_size, offset, full_signal_size,
+        validation_generator = data_manipulation.DataGenerator(x_train_list, batch_size, window_size, offset, full_signal_size,
                                                     num_channels, num_classes, train_tasks, 'validation', split_ratio)
-        testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size, full_signal_size,
+        testing_generator = data_manipulation.DataGenerator(x_test_list, batch_size, window_size, window_size, full_signal_size,
                                                     num_channels, num_classes, test_tasks, 'test', 1.0)
 
         # Compiling, defining the LearningRateScheduler and training the model
@@ -495,7 +498,7 @@ else:
 
         pos = 0
         for data in temp_x:
-            x_dataL, y_dataL = functions.signal_cropping(x_dataL, y_dataL, data, window_size, window_size, subjects[pos],
+            x_dataL, y_dataL = data_manipulation.signal_cropping(x_dataL, y_dataL, data, window_size, window_size, subjects[pos],
                                 num_classes, mode='labels_only')
             pos += 1
         
@@ -503,7 +506,7 @@ else:
         y_test = y_test.reshape(y_test.shape[0], y_test.shape[2])
 
         # Defining the generator
-        testing_generator = functions.DataGenerator(x_test_list, batch_size, window_size, window_size, full_signal_size,
+        testing_generator = data_manipulation.DataGenerator(x_test_list, batch_size, window_size, window_size, full_signal_size,
                                                     num_channels, num_classes, test_tasks, 'test', 1.0)
 
         # Removing the last layers of the model and getting the features array
@@ -515,7 +518,7 @@ else:
         x_pred = model_for_verification.predict(testing_generator, batch_size=batch_size)
 
         # Calculating EER and Decidability
-        y_test_classes = functions.one_hot_encoding_to_classes(y_test)
-        d, eer, thresholds = functions.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
+        y_test_classes = utils.one_hot_encoding_to_classes(y_test)
+        d, eer, thresholds = utils.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
         print(f'EER: {eer*100.0} %')
-        print(f'Decidability: {d}')    
+        print(f'Decidability: {d}')
