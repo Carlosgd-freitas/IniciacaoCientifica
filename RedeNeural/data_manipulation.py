@@ -455,8 +455,8 @@ class DataGenerator(keras.utils.Sequence):
             else:
                 self.last_sample_used += count - 1
 
-            print(f'x.shape = {x.shape}')
-            print(f'y.shape = {y.shape}')
+            # print(f'x.shape = {x.shape}')
+            # print(f'y.shape = {y.shape}')
 
             # Storing the N first batches for later use, if needed
             if(index < self.cache_size):

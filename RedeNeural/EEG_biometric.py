@@ -397,9 +397,9 @@ else:
 
         # Defining the data generators
         training_generator = data_manipulation.DataGenerator(x_train_list, batch_size, window_size, offset,
-            full_signal_size, num_channels, num_classes, train_tasks, 'train', split_ratio, processed_data_path)
+            full_signal_size, num_channels, num_classes, train_tasks, 'train', split_ratio, processed_data_path, True)
         validation_generator = data_manipulation.DataGenerator(x_train_list, batch_size, window_size, offset,
-            full_signal_size, num_channels, num_classes, train_tasks, 'validation', split_ratio, processed_data_path)
+            full_signal_size, num_channels, num_classes, train_tasks, 'validation', split_ratio, processed_data_path, True)
         # testing_generator = data_manipulation.DataGenerator(x_test_list, batch_size, window_size, window_size,
         #     full_signal_size, num_channels, num_classes, test_tasks, 'test', 1.0, processed_data_path)
 
