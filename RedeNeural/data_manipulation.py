@@ -344,8 +344,8 @@ class DataGenerator(keras.utils.Sequence):
 
         #         signal_index += 1
         
-        print(f'self.dataset_type = {self.dataset_type}, len(crop_positions) = {len(crop_positions)}')
-        print(f'crop_positions = {crop_positions}')
+        # print(f'self.dataset_type = {self.dataset_type}, len(crop_positions) = {len(crop_positions)}')
+        # print(f'crop_positions = {crop_positions}')
 
         self.data = data
         self.subjects = subjects
