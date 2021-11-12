@@ -371,37 +371,37 @@ else:
     #             savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
     #             print(f'file names were saved to processed_data/task{task}/x_list.csv')
 
+    # Getting the file names that contains the preprocessed data
+    x_train_list = []
+    # x_test_list = []
+
+    for task in train_tasks:
+        x_train_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
+
+    # for task in test_tasks:
+    #     x_test_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
+
+    x_train_list = np.asarray(x_train_list).astype('str')
+    x_train_list = x_train_list.reshape(-1)
+    x_train_list = x_train_list.tolist()
+
+    # x_test_list = np.asarray(x_test_list).astype('str')
+    # x_test_list = x_test_list.reshape(-1)
+    # x_test_list = x_test_list.tolist()
+
+    # Defining the data generators
+    training_generator = data_manipulation.DataGenerator(x_train_list, batch_size, window_size, offset,
+        full_signal_size, num_channels, num_classes, train_tasks, 'train', split_ratio, processed_data_path, True)
+    validation_generator = data_manipulation.DataGenerator(x_train_list, batch_size, window_size, offset,
+        full_signal_size, num_channels, num_classes, train_tasks, 'validation', split_ratio, processed_data_path, True)
+    # testing_generator = data_manipulation.DataGenerator(x_test_list, batch_size, window_size, window_size,
+    #     full_signal_size, num_channels, num_classes, test_tasks, 'test', 1.0, processed_data_path)
+
     # Training the model
     if(not args.nofit):
         # Creating the model
         model = models.create_model_mixed(window_size, num_channels, num_classes)
         model.summary()
-
-        # Getting the file names that contains the preprocessed data
-        x_train_list = []
-        # x_test_list = []
-
-        for task in train_tasks:
-            x_train_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
-
-        # for task in test_tasks:
-        #     x_test_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
-
-        x_train_list = np.asarray(x_train_list).astype('str')
-        x_train_list = x_train_list.reshape(-1)
-        x_train_list = x_train_list.tolist()
-
-        # x_test_list = np.asarray(x_test_list).astype('str')
-        # x_test_list = x_test_list.reshape(-1)
-        # x_test_list = x_test_list.tolist()
-
-        # Defining the data generators
-        training_generator = data_manipulation.DataGenerator(x_train_list, batch_size, window_size, offset,
-            full_signal_size, num_channels, num_classes, train_tasks, 'train', split_ratio, processed_data_path, True)
-        validation_generator = data_manipulation.DataGenerator(x_train_list, batch_size, window_size, offset,
-            full_signal_size, num_channels, num_classes, train_tasks, 'validation', split_ratio, processed_data_path, True)
-        # testing_generator = data_manipulation.DataGenerator(x_test_list, batch_size, window_size, window_size,
-        #     full_signal_size, num_channels, num_classes, test_tasks, 'test', 1.0, processed_data_path)
 
         # Compiling, defining the LearningRateScheduler and training the model
         model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
