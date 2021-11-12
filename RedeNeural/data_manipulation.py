@@ -3,7 +3,6 @@ import utils
 import math
 import random
 import numpy as np
-# from pyedflib import EdfReader
 import tensorflow.keras as keras
 
 def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, num_classes, split_ratio=1.0, x_data_2=0, y_data_2=0, mode=None):
@@ -203,14 +202,51 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
         return x_data, y_data, x_data_2, y_data_2
 
-processed_data_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
+def get_crop_positions(dataset_type, num_signals, signal_size, window_size, offset, split_ratio):
+    """
+    Stores and returns the information of all cropping that will be done in the EEG signals.
+
+    Parameters:
+        - dataset_type: which type of dataset will be created by the data generator. Valid types are 'train',
+        'validation' and 'test';
+        - num_signals: number of signals being processed;
+        - signal_size: full size of the signals being processed;
+        - window_size: size of the sliding window;
+        - offset: amount of samples the window will slide in each iteration;
+        - split_ratio: a number in the interval (0,1]. (split_ratio * 100)% of the processed signals will be
+        stored separetly from the other [100 - (split_ratio * 100)]%.
+    """
+    crop_positions = []
+
+    if(dataset_type == 'train' or dataset_type == 'test'):
+        first_i = window_size
+        stop = signal_size * split_ratio
+    
+    elif(dataset_type == 'validation'):
+        first_i = math.floor(signal_size * split_ratio) + offset
+        stop = signal_size
+
+    signal_index = 0
+    while(signal_index < num_signals):
+        i = first_i
+
+        while(i <= stop):
+            # Each crop position is a tuple: (file in which the crop will take place, end of the cropping)
+            one_crop_position = (signal_index, i)
+            crop_positions.append(one_crop_position)
+
+            i += offset
+        
+        signal_index += 1
+
+    return crop_positions
 
 class DataGenerator(keras.utils.Sequence):
     """
     Generates data for the model on the fly, using a sliding window for data augmentation.
     """
     def __init__(self, list_files, batch_size, dim, offset, full_signal_size, n_channels,
-                n_classes, tasks, dataset_type, split_ratio, shuffle=False):
+                n_classes, tasks, dataset_type, split_ratio, processed_data_path, shuffle=False):
         """
         Initialization function of the class.
         
@@ -227,7 +263,8 @@ class DataGenerator(keras.utils.Sequence):
             - dataset_type: which type of dataset will be created by the data generator. Valid types are 'train',
             'validation' and 'test';
             - split_ratio: a number in the interval (0,1]. (split_ratio * 100)% of the processed signals will be
-            stored separetly from the other [100 - (split_ratio * 100)]%.
+            stored separetly from the other [100 - (split_ratio * 100)]%;
+            - processed_data_path: .
         
         Optional Parameters:
             - shuffle: if the data being fed into the model will be shuffled or not at each epoch. Default value is
@@ -277,34 +314,38 @@ class DataGenerator(keras.utils.Sequence):
         data = np.asarray(data, dtype = object).astype('float32')
         
         # Storing the information of all cropping that will be done in the EEG signals
-        crop_positions = []
+        crop_positions = get_crop_positions(self.dataset_type, data.shape[0], data[0].shape[0], self.dim,
+            self.offset, self.split_ratio)
 
-        if(self.dataset_type == 'train' or self.dataset_type == 'test'):
-            signal_index = 0
-            while(signal_index < data.shape[0]):
-                i = self.dim
+        # if(self.dataset_type == 'train' or self.dataset_type == 'test'):
+        #     signal_index = 0
+        #     while(signal_index < data.shape[0]):
+        #         i = self.dim
 
-                while(i <= data[0].shape[0] * self.split_ratio):
-                    # Each crop position is a tuple: (file in which the crop will take place, end of the cropping)
-                    one_crop_position = (signal_index, i)
-                    crop_positions.append(one_crop_position)
+        #         while(i <= data[0].shape[0] * self.split_ratio):
+        #             # Each crop position is a tuple: (file in which the crop will take place, end of the cropping)
+        #             one_crop_position = (signal_index, i)
+        #             crop_positions.append(one_crop_position)
 
-                    i += self.offset
+        #             i += self.offset
                 
-                signal_index += 1
+        #         signal_index += 1
 
-        elif(self.dataset_type == 'validation'):
-            signal_index = 0
-            while(signal_index < data.shape[0]):
-                i = math.floor(data[0].shape[0] * self.split_ratio) + self.offset
+        # elif(self.dataset_type == 'validation'):
+        #     signal_index = 0
+        #     while(signal_index < data.shape[0]):
+        #         i = math.floor(data[0].shape[0] * self.split_ratio) + self.offset
 
-                while(i <= data[0].shape[0]):
-                    one_crop_position = (signal_index, i)
-                    crop_positions.append(one_crop_position)
+        #         while(i <= data[0].shape[0]):
+        #             one_crop_position = (signal_index, i)
+        #             crop_positions.append(one_crop_position)
 
-                    i += self.offset
+        #             i += self.offset
 
-                signal_index += 1
+        #         signal_index += 1
+        
+        print(f'self.dataset_type = {self.dataset_type}, crop_positions.shape = {crop_positions.shape}')
+        print(f'crop_positions = {crop_positions}')
 
         self.data = data
         self.subjects = subjects
@@ -329,53 +370,45 @@ class DataGenerator(keras.utils.Sequence):
         y = None
 
         # If the batch being generated does have batch_size samples
-        if(self.last_sample_used + self.batch_size < len(self.crop_positions)):
-            x = np.empty((self.batch_size, self.dim, self.n_channels))
-            y = np.empty((self.batch_size, self.n_classes))
+        # if(self.last_sample_used + self.batch_size < len(self.crop_positions)):
+        #     x = np.empty((self.batch_size, self.dim, self.n_channels))
+        #     y = np.empty((self.batch_size, self.n_classes))
 
-            crop_positions = self.crop_positions[index*self.batch_size : (index+1)*self.batch_size]
+        #     crop_positions = self.crop_positions[index*self.batch_size : (index+1)*self.batch_size]
 
-            for i in range(0, 100):
-                file_index = crop_positions[i][0]
-                crop_end = crop_positions[i][1]
+        #     for i in range(0, 100):
+        #         file_index = crop_positions[i][0]
+        #         crop_end = crop_positions[i][1]
 
-                x[i] = self.data[file_index][(crop_end-self.dim):crop_end]
+        #         x[i] = self.data[file_index][(crop_end-self.dim):crop_end]
 
-                subject = self.subjects[file_index]
+        #         subject = self.subjects[file_index]
 
-                label = np.zeros((1, self.n_classes))
-                label[0, subject-1] = 1
+        #         label = np.zeros((1, self.n_classes))
+        #         label[0, subject-1] = 1
 
-                y[i] = label
+        #         y[i] = label
             
-            if(self.last_sample_used != 0):
-                self.last_sample_used += self.batch_size
-            else:
-                self.last_sample_used += self.batch_size - 1
+        #     if(self.last_sample_used != 0):
+        #         self.last_sample_used += self.batch_size
+        #     else:
+        #         self.last_sample_used += self.batch_size - 1
             
-            # Storing the N first batches for later use, if needed
-            if(index < self.cache_size):
-                self.cache_x[index] = x[i]
-                self.cache_y[index] = label
+        #     # Storing the N first batches for later use, if needed
+        #     if(index < self.cache_size):
+        #         self.cache_x[index] = x[i]
+        #         self.cache_y[index] = label
 
-        # If the batch being generated doesn't have batch_size samples
-        elif(self.last_sample_used < len(self.crop_positions) - 1):
+        # If the batch being generated is using samples from crop_positions
+        if(self.last_sample_used < len(self.crop_positions) - 1):
             x = []
             y = []
 
             crop_positions = self.crop_positions[index*self.batch_size : (index+1)*self.batch_size]
 
-            # for crop_position in crop_positions:
-            #     file_index, crop_end = crop_position
-
             count = 0
-            for i in range(0, self.batch_size):
-
-                if(self.last_sample_used + count == len(self.crop_positions) - 1):
-                    break
-
-                file_index = crop_positions[i][0]
-                crop_end = crop_positions[i][1]
+            for crop_position in crop_positions:
+                file_index, crop_end = crop_position
                 sample = self.data[file_index][(crop_end-self.dim):crop_end]
 
                 x.append(sample)
@@ -388,6 +421,27 @@ class DataGenerator(keras.utils.Sequence):
                 y.append(label)
 
                 count += 1
+
+            # count = 0
+            # for i in range(0, self.batch_size):
+
+            #     if(self.last_sample_used + count == len(self.crop_positions) - 1):
+            #         break
+
+            #     file_index = crop_positions[i][0]
+            #     crop_end = crop_positions[i][1]
+            #     sample = self.data[file_index][(crop_end-self.dim):crop_end]
+
+            #     x.append(sample)
+
+            #     subject = self.subjects[file_index]
+
+            #     label = np.zeros((1, self.n_classes))
+            #     label[0, subject-1] = 1
+
+            #     y.append(label)
+
+            #     count += 1
             
             x = np.asarray(x, dtype = object).astype('float32')
             y = np.asarray(y, dtype = object).astype('float32')
@@ -396,7 +450,18 @@ class DataGenerator(keras.utils.Sequence):
             # is "a x num_classes".
             y = y.reshape(y.shape[0], y.shape[2])
 
-            self.last_sample_used += count
+            if(self.last_sample_used != 0):
+                self.last_sample_used += count
+            else:
+                self.last_sample_used += count - 1
+
+            print(f'x.shape = {x.shape}')
+            print(f'y.shape = {y.shape}')
+
+            # Storing the N first batches for later use, if needed
+            if(index < self.cache_size):
+                self.cache_x[index] = x
+                self.cache_y[index] = label
         
         # Taking data from cache
         else:
