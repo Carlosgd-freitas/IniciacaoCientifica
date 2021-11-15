@@ -275,19 +275,28 @@ print(f'y_val.shape = {y_val.shape}; y_val_2.shape = {y_val_2.shape}')
 print(f'x_test.shape = {x_test.shape}; x_test_2.shape = {x_test_2.shape}')
 print(f'y_test.shape = {y_test.shape}; y_test_2.shape = {y_test_2.shape}')
 
-e_train_x = euclidean_distances(x_train, x_train_2)
+i = 0
+while i < len(x_train):
+    e_train_x = euclidean_distances(x_train[i], x_train_2[i])
+    print(f'e_train_x.diagonal() = {e_train_x.diagonal()}\n')
+
+i = 0
+while i < len(x_val):
+    e_val_x = euclidean_distances(x_val[i], x_val_2[i])
+    print(f'e_val_x.diagonal() = {e_val_x.diagonal()}\n')
+
+i = 0
+while i < len(x_test):
+    e_test_x = euclidean_distances(x_test[i], x_test_2[i])
+    print(f'e_test_x.diagonal() = {e_test_x.diagonal()}\n')
+
 e_train_y = euclidean_distances(y_train, y_train_2)
-e_val_x = euclidean_distances(x_val, x_val_2)
 e_val_y = euclidean_distances(y_val, y_val_2)
-e_test_x = euclidean_distances(x_test, x_test_2)
 e_test_y = euclidean_distances(y_test, y_test_2)
 
-print(f'e_train_x.diagonal() = {e_train_x.diagonal()}')
-print(f'e_train_y.diagonal() = {e_train_y.diagonal()}')
-print(f'e_val_x.diagonal() = {e_val_x.diagonal()}')
-print(f'e_val_y.diagonal() = {e_val_y.diagonal()}')
-print(f'e_test_x.diagonal() = {e_test_x.diagonal()}')
-print(f'e_test_y.diagonal() = {e_test_y.diagonal()}')
+print(f'e_train_y.diagonal() = {e_train_y.diagonal()}\n')
+print(f'e_val_y.diagonal() = {e_val_y.diagonal()}\n')
+print(f'e_test_y.diagonal() = {e_test_y.diagonal()}\n')
 
 sys.exit()
 
