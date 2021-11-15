@@ -195,13 +195,13 @@ x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_class
 ######################################################################################
 
 # Loading the data
-train_content_2, test_content_2 = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)
+train_content_2, test_content_2 = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes)
 
 # Filtering the raw data
-test_content_2 = preprocessing.filter_data(test_content_2, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+test_content_2 = preprocessing.filter_data(test_content_2, band_pass_3, sample_frequency, filter_order, filter_type)
 
 # Normalize the filtered data
-test_content_2 = preprocessing.normalize_data(test_content_2, 'sun', 1)
+test_content_2 = preprocessing.normalize_data(test_content_2, 'sun')
 
 # Getting the testing data
 x_test_2, y_test_2 = data_manipulation.crop_data(test_content_2, test_tasks, num_classes, window_size,
@@ -221,6 +221,7 @@ for task in train_tasks:
         # Normalize the filtered data
         train_content_2 = preprocessing.normalize_data(train_content_2, 'sun')
 
+        full_signal_size = train_content_2[0].shape[1]
         print(f'train_content_2[0].shape = {train_content_2[0].shape}')
 
         # Getting the training, validation and testing data
