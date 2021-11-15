@@ -260,9 +260,9 @@ print(f'full_signal_size = {full_signal_size}') ####
 
 # Defining the data generators
 training_generator = data_manipulation.DataGenerator(x_train_2_list, batch_size, window_size, offset,
-    full_signal_size, num_channels, num_classes, train_tasks, 'train', split_ratio, processed_data_path, True)
+    full_signal_size, num_channels, num_classes, train_tasks, 'train', split_ratio, processed_data_path)
 validation_generator = data_manipulation.DataGenerator(x_train_2_list, batch_size, window_size, offset,
-    full_signal_size, num_channels, num_classes, train_tasks, 'validation', split_ratio, processed_data_path, True)
+    full_signal_size, num_channels, num_classes, train_tasks, 'validation', split_ratio, processed_data_path)
 
 (x_train_2, y_train_2) = training_generator.return_all_data()
 (x_val_2, y_val_2) = validation_generator.return_all_data()
@@ -309,13 +309,13 @@ while i < len(x_test):
 print(f'y_test = {y_test}')
 print(f'y_test_2 = {y_test_2}\n')
 
-# e_train_y = euclidean_distances(y_train, y_train_2)
-# e_val_y = euclidean_distances(y_val, y_val_2)
-# e_test_y = euclidean_distances(y_test, y_test_2)
+e_train_y = euclidean_distances(y_train, y_train_2)
+e_val_y = euclidean_distances(y_val, y_val_2)
+e_test_y = euclidean_distances(y_test, y_test_2)
 
-# print(f'e_train_y.diagonal() = {e_train_y.diagonal()}\n')
-# print(f'e_val_y.diagonal() = {e_val_y.diagonal()}\n')
-# print(f'e_test_y.diagonal() = {e_test_y.diagonal()}\n')
+print(f'e_train_y.diagonal() = {e_train_y.diagonal()}\n')
+print(f'e_val_y.diagonal() = {e_val_y.diagonal()}\n')
+print(f'e_test_y.diagonal() = {e_test_y.diagonal()}\n')
 
 sys.exit()
 
