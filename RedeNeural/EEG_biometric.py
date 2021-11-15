@@ -275,6 +275,8 @@ print(f'y_val.shape = {y_val.shape}; y_val_2.shape = {y_val_2.shape}')
 print(f'x_test.shape = {x_test.shape}; x_test_2.shape = {x_test_2.shape}')
 print(f'y_test.shape = {y_test.shape}; y_test_2.shape = {y_test_2.shape}')
 
+input('enter.')
+
 i = 0
 while i < len(x_train):
     print(f'i = {i}')
