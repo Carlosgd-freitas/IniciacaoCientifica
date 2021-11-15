@@ -299,13 +299,11 @@ while i < len(x_val):
 print(f'y_val = {y_val}')
 print(f'y_val_2 = {y_val_2}\n')
 
-input('enter.')
-
-i = 0
-while i < len(x_test):
-    e_test_x = euclidean_distances(x_test[i], x_test_2[i])
-    print(f'i = {i}, e_test_x.diagonal() = {e_test_x.diagonal()}\n')
-    i += 1
+# i = 0
+# while i < len(x_test):
+#     e_test_x = euclidean_distances(x_test[i], x_test_2[i])
+#     print(f'i = {i}, e_test_x.diagonal() = {e_test_x.diagonal()}\n')
+#     i += 1
 
 # e_train_y = euclidean_distances(y_train, y_train_2)
 # e_val_y = euclidean_distances(y_val, y_val_2)
