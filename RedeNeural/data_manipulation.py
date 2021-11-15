@@ -351,6 +351,10 @@ class DataGenerator(keras.utils.Sequence):
         self.subjects = subjects
         self.crop_positions = crop_positions
 
+        ###
+        if(self.dataset_type == 'validation'):
+            print(f'self.crop_positions = {self.crop_positions}')
+
         self.on_epoch_end()
 
     def __len__(self):

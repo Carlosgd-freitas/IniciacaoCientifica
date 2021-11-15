@@ -256,6 +256,8 @@ x_train_2_list = x_train_2_list.tolist()
 # x_test_list = x_test_list.reshape(-1)
 # x_test_list = x_test_list.tolist()
 
+print(f'full_signal_size = {full_signal_size}') ####
+
 # Defining the data generators
 training_generator = data_manipulation.DataGenerator(x_train_2_list, batch_size, window_size, offset,
     full_signal_size, num_channels, num_classes, train_tasks, 'train', split_ratio, processed_data_path, True)
