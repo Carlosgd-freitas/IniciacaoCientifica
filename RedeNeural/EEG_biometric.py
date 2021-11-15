@@ -192,6 +192,19 @@ x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_class
 
 ######################################################################################
 
+# Loading the data
+train_content_2, test_content_2 = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)
+
+# Filtering the raw data
+test_content_2 = preprocessing.filter_data(test_content_2, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+
+# Normalize the filtered data
+test_content_2 = preprocessing.normalize_data(test_content_2, 'sun', 1)
+
+# Getting the testing data
+x_test_2, y_test_2 = data_manipulation.crop_data(test_content_2, test_tasks, num_classes, window_size,
+                                    window_size)
+
 if(not os.path.exists(processed_data_path + 'processed_data/task'+str(task))):
     folder = Path(processed_data_path + 'processed_data/task'+str(task))
     folder.mkdir(parents=True)
@@ -208,18 +221,6 @@ if(not os.path.exists(processed_data_path + 'processed_data/task'+str(task))):
     # Getting the training, validation and testing data
     x_train_2, y_train_2 = data_manipulation.crop_data(train_content_2, [task], num_classes, full_signal_size,
                                         full_signal_size, reshape='data_generator')
-    
-
-
-    # Filtering the raw data
-    test_content_2 = preprocessing.filter_data(test_content_2, band_pass_3, sample_frequency, filter_order, filter_type, 1)
-
-    # Normalize the filtered data
-    test_content_2 = preprocessing.normalize_data(test_content_2, 'sun', 1)
-
-    # Getting the testing data
-    x_test_2, y_test_2 = data_manipulation.crop_data(test_content_2, test_tasks, num_classes, window_size,
-                                        window_size)
 
     list = []
     for index in range(0, x_train_2.shape[0]):
