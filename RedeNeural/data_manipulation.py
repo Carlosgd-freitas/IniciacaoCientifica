@@ -351,10 +351,6 @@ class DataGenerator(keras.utils.Sequence):
         self.subjects = subjects
         self.crop_positions = crop_positions
 
-        ###
-        if(self.dataset_type == 'validation'):
-            print(f'self.crop_positions = {self.crop_positions}')
-
         self.on_epoch_end()
 
     def __len__(self):
@@ -414,6 +410,11 @@ class DataGenerator(keras.utils.Sequence):
             for crop_position in crop_positions:
                 file_index, crop_end = crop_position
                 sample = self.data[file_index][(crop_end-self.dim):crop_end]
+
+                #######
+                if(self.dataset_type == 'validation'):
+                    print(f'file_index = {file_index}, crop_end = {crop_end}')
+                    print(f'sample = {sample}')
 
                 x.append(sample)
 

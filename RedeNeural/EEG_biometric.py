@@ -309,13 +309,13 @@ while i < len(x_test):
 print(f'y_test = {y_test}')
 print(f'y_test_2 = {y_test_2}\n')
 
-e_train_y = euclidean_distances(y_train, y_train_2)
-e_val_y = euclidean_distances(y_val, y_val_2)
-e_test_y = euclidean_distances(y_test, y_test_2)
+# e_train_y = euclidean_distances(y_train, y_train_2)
+# e_val_y = euclidean_distances(y_val, y_val_2)
+# e_test_y = euclidean_distances(y_test, y_test_2)
 
-print(f'e_train_y.diagonal() = {e_train_y.diagonal()}\n')
-print(f'e_val_y.diagonal() = {e_val_y.diagonal()}\n')
-print(f'e_test_y.diagonal() = {e_test_y.diagonal()}\n')
+# print(f'e_train_y.diagonal() = {e_train_y.diagonal()}\n')
+# print(f'e_val_y.diagonal() = {e_val_y.diagonal()}\n')
+# print(f'e_test_y.diagonal() = {e_test_y.diagonal()}\n')
 
 sys.exit()
 
