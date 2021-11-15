@@ -192,6 +192,7 @@ x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, trai
 x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_classes, window_size,
                                     window_size)
 
+print(f'x_train[0].shape after cropping = {x_train[0].shape}')
 print(f'x_train[0] after cropping = {x_train[0]}')
 
 ######################################################################################

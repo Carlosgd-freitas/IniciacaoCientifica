@@ -510,7 +510,8 @@ class DataGenerator(keras.utils.Sequence):
 
             #######
             if(self.dataset_type == 'train' and file_index == 0 and crop_end == 1920):
-                print(f'file_index = {file_index}, crop_end = {crop_end}')
+                print(f'\nfile_index = {file_index}, crop_end = {crop_end}')
+                print(f'sample.shape = {sample.shape}')
                 print(f'sample = {sample}')
 
             subject = self.subjects[file_index]
