@@ -17,6 +17,8 @@ from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.optimizers import SGD
 from numpy import savetxt, loadtxt
 
+from sklearn.metrics.pairwise import euclidean_distances #
+
 random.seed(1051)
 np.random.seed(1051)
 tf.random.set_seed(1051)
@@ -30,7 +32,7 @@ initial_learning_rate = 0.01    # Initial learning rate
 # folder_path = './Dataset_CSV/'
 folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
 processed_data_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
-num_classes = 109               # Total number of classes (individuals)
+num_classes = 5 #109               # Total number of classes (individuals)
 
 # Parameters used in functions.filter_data()
 band_pass_1 = [1, 50]           # First filter option, 1~50Hz
@@ -170,6 +172,115 @@ for task in test_tasks:
 # Defining the optimizer and the learning rate scheduler
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
 lr_scheduler = LearningRateScheduler(models.scheduler, verbose=0)
+
+# Data without Data Generators
+train_content, test_content = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
+
+# Filtering the raw data
+train_content = preprocessing.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+
+# Normalize the filtered data
+train_content = preprocessing.normalize_data(train_content, 'sun', 1)
+test_content = preprocessing.normalize_data(test_content, 'sun', 1)
+
+# Getting the training, validation and testing data
+x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, train_tasks, num_classes,
+                                                    window_size, offset, split_ratio)
+x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_classes, window_size,
+                                    window_size)
+
+######################################################################################
+
+if(not os.path.exists(processed_data_path + 'processed_data/task'+str(task))):
+    folder = Path(processed_data_path + 'processed_data/task'+str(task))
+    folder.mkdir(parents=True)
+
+    # Loading the raw data
+    train_content_2, test_content_2 = loader.load_data(folder_path, [task], [], 'csv', num_classes)   
+
+    # Filtering the raw data
+    train_content_2 = preprocessing.filter_data(train_content_2, band_pass_3, sample_frequency, filter_order, filter_type)
+
+    # Normalize the filtered data
+    train_content_2 = preprocessing.normalize_data(train_content_2, 'sun')
+
+    # Getting the training, validation and testing data
+    x_train_2, y_train_2 = data_manipulation.crop_data(train_content_2, [task], num_classes, full_signal_size,
+                                        full_signal_size, reshape='data_generator')
+    
+
+
+    # Filtering the raw data
+    test_content_2 = preprocessing.filter_data(test_content_2, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+
+    # Normalize the filtered data
+    test_content_2 = preprocessing.normalize_data(test_content_2, 'sun', 1)
+
+    # Getting the testing data
+    x_test_2, y_test_2 = data_manipulation.crop_data(test_content_2, test_tasks, num_classes, window_size,
+                                        window_size)
+
+    list = []
+    for index in range(0, x_train_2.shape[0]):
+        data = x_train_2[index]
+        string = 'x_subject_' + str(index+1)
+        savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
+        print(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv was saved.')
+        list.append(string+'.csv')
+    
+    savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
+    print(f'file names were saved to processed_data/task{task}/x_list.csv')
+
+x_train_2_list = []
+# x_test_list = []
+
+for task in train_tasks:
+    x_train_2_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
+
+# for task in test_tasks:
+#     x_test_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
+
+x_train_2_list = np.asarray(x_train_2_list).astype('str')
+x_train_2_list = x_train_2_list.reshape(-1)
+x_train_2_list = x_train_2_list.tolist()
+
+# x_test_list = np.asarray(x_test_list).astype('str')
+# x_test_list = x_test_list.reshape(-1)
+# x_test_list = x_test_list.tolist()
+
+# Defining the data generators
+training_generator = data_manipulation.DataGenerator(x_train_2_list, batch_size, window_size, offset,
+    full_signal_size, num_channels, num_classes, train_tasks, 'train', split_ratio, processed_data_path, True)
+validation_generator = data_manipulation.DataGenerator(x_train_2_list, batch_size, window_size, offset,
+    full_signal_size, num_channels, num_classes, train_tasks, 'validation', split_ratio, processed_data_path, True)
+
+(x_train_2, y_train_2) = training_generator.return_all_data()
+(x_val_2, y_val_2) = validation_generator.return_all_data()
+
+
+print(f'x_train.shape = {x_train.shape}; x_train_2.shape = {x_train_2.shape}')
+print(f'y_train.shape = {y_train.shape}; y_train_2.shape = {y_train_2.shape}')
+print(f'x_val.shape = {x_val.shape}; x_val_2.shape = {x_val_2.shape}')
+print(f'y_val.shape = {y_val.shape}; y_val_2.shape = {y_val_2.shape}')
+print(f'x_test.shape = {x_test.shape}; x_test_2.shape = {x_test_2.shape}')
+print(f'y_test.shape = {y_test.shape}; y_test_2.shape = {y_test_2.shape}')
+
+e_train_x = euclidean_distances(x_train, x_train_2)
+e_train_y = euclidean_distances(y_train, y_train_2)
+e_val_x = euclidean_distances(x_val, x_val_2)
+e_val_y = euclidean_distances(y_val, y_val_2)
+e_test_x = euclidean_distances(x_test, x_test_2)
+e_test_y = euclidean_distances(y_test, y_test_2)
+
+print(f'e_train_x.diagonal() = {e_train_x.diagonal()}')
+print(f'e_train_y.diagonal() = {e_train_y.diagonal()}')
+print(f'e_val_x.diagonal() = {e_val_x.diagonal()}')
+print(f'e_val_y.diagonal() = {e_val_y.diagonal()}')
+print(f'e_test_x.diagonal() = {e_test_x.diagonal()}')
+print(f'e_test_y.diagonal() = {e_test_y.diagonal()}')
+
+sys.exit()
 
 # Not using Data Generators
 if(not args.datagen):

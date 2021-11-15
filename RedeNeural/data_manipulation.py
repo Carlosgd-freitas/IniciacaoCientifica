@@ -494,3 +494,32 @@ class DataGenerator(keras.utils.Sequence):
         self.cache_next_index = 0
         self.cache_x = np.empty((self.cache_size, self.batch_size, self.dim, self.n_channels))
         self.cache_y = np.empty((self.cache_size, self.batch_size, self.n_classes))
+    
+    def return_all_data(self):
+        """
+        Returns all data at once.
+        """
+        x = []
+        y = []
+
+        for crop_position in self.crop_positions:
+            file_index, crop_end = crop_position
+            sample = self.data[file_index][(crop_end-self.dim):crop_end]
+
+            x.append(sample)
+
+            subject = self.subjects[file_index]
+
+            label = np.zeros((1, self.n_classes))
+            label[0, subject-1] = 1
+
+            y.append(label)
+        
+        x = np.asarray(x, dtype = object).astype('float32')
+        y = np.asarray(y, dtype = object).astype('float32')
+
+        # The initial format of "y" (label) is "a x 1 x num_classes", but the correct format
+        # is "a x num_classes".
+        y = y.reshape(y.shape[0], y.shape[2])
+
+        return (x, y)
