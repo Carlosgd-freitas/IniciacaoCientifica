@@ -223,7 +223,7 @@ def get_crop_positions(dataset_type, num_signals, signal_size, window_size, offs
         stop = signal_size * split_ratio
     
     elif(dataset_type == 'validation'):
-        first_i = math.floor(signal_size * split_ratio) + offset
+        first_i = math.floor(signal_size * split_ratio)
         stop = signal_size
 
     signal_index = 0
