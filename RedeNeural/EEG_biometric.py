@@ -277,17 +277,17 @@ print(f'y_test.shape = {y_test.shape}; y_test_2.shape = {y_test_2.shape}')
 
 input('enter.')
 
-i = 0
-while i < len(x_train):
-    print(f'i = {i}')
-    print(f'x_train[i] = {x_train[i]}')
-    print(f'x_train_2[i] = {x_train_2[i]}\n')
-    i += 1
+# i = 0
+# while i < len(x_train):
+#     print(f'i = {i}')
+#     print(f'x_train[i] = {x_train[i]}')
+#     print(f'x_train_2[i] = {x_train_2[i]}\n')
+#     i += 1
 
-print(f'y_train = {y_train}')
-print(f'y_train_2 = {y_train_2}\n')
+# print(f'y_train = {y_train}')
+# print(f'y_train_2 = {y_train_2}\n')
 
-input('enter.')
+# input('enter.')
 
 i = 0
 while i < len(x_val):
@@ -303,13 +303,9 @@ input('enter.')
 
 i = 0
 while i < len(x_test):
-    print(f'i = {i}')
-    print(f'x_test[i] = {x_test[i]}')
-    print(f'x_test_2[i] = {x_test_2[i]}\n')
+    e_test_x = euclidean_distances(x_test[i], x_test_2[i])
+    print(f'i = {i}, e_test_x.diagonal() = {e_test_x.diagonal()}\n')
     i += 1
-
-print(f'y_test = {y_test}')
-print(f'y_test_2 = {y_test_2}\n')
 
 # e_train_y = euclidean_distances(y_train, y_train_2)
 # e_val_y = euclidean_distances(y_val, y_val_2)
