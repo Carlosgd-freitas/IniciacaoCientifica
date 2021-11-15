@@ -178,19 +178,13 @@ lr_scheduler = LearningRateScheduler(models.scheduler, verbose=0)
 # Data without Data Generators
 train_content, test_content = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes)
 
-print(f'train_content[0] after loading = {train_content[0]}')
-
 # Filtering the raw data
 train_content = preprocessing.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
 test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
 
-print(f'train_content[0] after filtering = {train_content[0]}')
-
 # Normalize the filtered data
 train_content = preprocessing.normalize_data(train_content, 'sun')
 test_content = preprocessing.normalize_data(test_content, 'sun')
-
-print(f'train_content[0] after normalizing = {train_content[0]}')
 
 # Getting the training, validation and testing data
 x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, train_tasks, num_classes,
@@ -223,17 +217,11 @@ for task in train_tasks:
         # Loading the raw data
         train_content_2, test_content_2 = loader.load_data(folder_path, [task], [], 'csv', num_classes)  
 
-        print(f'train_content_2[0] after loading = {train_content_2[0]}') 
-
         # Filtering the raw data
         train_content_2 = preprocessing.filter_data(train_content_2, band_pass_3, sample_frequency, filter_order, filter_type)
 
-        print(f'train_content_2[0] after filtering = {train_content_2[0]}')
-
         # Normalize the filtered data
         train_content_2 = preprocessing.normalize_data(train_content_2, 'sun')
-
-        print(f'train_content_2[0] after normalizing = {train_content_2[0]}')
 
         full_signal_size = train_content_2[0].shape[1]
         print(f'train_content_2[0].shape = {train_content_2[0].shape}')
@@ -241,9 +229,6 @@ for task in train_tasks:
         # Getting the training, validation and testing data
         x_train_2, y_train_2 = data_manipulation.crop_data(train_content_2, [task], num_classes, train_content_2[0].shape[1],
                                             train_content_2[0].shape[1], reshape='data_generator')
-        
-        print(f'x_train[0] after cropping = {x_train[0]}')
-        print(f'x_train[0][0:1920] after cropping = {x_train[0][0:1920]}')
 
         list = []
         for index in range(0, x_train_2.shape[0]):

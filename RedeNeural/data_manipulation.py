@@ -509,7 +509,7 @@ class DataGenerator(keras.utils.Sequence):
             x.append(sample)
 
             #######
-            if(self.dataset_type == 'validation'):
+            if(self.dataset_type == 'train' and file_index == 0 and crop_end == 1920):
                 print(f'file_index = {file_index}, crop_end = {crop_end}')
                 print(f'sample = {sample}')
 
