@@ -296,6 +296,11 @@ validation_generator = data_manipulation.DataGenerator(x_train_2_list, batch_siz
 (x_train_2, y_train_2) = training_generator.return_all_data()
 (x_val_2, y_val_2) = validation_generator.return_all_data()
 
+print('depois do role todo')
+print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
+print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
+print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
+
 # print(f'x_train.shape = {x_train.shape}; x_train_2.shape = {x_train_2.shape}')
 # print(f'y_train.shape = {y_train.shape}; y_train_2.shape = {y_train_2.shape}')
 # print(f'x_val.shape = {x_val.shape}; x_val_2.shape = {x_val_2.shape}')
@@ -303,13 +308,13 @@ validation_generator = data_manipulation.DataGenerator(x_train_2_list, batch_siz
 # print(f'x_test.shape = {x_test.shape}; x_test_2.shape = {x_test_2.shape}')
 # print(f'y_test.shape = {y_test.shape}; y_test_2.shape = {y_test_2.shape}')
 
-input('enter.')
+# input('enter.')
 
-i = 0
-while i < len(x_train):
-    e_train_x = euclidean_distances(x_train[i], x_train_2[i])
-    print(f'i = {i}, e_train_x.diagonal() = {e_train_x.diagonal()}\n')
-    i += 1
+# i = 0
+# while i < len(x_train):
+#     e_train_x = euclidean_distances(x_train[i], x_train_2[i])
+#     print(f'i = {i}, e_train_x.diagonal() = {e_train_x.diagonal()}\n')
+#     i += 1
 
 # input('enter.')
 
