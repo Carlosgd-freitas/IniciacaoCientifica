@@ -186,11 +186,6 @@ test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequ
 train_content = preprocessing.normalize_data(train_content, 'sun')
 test_content = preprocessing.normalize_data(test_content, 'sun')
 
-print('depois de normalizar')
-print(f'train_content[0][:, 0] = {train_content[0][:, 0]}')
-print(f'train_content[0][:, 29] = {train_content[0][:, 29]}')
-print(f'train_content[0][:, 30] = {train_content[0][:, 30]}')
-
 # Getting the training, validation and testing data
 x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, train_tasks, num_classes,
                                                     window_size, offset, split_ratio)
@@ -234,11 +229,6 @@ for task in train_tasks:
         train_content_2 = preprocessing.normalize_data(train_content_2, 'sun')
 
         full_signal_size = train_content_2[0].shape[1]
-        
-        print('depois de normalizar')
-        print(f'train_content_2[0][:, 0] = {train_content_2[0][:, 0]}')
-        print(f'train_content_2[0][:, 29] = {train_content_2[0][:, 29]}')
-        print(f'train_content_2[0][:, 30] = {train_content_2[0][:, 30]}')
 
         # Getting the training, validation and testing data
         x_train_2, y_train_2 = data_manipulation.crop_data(train_content_2, [task], num_classes, train_content_2[0].shape[1],
