@@ -235,9 +235,14 @@ for task in train_tasks:
 
         print(f'x_train_2[0].shape = {x_train_2[0].shape}') #
 
+        savetxt(processed_data_path + 'terceiro.csv', x_train_2[0], fmt='%f', delimiter=';')
+
         list = []
         for index in range(0, x_train_2.shape[0]):
             data = x_train_2[index]
+
+            if (index == 0):
+                savetxt(processed_data_path + 'quarto.csv', data, fmt='%f', delimiter=';')
 
             print(f'index = {index}, data.shape = {data.shape}') #
             print(f'data[0] = {data[0]}')
