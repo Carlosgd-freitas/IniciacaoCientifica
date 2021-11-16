@@ -220,7 +220,8 @@ def crop_full_data(content):
         # one_signal = np.empty((full_signal_size, num_channels))
 
         for channel in range(0, num_channels):
-
+            print(f'channel = {channel}')
+            
             for float_index in range(0, full_signal_size):
                 one_float = signal[channel][float_index]
 
