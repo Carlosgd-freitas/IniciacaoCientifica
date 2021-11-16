@@ -231,7 +231,7 @@ for task in train_tasks:
 
         # Getting the training, validation and testing data
         x_train_2, y_train_2 = data_manipulation.crop_data(train_content_2, [task], num_classes, train_content_2[0].shape[1],
-                                            train_content_2[0].shape[1], reshape='data_generator')
+                                            train_content_2[0].shape[1])
 
         print(f'x_train_2[0].shape = {x_train_2[0].shape}') #
 
