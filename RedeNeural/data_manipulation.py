@@ -215,9 +215,11 @@ def crop_full_data(content):
 
     array = np.zeros((num_signals, full_signal_size, num_channels))
 
+    i = 0
     for signal in content:
-        array = signal.T # signal = (num_channels, full_signal_size)
+        array[i] = signal.T # signal = (num_channels, full_signal_size)
         # array = signal.reshape(full_signal_size, num_channels)
+        i += 1
 
     # for signal in content:
     #     list.append(signal.T)
