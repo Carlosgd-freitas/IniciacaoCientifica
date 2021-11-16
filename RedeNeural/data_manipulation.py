@@ -217,8 +217,8 @@ def crop_full_data(content):
 
     i = 0
     for signal in content:
-        array[i] = signal.T # signal = (num_channels, full_signal_size)
-        # array = signal.reshape(full_signal_size, num_channels)
+        # array[i] = signal.T # signal = (num_channels, full_signal_size)
+        array[i] = signal.reshape(full_signal_size, num_channels)
         i += 1
 
     # for signal in content:
