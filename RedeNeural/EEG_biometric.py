@@ -234,15 +234,12 @@ for task in train_tasks:
         # x_train_2, y_train_2 = data_manipulation.crop_data(train_content_2, [task], num_classes, train_content_2[0].shape[1],
         #                                     train_content_2[0].shape[1])
 
-        x_train_2 = np.asarray(train_content_2, dtype = object).astype('float32')
-        print(f'x_train_2.shape = {x_train_2.shape}') #
-        x_train_2 = x_train_2.reshape(x_train_2.shape[0], x_train_2.shape[2], x_train_2.shape[1])
-        print(f'x_train_2.shape = {x_train_2.shape}') #
+        x_train_2 = data_manipulation.crop_full_data(train_content_2)
 
-        # print('depois de croppar')
-        # print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
-        # print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
-        # print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
+        print('depois de croppar')
+        print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
+        print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
+        print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
 
         savetxt(processed_data_path + 'terceiro.csv', x_train_2[0], fmt='%f', delimiter=';')
 

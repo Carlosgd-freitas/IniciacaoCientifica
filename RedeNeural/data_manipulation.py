@@ -204,6 +204,26 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
         return x_data, y_data, x_data_2, y_data_2
 
+def crop_full_data(content):
+    """
+    """
+
+    list = []
+
+    num_signals = content[0].shape[0]
+    num_channels = content[0].shape[1]
+    full_signal_size = content[0].shape[2]
+
+    for signal in content:
+        list.append(signal.T)
+    
+    content_array = np.asarray(list, dtype = object).astype('float32')
+    
+    print(f'content_array.shape = {content_array.shape}') ###
+
+    return content_array
+
+
 def get_crop_positions(dataset_type, num_signals, signal_size, window_size, offset, split_ratio):
     """
     Stores and returns the information of all cropping that will be done in the EEG signals.
@@ -512,22 +532,21 @@ class DataGenerator(keras.utils.Sequence):
             x.append(sample)
 
             #######
-            if(self.dataset_type == 'train' and file_index == 0 and crop_end == 1920):
-                print(f'self.crop_positions[0] = {self.crop_positions[0]}')
-                print(f'sample.shape = {sample.shape}')
-                print(f'sample = {sample}')
+            # if(self.dataset_type == 'train' and file_index == 0 and crop_end == 1920):
+            #     print(f'self.crop_positions[0] = {self.crop_positions[0]}')
+            #     print(f'sample.shape = {sample.shape}')
+            #     print(f'sample = {sample}')
+            #     savetxt(self.processed_data_path + 'segundo.csv', sample, fmt='%f', delimiter=';')
             
-            elif(self.dataset_type == 'train' and file_index == 0 and crop_end == 2935):
-                print(f'self.crop_positions[29] = {self.crop_positions[29]}')
-                print(f'sample.shape = {sample.shape}')
-                print(f'sample = {sample}')
+            # elif(self.dataset_type == 'train' and file_index == 0 and crop_end == 2935):
+            #     print(f'self.crop_positions[29] = {self.crop_positions[29]}')
+            #     print(f'sample.shape = {sample.shape}')
+            #     print(f'sample = {sample}')
             
-            elif(self.dataset_type == 'train' and file_index == 0 and crop_end == 2970):
-                print(f'self.crop_positions[30] = {self.crop_positions[30]}')
-                print(f'sample.shape = {sample.shape}')
-                print(f'sample = {sample}')
-
-                # savetxt(self.processed_data_path + 'segundo.csv', sample, fmt='%f', delimiter=';')
+            # elif(self.dataset_type == 'train' and file_index == 0 and crop_end == 2970):
+            #     print(f'self.crop_positions[30] = {self.crop_positions[30]}')
+            #     print(f'sample.shape = {sample.shape}')
+            #     print(f'sample = {sample}')
 
             subject = self.subjects[file_index]
 
