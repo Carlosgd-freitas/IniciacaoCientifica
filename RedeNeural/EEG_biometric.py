@@ -235,9 +235,9 @@ for task in train_tasks:
         #                                     train_content_2[0].shape[1])
 
         x_train_2 = np.asarray(train_content_2, dtype = object).astype('float32')
-        print(f'x_train_2.shape = {x_train_2}') #
+        print(f'x_train_2.shape = {x_train_2.shape}') #
         x_train_2 = x_train_2.reshape(x_train_2.shape[0], x_train_2.shape[2], x_train_2.shape[1])
-        print(f'x_train_2.shape = {x_train_2}') #
+        print(f'x_train_2.shape = {x_train_2.shape}') #
 
         # print('depois de croppar')
         # print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
@@ -305,9 +305,8 @@ input('enter.')
 
 i = 0
 while i < len(x_train):
-    print(f'i = {i}')
-    print(f'x_train[i] = {x_train[i]}')
-    print(f'x_train_2[i] = {x_train_2[i]}\n')
+    e_train_x = euclidean_distances(x_train[i], x_train_2[i])
+    print(f'i = {i}, e_train_x.diagonal() = {e_train_x.diagonal()}\n')
     i += 1
 
 # input('enter.')
