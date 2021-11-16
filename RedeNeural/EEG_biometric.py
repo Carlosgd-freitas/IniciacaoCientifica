@@ -196,11 +196,11 @@ train_content = preprocessing.normalize_data(train_content, 'sun')
 with open('apos_normalizar.csv', 'w', newline='\n') as f:
     writer = csv.writer(f)
 
-    aux = train_content[0]
+    aux = train_content[0].T
     print(f'aux.shape = {aux.shape}')
 
-    for i in range (0, train_content[0].shape[1]):
-        writer.writerow(aux[:][i])
+    for i in range (0, 9760):
+        writer.writerow(aux[i])
 
 
 # Getting the training, validation and testing data
@@ -219,8 +219,11 @@ crop1_crop = x_train[0]
 with open('apos_croppar1.csv', 'w', newline='\n') as f:
     writer = csv.writer(f)
 
+    aux = x_train[0].T
+    print(f'aux.shape = {aux.shape}')
+
     for i in range (0, 1920):
-        writer.writerow(x_train[0][i][:])
+        writer.writerow(aux[i])
 
 ######################################################################################
 
@@ -260,8 +263,11 @@ for task in train_tasks:
         with open('apos_croppar2.csv', 'w', newline='\n') as f:
             writer = csv.writer(f)
 
+            aux = x_train_2[0].T
+            print(f'aux.shape = {aux.shape}')
+
             for i in range (0, 1920):
-                writer.writerow(x_train_2[0][i][:])
+                writer.writerow(aux[i])
 
         crop2_crop1 = x_train_2[0]
 
@@ -270,8 +276,11 @@ for task in train_tasks:
         with open('apos_croppar3.csv', 'w', newline='\n') as f:
             writer = csv.writer(f)
 
+            aux = x_train_2[0].T
+            print(f'aux.shape = {aux.shape}')
+
             for i in range (0, 1920):
-                writer.writerow(x_train_2[0][i][:])
+                writer.writerow(aux[i])
 
         crop2_crop2 = x_train_2[0]
 
