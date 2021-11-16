@@ -517,7 +517,7 @@ class DataGenerator(keras.utils.Sequence):
                 print(f'sample.shape = {sample.shape}')
                 print(f'sample = {sample}')
 
-                savetxt(self.processed_data_path + 'segundo.csv', sample[0], fmt='%f', delimiter=';')
+                savetxt(self.processed_data_path + 'segundo.csv', sample, fmt='%f', delimiter=';')
 
             subject = self.subjects[file_index]
 
