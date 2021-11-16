@@ -191,7 +191,7 @@ test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequ
 train_content = preprocessing.normalize_data(train_content, 'sun')
 test_content = preprocessing.normalize_data(test_content, 'sun')
 
-savetxt(processed_data_path + 'zero.csv', train_content[0], fmt='%f', delimiter=';')
+savetxt(processed_data_path + 'zero.csv', train_content[0], fmt='%f', delimiter=';', usecols=range(num_channels))
 
 # Getting the training, validation and testing data
 x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, train_tasks, num_classes,
@@ -495,6 +495,7 @@ else:
 
                 # Normalize the filtered data
                 train_content = preprocessing.normalize_data(train_content, 'sun')
+                full_signal_size = train_content[0].shape[1]
 
                 # Getting the training, validation and testing data
                 x_train, y_train = data_manipulation.crop_data(train_content, [task], num_classes, full_signal_size,
