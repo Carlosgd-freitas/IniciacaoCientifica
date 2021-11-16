@@ -178,11 +178,6 @@ lr_scheduler = LearningRateScheduler(models.scheduler, verbose=0)
 # Data without Data Generators
 train_content, test_content = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes)
 
-print('depois de ler')
-print(f'train_content[0][:, 0] = {train_content[0][:, 0]}')
-print(f'train_content[0][:, 29] = {train_content[0][:, 29]}')
-print(f'train_content[0][:, 30] = {train_content[0][:, 30]}')
-
 # Filtering the raw data
 train_content = preprocessing.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
 test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
@@ -191,14 +186,21 @@ test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequ
 train_content = preprocessing.normalize_data(train_content, 'sun')
 test_content = preprocessing.normalize_data(test_content, 'sun')
 
+print('depois de normalizar')
+print(f'train_content[0][:, 0] = {train_content[0][:, 0]}')
+print(f'train_content[0][:, 29] = {train_content[0][:, 29]}')
+print(f'train_content[0][:, 30] = {train_content[0][:, 30]}')
+
 # Getting the training, validation and testing data
 x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, train_tasks, num_classes,
                                                     window_size, offset, split_ratio)
 x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_classes, window_size,
                                     window_size)
 
-print(f'x_train[0].shape after cropping = {x_train[0].shape}')
-print(f'x_train[0] after cropping = {x_train[0]}')
+print('depois de croppar')
+print(f'x_train[0][0, :] = {x_train[0][0, :]}')
+print(f'x_train[0][29, :] = {x_train[0][29, :]}')
+print(f'x_train[0][30, :] = {x_train[0][30, :]}')
 
 savetxt(processed_data_path + 'primeiro.csv', x_train[0], fmt='%f', delimiter=';')
 
@@ -225,11 +227,6 @@ for task in train_tasks:
         # Loading the raw data
         train_content_2, test_content_2 = loader.load_data(folder_path, [task], [], 'csv', num_classes)
 
-        print('depois de ler')
-        print(f'train_content_2[0][:, 0] = {train_content_2[0][:, 0]}')
-        print(f'train_content_2[0][:, 29] = {train_content_2[0][:, 29]}')
-        print(f'train_content_2[0][:, 30] = {train_content_2[0][:, 30]}')
-
         # Filtering the raw data
         train_content_2 = preprocessing.filter_data(train_content_2, band_pass_3, sample_frequency, filter_order, filter_type)
 
@@ -237,13 +234,20 @@ for task in train_tasks:
         train_content_2 = preprocessing.normalize_data(train_content_2, 'sun')
 
         full_signal_size = train_content_2[0].shape[1]
-        print(f'train_content_2[0].shape = {train_content_2[0].shape}')
+        
+        print('depois de normalizar')
+        print(f'train_content_2[0][:, 0] = {train_content_2[0][:, 0]}')
+        print(f'train_content_2[0][:, 29] = {train_content_2[0][:, 29]}')
+        print(f'train_content_2[0][:, 30] = {train_content_2[0][:, 30]}')
 
         # Getting the training, validation and testing data
         x_train_2, y_train_2 = data_manipulation.crop_data(train_content_2, [task], num_classes, train_content_2[0].shape[1],
                                             train_content_2[0].shape[1])
 
-        print(f'x_train_2[0].shape = {x_train_2[0].shape}') #
+        print('depois de croppar')
+        print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
+        print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
+        print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
 
         savetxt(processed_data_path + 'terceiro.csv', x_train_2[0], fmt='%f', delimiter=';')
 
@@ -284,7 +288,7 @@ x_train_2_list = x_train_2_list.tolist()
 # x_test_list = x_test_list.reshape(-1)
 # x_test_list = x_test_list.tolist()
 
-print(f'full_signal_size = {full_signal_size}') ####
+# print(f'full_signal_size = {full_signal_size}') ####
 
 # Defining the data generators
 training_generator = data_manipulation.DataGenerator(x_train_2_list, batch_size, window_size, offset,
@@ -295,12 +299,12 @@ validation_generator = data_manipulation.DataGenerator(x_train_2_list, batch_siz
 (x_train_2, y_train_2) = training_generator.return_all_data()
 (x_val_2, y_val_2) = validation_generator.return_all_data()
 
-print(f'x_train.shape = {x_train.shape}; x_train_2.shape = {x_train_2.shape}')
-print(f'y_train.shape = {y_train.shape}; y_train_2.shape = {y_train_2.shape}')
-print(f'x_val.shape = {x_val.shape}; x_val_2.shape = {x_val_2.shape}')
-print(f'y_val.shape = {y_val.shape}; y_val_2.shape = {y_val_2.shape}')
-print(f'x_test.shape = {x_test.shape}; x_test_2.shape = {x_test_2.shape}')
-print(f'y_test.shape = {y_test.shape}; y_test_2.shape = {y_test_2.shape}')
+# print(f'x_train.shape = {x_train.shape}; x_train_2.shape = {x_train_2.shape}')
+# print(f'y_train.shape = {y_train.shape}; y_train_2.shape = {y_train_2.shape}')
+# print(f'x_val.shape = {x_val.shape}; x_val_2.shape = {x_val_2.shape}')
+# print(f'y_val.shape = {y_val.shape}; y_val_2.shape = {y_val_2.shape}')
+# print(f'x_test.shape = {x_test.shape}; x_test_2.shape = {x_test_2.shape}')
+# print(f'y_test.shape = {y_test.shape}; y_test_2.shape = {y_test_2.shape}')
 
 # input('enter.')
 
