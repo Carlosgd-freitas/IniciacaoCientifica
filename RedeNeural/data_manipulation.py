@@ -5,6 +5,8 @@ import random
 import numpy as np
 import tensorflow.keras as keras
 
+from numpy import savetxt, loadtxt #
+
 def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, num_classes, split_ratio=1.0, x_data_2=0, y_data_2=0, mode=None):
     """
     Crops a content (EEG signal) and returns the processed signal and its' respective label using a sliding
@@ -281,6 +283,7 @@ class DataGenerator(keras.utils.Sequence):
         self.tasks = tasks
         self.dataset_type = dataset_type
         self.split_ratio = split_ratio
+        self.processed_data_path = processed_data_path
         self.shuffle = shuffle
 
         # Calculating the number of samples per file
@@ -513,6 +516,8 @@ class DataGenerator(keras.utils.Sequence):
                 print(f'\nfile_index = {file_index}, crop_end = {crop_end}')
                 print(f'sample.shape = {sample.shape}')
                 print(f'sample = {sample}')
+
+                savetxt(self.processed_data_path + 'segundo.csv', sample[0], fmt='%f', delimiter=';')
 
             subject = self.subjects[file_index]
 

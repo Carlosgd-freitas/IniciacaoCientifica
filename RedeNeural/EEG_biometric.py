@@ -195,6 +195,8 @@ x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_class
 print(f'x_train[0].shape after cropping = {x_train[0].shape}')
 print(f'x_train[0] after cropping = {x_train[0]}')
 
+savetxt(processed_data_path + 'primeiro.csv', x_train[0], fmt='%f', delimiter=';')
+
 ######################################################################################
 
 # Loading the data
