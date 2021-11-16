@@ -191,6 +191,8 @@ test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequ
 train_content = preprocessing.normalize_data(train_content, 'sun')
 test_content = preprocessing.normalize_data(test_content, 'sun')
 
+savetxt(processed_data_path + 'zero.csv', train_content[0], fmt='%f', delimiter=';')
+
 # Getting the training, validation and testing data
 x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, train_tasks, num_classes,
                                                     window_size, offset, split_ratio)
