@@ -196,11 +196,11 @@ train_content = preprocessing.normalize_data(train_content, 'sun')
 with open('apos_normalizar.csv', 'w', newline='\n') as f:
     writer = csv.writer(f)
 
-    print(f'train_content[0][:][0].shape = {train_content[0][:][0].shape}')
-    print(f'train_content[0][0][:].shape = {train_content[0][0][:].shape}')
+    aux = train_content[0]
+    print(f'aux.shape = {aux.shape}')
 
     for i in range (0, train_content[0].shape[1]):
-        writer.writerow(train_content[0][:][i])
+        writer.writerow(aux[:][i])
 
 
 # Getting the training, validation and testing data
