@@ -210,8 +210,8 @@ def crop_full_data(content):
     """
 
     num_channels = content[0].shape[0]
-    num_signals = content[0].shape[1]
-    full_signal_size = len(content)
+    full_signal_size = content[0].shape[1]
+    num_signals = len(content)
 
     array = np.zeros((num_signals, full_signal_size, num_channels))
 
