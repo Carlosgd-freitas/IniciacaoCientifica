@@ -178,6 +178,11 @@ lr_scheduler = LearningRateScheduler(models.scheduler, verbose=0)
 # Data without Data Generators
 train_content, test_content = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes)
 
+print('depois de ler')
+print(f'train_content[0][:, 0] = {train_content[0][:, 0]}')
+print(f'train_content[0][:, 29] = {train_content[0][:, 29]}')
+print(f'train_content[0][:, 30] = {train_content[0][:, 30]}')
+
 # Filtering the raw data
 train_content = preprocessing.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
 test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
@@ -218,7 +223,12 @@ for task in train_tasks:
         folder.mkdir(parents=True)
 
         # Loading the raw data
-        train_content_2, test_content_2 = loader.load_data(folder_path, [task], [], 'csv', num_classes)  
+        train_content_2, test_content_2 = loader.load_data(folder_path, [task], [], 'csv', num_classes)
+
+        print('depois de ler')
+        print(f'train_content_2[0][:, 0] = {train_content_2[0][:, 0]}')
+        print(f'train_content_2[0][:, 29] = {train_content_2[0][:, 29]}')
+        print(f'train_content_2[0][:, 30] = {train_content_2[0][:, 30]}')
 
         # Filtering the raw data
         train_content_2 = preprocessing.filter_data(train_content_2, band_pass_3, sample_frequency, filter_order, filter_type)
@@ -244,10 +254,10 @@ for task in train_tasks:
             if (index == 0):
                 savetxt(processed_data_path + 'quarto.csv', data, fmt='%f', delimiter=';')
 
-            print(f'index = {index}, data.shape = {data.shape}') #
-            print(f'data[0] = {data[0]}')
-            print(f'data[29] = {data[29]}')
-            print(f'data[30] = {data[30]}')
+            # print(f'index = {index}, data.shape = {data.shape}') #
+            # print(f'data[0] = {data[0]}')
+            # print(f'data[29] = {data[29]}')
+            # print(f'data[30] = {data[30]}')
 
             string = 'x_subject_' + str(index+1)
             savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
