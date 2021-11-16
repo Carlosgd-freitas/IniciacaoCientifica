@@ -231,13 +231,18 @@ for task in train_tasks:
         full_signal_size = train_content_2[0].shape[1]
 
         # Getting the training, validation and testing data
-        x_train_2, y_train_2 = data_manipulation.crop_data(train_content_2, [task], num_classes, train_content_2[0].shape[1],
-                                            train_content_2[0].shape[1])
+        # x_train_2, y_train_2 = data_manipulation.crop_data(train_content_2, [task], num_classes, train_content_2[0].shape[1],
+        #                                     train_content_2[0].shape[1])
 
-        print('depois de croppar')
-        print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
-        print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
-        print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
+        x_train_2 = np.asarray(train_content_2, dtype = object).astype('float32')
+        print(f'x_train_2.shape = {x_train_2}') #
+        x_train_2 = x_train_2.reshape(x_train_2.shape[0], x_train_2.shape[2], x_train_2.shape[1])
+        print(f'x_train_2.shape = {x_train_2}') #
+
+        # print('depois de croppar')
+        # print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
+        # print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
+        # print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
 
         savetxt(processed_data_path + 'terceiro.csv', x_train_2[0], fmt='%f', delimiter=';')
 
@@ -296,14 +301,14 @@ validation_generator = data_manipulation.DataGenerator(x_train_2_list, batch_siz
 # print(f'x_test.shape = {x_test.shape}; x_test_2.shape = {x_test_2.shape}')
 # print(f'y_test.shape = {y_test.shape}; y_test_2.shape = {y_test_2.shape}')
 
-# input('enter.')
+input('enter.')
 
-# i = 0
-# while i < len(x_train):
-#     print(f'i = {i}')
-#     print(f'x_train[i] = {x_train[i]}')
-#     print(f'x_train_2[i] = {x_train_2[i]}\n')
-#     i += 1
+i = 0
+while i < len(x_train):
+    print(f'i = {i}')
+    print(f'x_train[i] = {x_train[i]}')
+    print(f'x_train_2[i] = {x_train_2[i]}\n')
+    i += 1
 
 # input('enter.')
 
