@@ -219,7 +219,7 @@ crop1_crop = x_train[0]
 with open('apos_croppar1.csv', 'w', newline='\n') as f:
     writer = csv.writer(f)
 
-    aux = x_train[0].T
+    aux = x_train[0]
     print(f'aux.shape = {aux.shape}')
 
     for i in range (0, 1920):
@@ -263,7 +263,7 @@ for task in train_tasks:
         with open('apos_croppar2.csv', 'w', newline='\n') as f:
             writer = csv.writer(f)
 
-            aux = x_train_2[0].T
+            aux = x_train_2[0]
             print(f'aux.shape = {aux.shape}')
 
             for i in range (0, 1920):
@@ -276,7 +276,7 @@ for task in train_tasks:
         with open('apos_croppar3.csv', 'w', newline='\n') as f:
             writer = csv.writer(f)
 
-            aux = x_train_2[0].T
+            aux = x_train_2[0]
             print(f'aux.shape = {aux.shape}')
 
             for i in range (0, 1920):
