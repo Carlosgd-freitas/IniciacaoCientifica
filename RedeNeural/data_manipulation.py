@@ -209,8 +209,8 @@ def crop_full_data(content):
     essa lógica está errada.
     """
 
-    num_signals = content[0].shape[0]
-    num_channels = content[0].shape[1]
+    num_channels = content[0].shape[0]
+    num_signals = content[0].shape[1]
     full_signal_size = len(content)
 
     array = np.zeros((num_signals, full_signal_size, num_channels))
@@ -220,8 +220,7 @@ def crop_full_data(content):
         # one_signal = np.empty((full_signal_size, num_channels))
 
         for channel in range(0, num_channels):
-            print(f'channel = {channel}')
-            
+
             for float_index in range(0, full_signal_size):
                 one_float = signal[channel][float_index]
 
