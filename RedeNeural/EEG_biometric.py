@@ -18,6 +18,7 @@ from tensorflow.keras.optimizers import SGD
 from numpy import savetxt, loadtxt
 
 from sklearn.metrics.pairwise import euclidean_distances #
+import csv
 
 random.seed(1051)
 np.random.seed(1051)
@@ -185,20 +186,25 @@ train_content, test_content = loader.load_data(folder_path, train_tasks, test_ta
 
 # Filtering the raw data
 train_content = preprocessing.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
-test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
+# test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
 
 # Normalize the filtered data
 train_content = preprocessing.normalize_data(train_content, 'sun')
-test_content = preprocessing.normalize_data(test_content, 'sun')
+# test_content = preprocessing.normalize_data(test_content, 'sun')
 
-crop1_norm = train_content[0]
-savetxt(processed_data_path + 'zero.csv', train_content[0], fmt='%f', delimiter=';')
+
+with open('apos_normalizar.csv', 'w', newline='\n') as f:
+    writer = csv.writer(f)
+
+    for i in range (0, train_content[0].shape[1]):
+        writer.writerow(train_content[0][:][i])
+
 
 # Getting the training, validation and testing data
 x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, train_tasks, num_classes,
                                                     window_size, offset, split_ratio)
-x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_classes, window_size,
-                                    window_size)
+# x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_classes, window_size,
+#                                     window_size)
 
 crop1_crop = x_train[0]
 
@@ -207,7 +213,11 @@ crop1_crop = x_train[0]
 # print(f'x_train[0][29, :] = {x_train[0][29, :]}')
 # print(f'x_train[0][30, :] = {x_train[0][30, :]}')
 
-savetxt(processed_data_path + 'primeiro.csv', x_train[0], fmt='%f', delimiter=';')
+with open('apos_croppar1.csv', 'w', newline='\n') as f:
+    writer = csv.writer(f)
+
+    for i in range (0, 1920):
+        writer.writerow(x_train[0][i][:])
 
 ######################################################################################
 
@@ -221,8 +231,8 @@ test_content_2 = preprocessing.filter_data(test_content_2, band_pass_3, sample_f
 test_content_2 = preprocessing.normalize_data(test_content_2, 'sun')
 
 # Getting the testing data
-x_test_2, y_test_2 = data_manipulation.crop_data(test_content_2, test_tasks, num_classes, window_size,
-                                    window_size)
+# x_test_2, y_test_2 = data_manipulation.crop_data(test_content_2, test_tasks, num_classes, window_size,
+#                                     window_size)
 
 for task in train_tasks:
     if(not os.path.exists(processed_data_path + 'processed_data/task'+str(task))):
@@ -238,17 +248,27 @@ for task in train_tasks:
         # Normalize the filtered data
         train_content_2 = preprocessing.normalize_data(train_content_2, 'sun')
 
-        crop2_norm = train_content_2[0]
-
         full_signal_size = train_content_2[0].shape[1]
 
         # Getting the training, validation and testing data
         x_train_2, y_train_2 = data_manipulation.crop_data(train_content_2, [task], num_classes, full_signal_size,
                                             full_signal_size)
 
+        with open('apos_croppar2.csv', 'w', newline='\n') as f:
+            writer = csv.writer(f)
+
+            for i in range (0, 1920):
+                writer.writerow(x_train_2[0][i][:])
+
         crop2_crop1 = x_train_2[0]
 
         x_train_2 = data_manipulation.crop_full_data(train_content_2)
+
+        with open('apos_croppar3.csv', 'w', newline='\n') as f:
+            writer = csv.writer(f)
+
+            for i in range (0, 1920):
+                writer.writerow(x_train_2[0][i][:])
 
         crop2_crop2 = x_train_2[0]
 
@@ -257,14 +277,9 @@ for task in train_tasks:
         # print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
         # print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
 
-        savetxt(processed_data_path + 'terceiro.csv', x_train_2[0], fmt='%f', delimiter=';')
-
         list = []
         for index in range(0, x_train_2.shape[0]):
             data = x_train_2[index]
-
-            if (index == 0):
-                savetxt(processed_data_path + 'quarto.csv', data, fmt='%f', delimiter=';')
 
             # print(f'index = {index}, data.shape = {data.shape}') #
             # print(f'data[0] = {data[0]}')
@@ -309,9 +324,6 @@ validation_generator = data_manipulation.DataGenerator(x_train_2_list, batch_siz
 
 crop2_crop3 = x_train_2[0]
 
-euclid = euclidean_distances(crop1_norm, crop2_norm)
-print(f'entre os norms = {np.amax(euclid.diagonal())}\n')
-
 euclid = euclidean_distances(crop1_crop, crop2_crop1)
 print(f'entre crop1_crop e crop2_crop1 = {np.amax(euclid.diagonal())}\n')
 
@@ -333,36 +345,31 @@ print(f'entre crop1_crop e crop2_crop3 = {np.amax(euclid.diagonal())}\n')
 # print(f'x_test.shape = {x_test.shape}; x_test_2.shape = {x_test_2.shape}')
 # print(f'y_test.shape = {y_test.shape}; y_test_2.shape = {y_test_2.shape}')
 
-# input('enter.')
-
 # i = 0
 # while i < len(x_train):
 #     e_train_x = euclidean_distances(x_train[i], x_train_2[i])
-#     print(f'i = {i}, e_train_x.diagonal() = {e_train_x.diagonal()}\n')
+#     print(f'i = {i}, e_train_x.diagonal() = {np.amax(e_train_x.diagonal())}\n')
 #     i += 1
-
-# input('enter.')
 
 # i = 0
 # while i < len(x_val):
-#     print(f'i = {i}')
-#     print(f'x_val[i] = {x_val[i]}')
-#     print(f'x_val_2[i] = {x_val_2[i]}\n')
+#     e_val_x = euclidean_distances(x_val[i], x_val_2[i])
+#     print(f'i = {i}, e_val_x.diagonal() = {np.amax(e_val_x.diagonal())}\n')
 #     i += 1
 
 # i = 0
 # while i < len(x_test):
 #     e_test_x = euclidean_distances(x_test[i], x_test_2[i])
-#     print(f'i = {i}, e_test_x.diagonal() = {e_test_x.diagonal()}\n')
+#     print(f'i = {i}, e_test_x.diagonal() = {np.amax(e_test_x.diagonal())}\n')
 #     i += 1
 
 # e_train_y = euclidean_distances(y_train, y_train_2)
 # e_val_y = euclidean_distances(y_val, y_val_2)
 # e_test_y = euclidean_distances(y_test, y_test_2)
 
-# print(f'e_train_y.diagonal() = {e_train_y.diagonal()}\n')
-# print(f'e_val_y.diagonal() = {e_val_y.diagonal()}\n')
-# print(f'e_test_y.diagonal() = {e_test_y.diagonal()}\n')
+# print(f'e_train_y.diagonal() = {np.amax(e_train_y.diagonal())}\n')
+# print(f'e_val_y.diagonal() = {np.amax(e_val_y.diagonal())}\n')
+# print(f'e_test_y.diagonal() = {np.amax(e_test_y.diagonal())}\n')
 
 sys.exit()
 
