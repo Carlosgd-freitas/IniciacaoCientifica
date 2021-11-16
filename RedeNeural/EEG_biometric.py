@@ -310,16 +310,16 @@ validation_generator = data_manipulation.DataGenerator(x_train_2_list, batch_siz
 crop2_crop3 = x_train_2[0]
 
 euclid = euclidean_distances(crop1_norm, crop2_norm)
-print(f'euclid.diagonal() = {euclid.diagonal()}\n')
+print(f'entre os norms = {np.amax(euclid.diagonal())}\n')
 
 euclid = euclidean_distances(crop1_crop, crop2_crop1)
-print(f'euclid.diagonal() = {euclid.diagonal()}\n')
+print(f'entre crop1_crop e crop2_crop1 = {np.amax(euclid.diagonal())}\n')
 
 euclid = euclidean_distances(crop1_crop, crop2_crop2)
-print(f'euclid.diagonal() = {euclid.diagonal()}\n')
+print(f'entre crop1_crop e crop2_crop2 = {np.amax(euclid.diagonal())}\n')
 
 euclid = euclidean_distances(crop1_crop, crop2_crop3)
-print(f'euclid.diagonal() = {euclid.diagonal()}\n')
+print(f'entre crop1_crop e crop2_crop3 = {np.amax(euclid.diagonal())}\n')
 
 # print('depois do role todo')
 # print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
