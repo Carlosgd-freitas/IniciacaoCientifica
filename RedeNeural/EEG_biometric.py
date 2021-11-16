@@ -233,9 +233,17 @@ for task in train_tasks:
         x_train_2, y_train_2 = data_manipulation.crop_data(train_content_2, [task], num_classes, train_content_2[0].shape[1],
                                             train_content_2[0].shape[1], reshape='data_generator')
 
+        print(f'x_train_2[0].shape = {x_train_2[0].shape}') #
+
         list = []
         for index in range(0, x_train_2.shape[0]):
             data = x_train_2[index]
+
+            print(f'index = {index}, data.shape = {data.shape}') #
+            print(f'data[0] = {data[0]}')
+            print(f'data[29] = {data[29]}')
+            print(f'data[30] = {data[30]}')
+
             string = 'x_subject_' + str(index+1)
             savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
             print(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv was saved.')
