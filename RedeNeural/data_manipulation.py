@@ -210,15 +210,15 @@ def crop_full_data(content):
 
     list = []
 
-    num_signals = content[0].shape[0]
-    num_channels = content[0].shape[1]
-    full_signal_size = content[0].shape[2]
+    # num_signals = content[0].shape[0]
+    # num_channels = content[0].shape[1]
+    # full_signal_size = content[0].shape[2]
 
     for signal in content:
         list.append(signal.T)
     
     content_array = np.asarray(list, dtype = object).astype('float32')
-    
+
     print(f'content_array.shape = {content_array.shape}') ###
 
     return content_array
