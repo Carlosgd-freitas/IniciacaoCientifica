@@ -214,6 +214,9 @@ def crop_full_data(content):
 
     array = np.zeros((full_signal_size, num_channels))
 
+    print(f'num_channels = {num_channels}, full_signal_size = {full_signal_size}')
+    print(f'len(content) = {len(content)}, content[0].shape = {content[0].shape}')
+
     # one_signal = np.empty((full_signal_size, num_channels))
 
     for channel in range(0, num_channels):
