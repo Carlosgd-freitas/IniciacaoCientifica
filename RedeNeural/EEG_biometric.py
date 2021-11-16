@@ -191,7 +191,8 @@ test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequ
 train_content = preprocessing.normalize_data(train_content, 'sun')
 test_content = preprocessing.normalize_data(test_content, 'sun')
 
-savetxt(processed_data_path + 'zero.csv', train_content[0], fmt='%f', delimiter=';', usecols=range(num_channels))
+crop1_norm = train_content[0]
+savetxt(processed_data_path + 'zero.csv', train_content[0], fmt='%f', delimiter=';')
 
 # Getting the training, validation and testing data
 x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, train_tasks, num_classes,
@@ -199,10 +200,12 @@ x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, trai
 x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_classes, window_size,
                                     window_size)
 
-print('depois de croppar')
-print(f'x_train[0][0, :] = {x_train[0][0, :]}')
-print(f'x_train[0][29, :] = {x_train[0][29, :]}')
-print(f'x_train[0][30, :] = {x_train[0][30, :]}')
+crop1_crop = x_train[0]
+
+# print('depois de croppar')
+# print(f'x_train[0][0, :] = {x_train[0][0, :]}')
+# print(f'x_train[0][29, :] = {x_train[0][29, :]}')
+# print(f'x_train[0][30, :] = {x_train[0][30, :]}')
 
 savetxt(processed_data_path + 'primeiro.csv', x_train[0], fmt='%f', delimiter=';')
 
@@ -235,18 +238,24 @@ for task in train_tasks:
         # Normalize the filtered data
         train_content_2 = preprocessing.normalize_data(train_content_2, 'sun')
 
+        crop2_norm = train_content_2[0]
+
         full_signal_size = train_content_2[0].shape[1]
 
         # Getting the training, validation and testing data
-        # x_train_2, y_train_2 = data_manipulation.crop_data(train_content_2, [task], num_classes, train_content_2[0].shape[1],
-        #                                     train_content_2[0].shape[1])
+        x_train_2, y_train_2 = data_manipulation.crop_data(train_content_2, [task], num_classes, full_signal_size,
+                                            full_signal_size)
+
+        crop2_crop1 = x_train_2[0]
 
         x_train_2 = data_manipulation.crop_full_data(train_content_2)
 
-        print('depois de croppar')
-        print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
-        print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
-        print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
+        crop2_crop2 = x_train_2[0]
+
+        # print('depois de croppar')
+        # print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
+        # print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
+        # print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
 
         savetxt(processed_data_path + 'terceiro.csv', x_train_2[0], fmt='%f', delimiter=';')
 
@@ -298,10 +307,24 @@ validation_generator = data_manipulation.DataGenerator(x_train_2_list, batch_siz
 (x_train_2, y_train_2) = training_generator.return_all_data()
 (x_val_2, y_val_2) = validation_generator.return_all_data()
 
-print('depois do role todo')
-print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
-print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
-print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
+crop2_crop3 = x_train_2[0]
+
+euclid = euclidean_distances(crop1_norm, crop2_norm)
+print(f'euclid.diagonal() = {euclid.diagonal()}\n')
+
+euclid = euclidean_distances(crop1_crop, crop2_crop1)
+print(f'euclid.diagonal() = {euclid.diagonal()}\n')
+
+euclid = euclidean_distances(crop1_crop, crop2_crop2)
+print(f'euclid.diagonal() = {euclid.diagonal()}\n')
+
+euclid = euclidean_distances(crop1_crop, crop2_crop3)
+print(f'euclid.diagonal() = {euclid.diagonal()}\n')
+
+# print('depois do role todo')
+# print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
+# print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
+# print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
 
 # print(f'x_train.shape = {x_train.shape}; x_train_2.shape = {x_train_2.shape}')
 # print(f'y_train.shape = {y_train.shape}; y_train_2.shape = {y_train_2.shape}')
