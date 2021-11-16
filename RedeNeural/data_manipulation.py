@@ -206,22 +206,27 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
 def crop_full_data(content):
     """
+    essa lógica está errada.
     """
 
-    list = []
+    # list = []
 
     # num_signals = content[0].shape[0]
     # num_channels = content[0].shape[1]
     # full_signal_size = content[0].shape[2]
 
-    for signal in content:
-        list.append(signal.T)
+    # for signal in content:
+    #     list.append(signal.T)
     
-    content_array = np.asarray(list, dtype = object).astype('float32')
+    # content_array = np.asarray(list, dtype = object).astype('float32')
 
-    print(f'content_array.shape = {content_array.shape}') ###
+    # print(f'content_array.shape = {content_array.shape}') ###
 
-    return content_array
+    # return content_array
+    array = np.asarray(content, dtype = object).astype('float32')
+    array = array.reshape(array.shape[0], array.shape[2], array.shape[1])
+
+    return array
 
 
 def get_crop_positions(dataset_type, num_signals, signal_size, window_size, offset, split_ratio):

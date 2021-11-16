@@ -66,6 +66,11 @@ motor_cortex_yang = ['C1..', 'Cz..', 'C2..']
 occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
 
+############################## TODO ##############################
+# - Até a normalização está ok, o problema fica na hora de croppar o x_train_2 (linhas 239 e 240)
+#   * analisar o que o data_manipulation.crop_data() faz e replicar em uma função nova, mas que use o sinal completo
+#   de (9760, 64)
+
 # Tasks:
 # Task 1 - EO
 # Task 2 - EC
