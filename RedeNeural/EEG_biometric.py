@@ -524,6 +524,7 @@ else:
     x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_classes, window_size, window_size)
 
     print(f'len(train_content) = {len(train_content)}') ###
+    print(f'train_content[0].shape = {train_content[0].shape}') ###
 
     # Processing train/validation data
     if(not args.noptrain):
