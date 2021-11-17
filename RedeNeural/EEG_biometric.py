@@ -523,11 +523,7 @@ else:
                 if signal.shape[1] < full_signal_size:
                     full_signal_size = signal.shape[1]
             
-            print(f'full_signal_size = {full_signal_size}') ###
-
             x_train, y_train = data_manipulation.crop_data(train_content, [task], num_classes, full_signal_size, full_signal_size)
-            
-            print(f'x_train.shape = {x_train.shape}')
 
             list = []
             for index in range(0, num_classes):
