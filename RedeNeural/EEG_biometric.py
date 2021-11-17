@@ -535,8 +535,7 @@ else:
                 folder.mkdir(parents=True)
 
                 # Getting the training, validation and testing data
-                x_train, y_train = data_manipulation.crop_data(train_content, [task], num_classes, full_signal_size,
-                                                    full_signal_size)
+                x_train = data_manipulation.crop_full_data(train_content)
                 
                 print(f'x_train.shape = {x_train.shape}')
 
