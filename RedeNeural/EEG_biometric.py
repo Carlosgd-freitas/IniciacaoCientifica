@@ -266,7 +266,7 @@ for task in train_tasks:
             aux = x_train_2[0]
             print(f'aux.shape = {aux.shape}')
 
-            for i in range (0, 1920):
+            for i in range (0, 9760):
                 writer.writerow(aux[i])
 
         crop2_crop1 = x_train_2[0]
@@ -279,7 +279,7 @@ for task in train_tasks:
             aux = x_train_2[0]
             print(f'aux.shape = {aux.shape}')
 
-            for i in range (0, 1920):
+            for i in range (0, 9760):
                 writer.writerow(aux[i])
 
         crop2_crop2 = x_train_2[0]
