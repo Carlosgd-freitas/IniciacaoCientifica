@@ -215,16 +215,12 @@ def crop_full_data(content):
 
     array = np.zeros((num_signals, full_signal_size, num_channels))
 
-    # print('antes')
-    # print(f'1 = {np.where(content[0] == -3.52528526e-04)}')
-    # print(f'2 = {np.where(content[0] == 5.76062655e-04)}')
-    # print(f'3 certo = {np.where(content[0] == -9.66625987e-04)}')
-    # print(f'3 errado = {np.where(content[0] == -0.27238589)}')
-
     i = 0
     for signal in content:
-        # array[i] = signal.T # signal = (num_channels, full_signal_size)
-        array[i] = signal.reshape(full_signal_size, num_channels)
+        print(f'signal.shape = {signal.shape}')
+
+        array[i] = signal.T # signal = (num_channels, full_signal_size)
+        # array[i] = signal.reshape(full_signal_size, num_channels)
         i += 1
 
     # for signal in content:
@@ -237,12 +233,6 @@ def crop_full_data(content):
     # return content_array
     # array = np.asarray(content, dtype = object).astype('float32')
     # array = array.reshape(array.shape[0], array.shape[2], array.shape[1])
-
-    # print('depois')
-    # print(f'1 = {np.where(array[0] == -3.52528526e-04)}')
-    # print(f'2 = {np.where(array[0] == 5.76062655e-04)}')
-    # print(f'3 certo = {np.where(array[0] == -9.66625987e-04)}')
-    # print(f'3 errado = {np.where(array[0] == -0.27238589)}')
 
     # print(f'array.shape = {array.shape}')
 
