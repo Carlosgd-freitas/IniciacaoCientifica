@@ -211,10 +211,10 @@ x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, trai
 
 crop1_crop = x_train[0]
 
-# print('depois de croppar')
-# print(f'x_train[0][0, :] = {x_train[0][0, :]}')
-# print(f'x_train[0][29, :] = {x_train[0][29, :]}')
-# print(f'x_train[0][30, :] = {x_train[0][30, :]}')
+print('depois de croppar')
+print(f'x_train[0][0, :] = {x_train[0][0, :]}')
+print(f'x_train[0][29, :] = {x_train[0][29, :]}')
+print(f'x_train[0][30, :] = {x_train[0][30, :]}')
 
 with open('apos_croppar1.csv', 'w', newline='\n') as f:
     writer = csv.writer(f)
