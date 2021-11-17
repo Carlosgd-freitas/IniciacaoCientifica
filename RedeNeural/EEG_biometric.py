@@ -538,12 +538,14 @@ else:
                 train_content = preprocessing.normalize_data(train_content, 'sun')
                 full_signal_size = train_content[0].shape[1]
 
+                print(f'full_signal_size = {full_signal_size}') ###
+
                 # Getting the training, validation and testing data
                 x_train, y_train = data_manipulation.crop_data(train_content, [task], num_classes, full_signal_size,
-                                                    full_signal_size, reshape='data_generator')
+                                                    full_signal_size)
 
                 list = []
-                for index in range(0, x_train.shape[0]):
+                for index in range(0, num_classes):
                     data = x_train[index]
                     string = 'x_subject_' + str(index+1)
                     savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
