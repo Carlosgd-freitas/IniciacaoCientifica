@@ -516,40 +516,40 @@ else:
 
     # Normalize the filtered data
     train_content = preprocessing.normalize_data(train_content, 'sun')
-    full_signal_size = train_content[0].shape[1]
-
     test_content = preprocessing.normalize_data(test_content, 'sun')
 
     # Getting the testing data
     x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_classes, window_size, window_size)
 
-    print(f'len(train_content) = {len(train_content)}') ###
-    print(f'train_content[0].shape = {train_content[0].shape}') ###
-
     # Processing train/validation data
-    if(not args.noptrain):
+    for task in train_tasks:
 
-        for task in train_tasks:
+        if(not os.path.exists(processed_data_path + 'processed_data/task'+str(task))):
+            folder = Path(processed_data_path + 'processed_data/task'+str(task))
+            folder.mkdir(parents=True)
 
-            if(not os.path.exists(processed_data_path + 'processed_data/task'+str(task))):
-                folder = Path(processed_data_path + 'processed_data/task'+str(task))
-                folder.mkdir(parents=True)
+            # Getting the training, validation and testing data
+            full_signal_size = 999999
+            for signal in train_content:
+                if signal.shape[1] < full_signal_size:
+                    full_signal_size = signal.shape[1]
+            
+            print(f'full_signal_size = {full_signal_size}') ###
 
-                # Getting the training, validation and testing data
-                x_train = data_manipulation.crop_full_data(train_content)
+            x_train = data_manipulation.crop_data(train_content, [task], num_classes, full_signal_size, full_signal_size)
+            
+            print(f'x_train.shape = {x_train.shape}')
+
+            list = []
+            for index in range(0, num_classes):
+                data = x_train[index]
+                string = 'x_subject_' + str(index+1)
+                savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
+                # print(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv was saved.')
+                list.append(string+'.csv')
                 
-                print(f'x_train.shape = {x_train.shape}')
-
-                list = []
-                for index in range(0, num_classes):
-                    data = x_train[index]
-                    string = 'x_subject_' + str(index+1)
-                    savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
-                    # print(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv was saved.')
-                    list.append(string+'.csv')
-                    
-                savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
-                print(f'file names were saved to processed_data/task{task}/x_list.csv')
+            savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
+            print(f'file names were saved to processed_data/task{task}/x_list.csv')
     
     # Processing test data
     # if(not args.noptest):

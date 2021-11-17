@@ -204,23 +204,20 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
         return x_data, y_data, x_data_2, y_data_2
 
-def crop_full_data(content):
+def crop_full_data(content, full_signal_size):
     """
     essa lógica está errada.
     """
 
     num_channels = content[0].shape[0]
-    full_signal_size = content[0].shape[1]
     num_signals = len(content)
 
     array = np.zeros((num_signals, full_signal_size, num_channels))
 
     i = 0
     for signal in content:
-        print(f'signal.shape = {signal.shape}')
-
-        array[i] = signal.T # signal = (num_channels, full_signal_size)
-        # array[i] = signal.reshape(full_signal_size, num_channels)
+        # array[i] = signal.T # signal = (num_channels, full_signal_size)
+        array[i] = signal.reshape(full_signal_size, num_channels)
         i += 1
 
     # for signal in content:
