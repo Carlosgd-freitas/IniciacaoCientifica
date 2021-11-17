@@ -134,12 +134,6 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 parser = argparse.ArgumentParser()
 parser.add_argument('--datagen', action='store_true',
                     help='the model will use Data Generators to crop data on the fly')
-parser.add_argument('--noptrain', action='store_true',
-                    help='train/validation data will not be preprocessed and stored. This argument can only be'+
-                    ' specified if --datagen was also specified')
-parser.add_argument('--noptest', action='store_true',
-                    help='test data will not be preprocessed and stored. This argument can only be specified if'+
-                    ' --datagen was also specified')
 parser.add_argument('--nofit', action='store_true',
                     help='model.fit will not be executed. The weights will be gathered from the file'+
                     ' \'model_weights.h5\', that is generated if you have ran the model in Identification mode'
@@ -159,11 +153,6 @@ args = parser.parse_args()
 
 train_tasks = args.train
 test_tasks = args.test
-
-if(not args.datagen):
-    if(args.noptrain or args.noptest):
-        print('WARNING: When not using Data Generators, both training/validation and testing data will be ' +
-        'processed, so there isn\'t a option to use the --noptrain or --noptest flags.\n')
 
 for task in train_tasks:
     if(task <= 0 or task >= 15):
@@ -536,7 +525,7 @@ else:
             
             print(f'full_signal_size = {full_signal_size}') ###
 
-            x_train = data_manipulation.crop_data(train_content, [task], num_classes, full_signal_size, full_signal_size)
+            x_train, y_train = data_manipulation.crop_data(train_content, [task], num_classes, full_signal_size, full_signal_size)
             
             print(f'x_train.shape = {x_train.shape}')
 
