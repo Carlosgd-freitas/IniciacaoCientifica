@@ -511,13 +511,19 @@ else:
     train_content, test_content = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes)   
 
     # Filtering the raw data
+    train_content = preprocessing.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
     test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
 
     # Normalize the filtered data
+    train_content = preprocessing.normalize_data(train_content, 'sun')
+    full_signal_size = train_content[0].shape[1]
+
     test_content = preprocessing.normalize_data(test_content, 'sun')
 
     # Getting the testing data
     x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_classes, window_size, window_size)
+
+    print(f'len(train_content) = {len(train_content)}') ###
 
     # Processing train/validation data
     if(not args.noptrain):
@@ -528,28 +534,18 @@ else:
                 folder = Path(processed_data_path + 'processed_data/task'+str(task))
                 folder.mkdir(parents=True)
 
-                # Loading the raw data
-                train_content, test_content = loader.load_data(folder_path, [task], [], 'csv', num_classes)   
-
-                # Filtering the raw data
-                train_content = preprocessing.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
-
-                # Normalize the filtered data
-                train_content = preprocessing.normalize_data(train_content, 'sun')
-                full_signal_size = train_content[0].shape[1]
-
-                print(f'full_signal_size = {full_signal_size}') ###
-
                 # Getting the training, validation and testing data
                 x_train, y_train = data_manipulation.crop_data(train_content, [task], num_classes, full_signal_size,
                                                     full_signal_size)
+                
+                print(f'x_train.shape = {x_train.shape}')
 
                 list = []
                 for index in range(0, num_classes):
                     data = x_train[index]
                     string = 'x_subject_' + str(index+1)
                     savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
-                    print(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv was saved.')
+                    # print(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv was saved.')
                     list.append(string+'.csv')
                     
                 savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
