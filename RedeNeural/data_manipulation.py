@@ -567,8 +567,11 @@ class DataGenerator(keras.utils.Sequence):
         x = np.asarray(x, dtype = object).astype('float32')
         y = np.asarray(y, dtype = object).astype('float32')
 
+        print(f'x.shape = {x.shape}')
+        print(f'y.shape = {y.shape}')
+
         # The initial format of "y" (label) is "a x 1 x num_classes", but the correct format
         # is "a x num_classes".
-        y = y.reshape(y.shape[0], y.shape[2])
+        # y = y.reshape(y.shape[0], y.shape[2])
 
         return (x, y)
