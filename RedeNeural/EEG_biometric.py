@@ -33,7 +33,7 @@ initial_learning_rate = 0.01    # Initial learning rate
 # folder_path = './Dataset_CSV/'
 folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
 processed_data_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
-num_classes = 109 # 5              # Total number of classes (individuals)
+num_classes = 5 #109 # 5              # Total number of classes (individuals)
 
 # Parameters used in functions.filter_data()
 band_pass_1 = [1, 50]           # First filter option, 1~50Hz
