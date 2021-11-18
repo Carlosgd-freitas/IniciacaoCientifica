@@ -346,7 +346,7 @@ class DataGenerator(keras.utils.Sequence):
 
                 i += 1
                 
-        data = np.asarray(data, dtype = object).astype('float32')
+        # data = np.asarray(data, dtype = object).astype('float32')
         
         # Storing the information of all cropping that will be done in the EEG signals
         crop_positions = get_crop_positions(self.dataset_type, data.shape[0], data[0].shape[0], self.dim,

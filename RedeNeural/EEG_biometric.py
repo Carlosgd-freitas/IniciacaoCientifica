@@ -226,6 +226,8 @@ test_content_2 = preprocessing.filter_data(test_content_2, band_pass_3, sample_f
 # Normalize the filtered data
 test_content_2 = preprocessing.normalize_data(test_content_2, 'sun')
 
+full_signal_size = test_content_2[0].shape[1]
+
 # Getting the testing data
 x_test_2, y_test_2 = data_manipulation.crop_data(test_content_2, test_tasks, num_classes, window_size,
                                     window_size)
@@ -243,8 +245,6 @@ for task in train_tasks:
 
         # Normalize the filtered data
         train_content_2 = preprocessing.normalize_data(train_content_2, 'sun')
-
-        full_signal_size = train_content_2[0].shape[1]
 
         # Getting the training, validation and testing data
         # x_train_2, y_train_2 = data_manipulation.crop_data(train_content_2, [task], num_classes, full_signal_size,
@@ -497,6 +497,8 @@ else:
     train_content = preprocessing.normalize_data(train_content, 'sun')
     test_content = preprocessing.normalize_data(test_content, 'sun')
 
+    full_signal_size = train_content[0].shape[1]
+
     # Getting the testing data
     x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_classes, window_size, window_size)
 
@@ -508,10 +510,10 @@ else:
             folder.mkdir(parents=True)
 
             # Getting the training, validation and testing data
-            full_signal_size = 999999
-            for signal in train_content:
-                if signal.shape[1] < full_signal_size:
-                    full_signal_size = signal.shape[1]
+            # full_signal_size = 999999
+            # for signal in train_content:
+            #     if signal.shape[1] < full_signal_size:
+            #         full_signal_size = signal.shape[1]
             
             x_train, y_train = data_manipulation.crop_data(train_content, [task], num_classes, full_signal_size, full_signal_size)
 
