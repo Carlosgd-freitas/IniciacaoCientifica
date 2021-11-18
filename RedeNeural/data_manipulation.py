@@ -390,57 +390,80 @@ class DataGenerator(keras.utils.Sequence):
         Denotes the number of batches per epoch.
         """
 
-        return math.ceil(len(self.crop_positions) / self.batch_size)
+        return math.floor(len(self.crop_positions) / self.batch_size)
 
     def __getitem__(self, index):
         """
         Generate one batch of data.
         """
-        index = self.next_index
+        # index = self.next_index
 
-        x = None
-        y = None
+        # x = None
+        # y = None
 
         # If the batch being generated does have batch_size samples
-        if(self.last_sample_used + self.batch_size < len(self.crop_positions)):
-            x = np.empty((self.batch_size, self.dim, self.n_channels))
-            y = np.empty((self.batch_size, self.n_classes))
+        # if(self.last_sample_used + self.batch_size < len(self.crop_positions)):
+        #     x = np.empty((self.batch_size, self.dim, self.n_channels))
+        #     y = np.empty((self.batch_size, self.n_classes))
 
-            crop_positions = self.crop_positions[index*self.batch_size : (index+1)*self.batch_size]
+        #     crop_positions = self.crop_positions[index*self.batch_size : (index+1)*self.batch_size]
 
-            for i in range(0, 100):
-                file_index = crop_positions[i][0]
-                crop_end = crop_positions[i][1]
+        #     for i in range(0, 100):
+        #         file_index = crop_positions[i][0]
+        #         crop_end = crop_positions[i][1]
 
-                x[i] = self.data[file_index][(crop_end-self.dim):crop_end]
+        #         x[i] = self.data[file_index][(crop_end-self.dim):crop_end]
 
-                subject = self.subjects[file_index]
+        #         subject = self.subjects[file_index]
 
-                label = np.zeros((1, self.n_classes))
-                label[0, subject-1] = 1
+        #         label = np.zeros((1, self.n_classes))
+        #         label[0, subject-1] = 1
 
-                y[i] = label
+        #         y[i] = label
             
-            if(self.last_sample_used != 0):
-                self.last_sample_used += self.batch_size
-            else:
-                self.last_sample_used += self.batch_size - 1
+        #     if(self.last_sample_used != 0):
+        #         self.last_sample_used += self.batch_size
+        #     else:
+        #         self.last_sample_used += self.batch_size - 1
             
-            # Storing the N first batches for later use, if needed
-            if(index < self.cache_size):
-                self.cache_x[index] = x[i]
-                self.cache_y[index] = label
+        #     # Storing the N first batches for later use, if needed
+        #     if(index < self.cache_size):
+        #         self.cache_x[index] = x[i]
+        #         self.cache_y[index] = label
 
         # If the batch being generated is using samples from crop_positions
-        if(self.last_sample_used < len(self.crop_positions) - 1):
-            x = []
-            y = []
+        # if(self.last_sample_used < len(self.crop_positions) - 1):
+        x = []
+        y = []
 
-            crop_positions = self.crop_positions[index*self.batch_size : (index+1)*self.batch_size]
+        crop_positions = self.crop_positions[index*self.batch_size : (index+1)*self.batch_size]
 
+        # count = 0
+        for crop_position in crop_positions:
+            file_index, crop_end = crop_position
+            sample = self.data[file_index][:, (crop_end-self.dim):crop_end]
+            sample = sample.reshape(sample.shape[1], sample.shape[0])
+
+            x.append(sample)
+
+            subject = self.subjects[file_index]
+
+            label = np.zeros((1, self.n_classes))
+            label[0, subject-1] = 1
+
+            y.append(label)
+
+            # count += 1
+
+            ######
             # count = 0
-            # for crop_position in crop_positions:
-            #     file_index, crop_end = crop_position
+            # for i in range(0, self.batch_size):
+
+            #     if(self.last_sample_used + count == len(self.crop_positions) - 1):
+            #         break
+
+            #     file_index = crop_positions[i][0]
+            #     crop_end = crop_positions[i][1]
             #     sample = self.data[file_index][(crop_end-self.dim):crop_end]
 
             #     x.append(sample)
@@ -453,27 +476,6 @@ class DataGenerator(keras.utils.Sequence):
             #     y.append(label)
 
             #     count += 1
-
-            count = 0
-            for i in range(0, self.batch_size):
-
-                if(self.last_sample_used + count == len(self.crop_positions) - 1):
-                    break
-
-                file_index = crop_positions[i][0]
-                crop_end = crop_positions[i][1]
-                sample = self.data[file_index][(crop_end-self.dim):crop_end]
-
-                x.append(sample)
-
-                subject = self.subjects[file_index]
-
-                label = np.zeros((1, self.n_classes))
-                label[0, subject-1] = 1
-
-                y.append(label)
-
-                count += 1
             
             x = np.asarray(x, dtype = object).astype('float32')
             y = np.asarray(y, dtype = object).astype('float32')
@@ -482,28 +484,28 @@ class DataGenerator(keras.utils.Sequence):
             # is "a x num_classes".
             y = y.reshape(y.shape[0], y.shape[2])
 
-            if(self.last_sample_used != 0):
-                self.last_sample_used += count
-            else:
-                self.last_sample_used += count - 1
+            # if(self.last_sample_used != 0):
+            #     self.last_sample_used += count
+            # else:
+            #     self.last_sample_used += count - 1
 
             # Storing the N first batches for later use, if needed
-            if(index < self.cache_size):
-                self.cache_x[index] = x
-                self.cache_y[index] = label
+            # if(index < self.cache_size):
+            #     self.cache_x[index] = x
+            #     self.cache_y[index] = label
         
         # Taking data from cache
-        else:
+        # else:
 
-            if(self.cache_next_index == self.cache_size):
-                self.cache_next_index = 0
+        #     if(self.cache_next_index == self.cache_size):
+        #         self.cache_next_index = 0
 
-            x = self.cache_x[self.cache_next_index]
-            y = self.cache_y[self.cache_next_index]
+        #     x = self.cache_x[self.cache_next_index]
+        #     y = self.cache_y[self.cache_next_index]
 
-            self.cache_next_index += 1
+            # self.cache_next_index += 1
 
-        self.next_index += 1
+        # self.next_index += 1
 
         return (x, y)
 
@@ -514,15 +516,15 @@ class DataGenerator(keras.utils.Sequence):
         if self.shuffle == True:
             random.shuffle(self.crop_positions)
 
-        self.next_index = 0       # Index of the next batch
-        self.last_sample_used = 0 # Index of the last sample used
+        # self.next_index = 0       # Index of the next batch
+        # self.last_sample_used = 0 # Index of the last sample used
 
         # Cache: stores the N first batches, that can be used later if the asynchronous behavior of Data Generators
         # make no use of them at first
-        self.cache_size = 10
-        self.cache_next_index = 0
-        self.cache_x = np.empty((self.cache_size, self.batch_size, self.dim, self.n_channels))
-        self.cache_y = np.empty((self.cache_size, self.batch_size, self.n_classes))
+        # self.cache_size = 10
+        # self.cache_next_index = 0
+        # self.cache_x = np.empty((self.cache_size, self.batch_size, self.dim, self.n_channels))
+        # self.cache_y = np.empty((self.cache_size, self.batch_size, self.n_classes))
     
     def return_all_data(self):
         """
@@ -533,7 +535,8 @@ class DataGenerator(keras.utils.Sequence):
 
         for crop_position in self.crop_positions:
             file_index, crop_end = crop_position
-            sample = self.data[file_index][(crop_end-self.dim):crop_end]
+            sample = self.data[file_index][:, (crop_end-self.dim):crop_end]
+            sample = sample.reshape(sample.shape[1], sample.shape[0])
 
             x.append(sample)
 

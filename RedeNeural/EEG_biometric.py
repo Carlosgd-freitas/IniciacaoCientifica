@@ -71,6 +71,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # - Até a normalização está ok, o problema fica na hora de croppar o x_train_2 (linhas 239 e 240)
 #   * analisar o que o data_manipulation.crop_data() faz e replicar em uma função nova, mas que use o sinal completo
 #   de (9760, 64)
+# APLICAR O RESHAPE SÓ NA HORA DE FEEDAR A REDE!
 
 # Tasks:
 # Task 1 - EO
@@ -170,160 +171,167 @@ lr_scheduler = LearningRateScheduler(models.scheduler, verbose=0)
 
 
 
-# # Data without Data Generators
-# train_content, test_content = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes)
+# Data without Data Generators
+train_content, test_content = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes)
 
-# # Filtering the raw data
-# train_content = preprocessing.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
-# # test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
+# Filtering the raw data
+train_content = preprocessing.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type)
+test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
 
-# # Normalize the filtered data
-# train_content = preprocessing.normalize_data(train_content, 'sun')
-# # test_content = preprocessing.normalize_data(test_content, 'sun')
-
-
-# with open('apos_normalizar.csv', 'w', newline='\n') as f:
-#     writer = csv.writer(f)
-
-#     aux = train_content[0].T
-#     print(f'aux.shape = {aux.shape}')
-
-#     for i in range (0, 9760):
-#         writer.writerow(aux[i])
+# Normalize the filtered data
+train_content = preprocessing.normalize_data(train_content, 'sun')
+test_content = preprocessing.normalize_data(test_content, 'sun')
 
 
-# # Getting the training, validation and testing data
-# x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, train_tasks, num_classes,
-#                                                     window_size, offset, split_ratio)
-# # x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_classes, window_size,
-# #                                     window_size)
+with open('apos_normalizar.csv', 'w', newline='\n') as f:
+    writer = csv.writer(f)
 
-# crop1_crop = x_train[0]
+    aux = train_content[0].T
+    print(f'aux.shape = {aux.shape}')
 
-# print('depois de croppar')
-# print(f'x_train[0][0, :] = {x_train[0][0, :]}')
-# print(f'x_train[0][29, :] = {x_train[0][29, :]}')
-# print(f'x_train[0][30, :] = {x_train[0][30, :]}')
+    for i in range (0, 9760):
+        writer.writerow(aux[i])
 
-# with open('apos_croppar1.csv', 'w', newline='\n') as f:
-#     writer = csv.writer(f)
 
-#     aux = x_train[0]
-#     print(f'aux.shape = {aux.shape}')
+# Getting the training, validation and testing data
+x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, train_tasks, num_classes,
+                                                    window_size, offset, split_ratio)
+x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_classes, window_size,
+                                    window_size)
 
-#     for i in range (0, 1920):
-#         writer.writerow(aux[i])
+crop1_crop = x_train[0]
 
-# ######################################################################################
+print('depois de croppar')
+print(f'x_train[0][0, :] = {x_train[0][0, :]}')
+print(f'x_train[0][29, :] = {x_train[0][29, :]}')
+print(f'x_train[0][30, :] = {x_train[0][30, :]}')
 
-# # Loading the data
-# train_content_2, test_content_2 = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes)
+with open('apos_croppar1.csv', 'w', newline='\n') as f:
+    writer = csv.writer(f)
 
-# # Filtering the raw data
-# test_content_2 = preprocessing.filter_data(test_content_2, band_pass_3, sample_frequency, filter_order, filter_type)
+    aux = x_train[0]
+    print(f'aux.shape = {aux.shape}')
 
-# # Normalize the filtered data
-# test_content_2 = preprocessing.normalize_data(test_content_2, 'sun')
+    for i in range (0, 1920):
+        writer.writerow(aux[i])
 
-# # Getting the testing data
-# # x_test_2, y_test_2 = data_manipulation.crop_data(test_content_2, test_tasks, num_classes, window_size,
-# #                                     window_size)
+######################################################################################
 
-# for task in train_tasks:
-#     if(not os.path.exists(processed_data_path + 'processed_data/task'+str(task))):
-#         folder = Path(processed_data_path + 'processed_data/task'+str(task))
-#         folder.mkdir(parents=True)
+# Loading the data
+train_content_2, test_content_2 = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes)
 
-#         # Loading the raw data
-#         train_content_2, test_content_2 = loader.load_data(folder_path, [task], [], 'csv', num_classes)
+# Filtering the raw data
+test_content_2 = preprocessing.filter_data(test_content_2, band_pass_3, sample_frequency, filter_order, filter_type)
 
-#         # Filtering the raw data
-#         train_content_2 = preprocessing.filter_data(train_content_2, band_pass_3, sample_frequency, filter_order, filter_type)
+# Normalize the filtered data
+test_content_2 = preprocessing.normalize_data(test_content_2, 'sun')
 
-#         # Normalize the filtered data
-#         train_content_2 = preprocessing.normalize_data(train_content_2, 'sun')
+# Getting the testing data
+x_test_2, y_test_2 = data_manipulation.crop_data(test_content_2, test_tasks, num_classes, window_size,
+                                    window_size)
 
-#         full_signal_size = train_content_2[0].shape[1]
+for task in train_tasks:
+    if(not os.path.exists(processed_data_path + 'processed_data/task'+str(task))):
+        folder = Path(processed_data_path + 'processed_data/task'+str(task))
+        folder.mkdir(parents=True)
 
-#         # Getting the training, validation and testing data
-#         x_train_2, y_train_2 = data_manipulation.crop_data(train_content_2, [task], num_classes, full_signal_size,
-#                                             full_signal_size)
+        # Loading the raw data
+        train_content_2, test_content_2 = loader.load_data(folder_path, [task], [], 'csv', num_classes)
 
-#         with open('apos_croppar2.csv', 'w', newline='\n') as f:
-#             writer = csv.writer(f)
+        # Filtering the raw data
+        train_content_2 = preprocessing.filter_data(train_content_2, band_pass_3, sample_frequency, filter_order, filter_type)
 
-#             aux = x_train_2[0]
-#             print(f'aux.shape = {aux.shape}')
+        # Normalize the filtered data
+        train_content_2 = preprocessing.normalize_data(train_content_2, 'sun')
 
-#             for i in range (0, 9760):
-#                 writer.writerow(aux[i])
+        full_signal_size = train_content_2[0].shape[1]
 
-#         crop2_crop1 = x_train_2[0]
+        # Getting the training, validation and testing data
+        # x_train_2, y_train_2 = data_manipulation.crop_data(train_content_2, [task], num_classes, full_signal_size,
+        #                                     full_signal_size)
 
-#         x_train_2 = data_manipulation.crop_full_data(train_content_2)
+        # with open('apos_croppar2.csv', 'w', newline='\n') as f:
+        #     writer = csv.writer(f)
 
-#         with open('apos_croppar3.csv', 'w', newline='\n') as f:
-#             writer = csv.writer(f)
+        #     aux = x_train_2[0]
+        #     print(f'aux.shape = {aux.shape}')
 
-#             aux = x_train_2[0]
-#             print(f'aux.shape = {aux.shape}')
+        #     for i in range (0, 9760):
+        #         writer.writerow(aux[i])
 
-#             for i in range (0, 9760):
-#                 writer.writerow(aux[i])
+        # crop2_crop1 = x_train_2[0]
 
-#         crop2_crop2 = x_train_2[0]
+        # x_train_2 = data_manipulation.crop_full_data(train_content_2)
 
-#         # print('depois de croppar')
-#         # print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
-#         # print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
-#         # print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
+        # with open('apos_croppar3.csv', 'w', newline='\n') as f:
+        #     writer = csv.writer(f)
 
-#         list = []
-#         for index in range(0, x_train_2.shape[0]):
-#             data = x_train_2[index]
+        #     aux = x_train_2[0]
+        #     print(f'aux.shape = {aux.shape}')
 
-#             # print(f'index = {index}, data.shape = {data.shape}') #
-#             # print(f'data[0] = {data[0]}')
-#             # print(f'data[29] = {data[29]}')
-#             # print(f'data[30] = {data[30]}')
+        #     for i in range (0, 9760):
+        #         writer.writerow(aux[i])
 
-#             string = 'x_subject_' + str(index+1)
-#             savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
-#             print(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv was saved.')
-#             list.append(string+'.csv')
+        # crop2_crop2 = x_train_2[0]
+
+        # print('depois de croppar')
+        # print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
+        # print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
+        # print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
+
+        list = []
+        # for index in range(0, x_train_2.shape[0]):
+        for index in range(0, len(train_content_2)):
+            data = train_content_2[index]
+
+            # print(f'index = {index}, data.shape = {data.shape}') #
+            # print(f'data[0] = {data[0]}')
+            # print(f'data[29] = {data[29]}')
+            # print(f'data[30] = {data[30]}')
+
+            string = 'x_subject_' + str(index+1)
+            savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
+            print(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv was saved.')
+            list.append(string+'.csv')
         
-#         savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
-#         print(f'file names were saved to processed_data/task{task}/x_list.csv')
+        savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
+        print(f'file names were saved to processed_data/task{task}/x_list.csv')
 
-# x_train_2_list = []
-# # x_test_list = []
+x_train_2_list = []
+# x_test_list = []
 
-# for task in train_tasks:
-#     x_train_2_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
+for task in train_tasks:
+    x_train_2_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
 
-# # for task in test_tasks:
-# #     x_test_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
+# for task in test_tasks:
+#     x_test_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
 
 # x_train_2_list = np.asarray(x_train_2_list).astype('str')
 # x_train_2_list = x_train_2_list.reshape(-1)
 # x_train_2_list = x_train_2_list.tolist()
 
-# # x_test_list = np.asarray(x_test_list).astype('str')
-# # x_test_list = x_test_list.reshape(-1)
-# # x_test_list = x_test_list.tolist()
+x_train_2_list = [item for sublist in x_train_2_list for item in sublist]
 
-# # print(f'full_signal_size = {full_signal_size}') ####
+print(f'x_train_2_list = {x_train_2_list}')
 
-# # Defining the data generators
-# training_generator = data_manipulation.DataGenerator(x_train_2_list, batch_size, window_size, offset,
-#     full_signal_size, num_channels, num_classes, train_tasks, 'train', split_ratio, processed_data_path)
-# validation_generator = data_manipulation.DataGenerator(x_train_2_list, batch_size, window_size, offset,
-#     full_signal_size, num_channels, num_classes, train_tasks, 'validation', split_ratio, processed_data_path)
+sys.exit()
 
-# (x_train_2, y_train_2) = training_generator.return_all_data()
-# (x_val_2, y_val_2) = validation_generator.return_all_data()
+# x_test_list = np.asarray(x_test_list).astype('str')
+# x_test_list = x_test_list.reshape(-1)
+# x_test_list = x_test_list.tolist()
 
-# crop2_crop3 = x_train_2[0]
+# print(f'full_signal_size = {full_signal_size}') ####
+
+# Defining the data generators
+training_generator = data_manipulation.DataGenerator(x_train_2_list, batch_size, window_size, offset,
+    full_signal_size, num_channels, num_classes, train_tasks, 'train', split_ratio, processed_data_path)
+validation_generator = data_manipulation.DataGenerator(x_train_2_list, batch_size, window_size, offset,
+    full_signal_size, num_channels, num_classes, train_tasks, 'validation', split_ratio, processed_data_path)
+
+(x_train_2, y_train_2) = training_generator.return_all_data()
+(x_val_2, y_val_2) = validation_generator.return_all_data()
+
+crop2_crop3 = x_train_2[0]
 
 # euclid = euclidean_distances(crop1_crop, crop2_crop1)
 # print(f'entre crop1_crop e crop2_crop1 = {np.amax(euclid.diagonal())}\n')
@@ -331,48 +339,48 @@ lr_scheduler = LearningRateScheduler(models.scheduler, verbose=0)
 # euclid = euclidean_distances(crop1_crop, crop2_crop2)
 # print(f'entre crop1_crop e crop2_crop2 = {np.amax(euclid.diagonal())}\n')
 
-# euclid = euclidean_distances(crop1_crop, crop2_crop3)
-# print(f'entre crop1_crop e crop2_crop3 = {np.amax(euclid.diagonal())}\n')
+euclid = euclidean_distances(crop1_crop, crop2_crop3)
+print(f'entre crop1_crop e crop2_crop3 = {np.amax(euclid.diagonal())}\n')
 
-# # print('depois do role todo')
-# # print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
-# # print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
-# # print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
+print('depois do role todo')
+print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
+print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
+print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
 
-# # print(f'x_train.shape = {x_train.shape}; x_train_2.shape = {x_train_2.shape}')
-# # print(f'y_train.shape = {y_train.shape}; y_train_2.shape = {y_train_2.shape}')
-# # print(f'x_val.shape = {x_val.shape}; x_val_2.shape = {x_val_2.shape}')
-# # print(f'y_val.shape = {y_val.shape}; y_val_2.shape = {y_val_2.shape}')
-# # print(f'x_test.shape = {x_test.shape}; x_test_2.shape = {x_test_2.shape}')
-# # print(f'y_test.shape = {y_test.shape}; y_test_2.shape = {y_test_2.shape}')
+print(f'x_train.shape = {x_train.shape}; x_train_2.shape = {x_train_2.shape}')
+print(f'y_train.shape = {y_train.shape}; y_train_2.shape = {y_train_2.shape}')
+print(f'x_val.shape = {x_val.shape}; x_val_2.shape = {x_val_2.shape}')
+print(f'y_val.shape = {y_val.shape}; y_val_2.shape = {y_val_2.shape}')
+print(f'x_test.shape = {x_test.shape}; x_test_2.shape = {x_test_2.shape}')
+print(f'y_test.shape = {y_test.shape}; y_test_2.shape = {y_test_2.shape}')
 
-# # i = 0
-# # while i < len(x_train):
-# #     e_train_x = euclidean_distances(x_train[i], x_train_2[i])
-# #     print(f'i = {i}, e_train_x.diagonal() = {np.amax(e_train_x.diagonal())}\n')
-# #     i += 1
+i = 0
+while i < len(x_train):
+    e_train_x = euclidean_distances(x_train[i], x_train_2[i])
+    print(f'i = {i}, e_train_x.diagonal() = {np.amax(e_train_x.diagonal())}\n')
+    i += 1
 
-# # i = 0
-# # while i < len(x_val):
-# #     e_val_x = euclidean_distances(x_val[i], x_val_2[i])
-# #     print(f'i = {i}, e_val_x.diagonal() = {np.amax(e_val_x.diagonal())}\n')
-# #     i += 1
+i = 0
+while i < len(x_val):
+    e_val_x = euclidean_distances(x_val[i], x_val_2[i])
+    print(f'i = {i}, e_val_x.diagonal() = {np.amax(e_val_x.diagonal())}\n')
+    i += 1
 
-# # i = 0
-# # while i < len(x_test):
-# #     e_test_x = euclidean_distances(x_test[i], x_test_2[i])
-# #     print(f'i = {i}, e_test_x.diagonal() = {np.amax(e_test_x.diagonal())}\n')
-# #     i += 1
+# i = 0
+# while i < len(x_test):
+#     e_test_x = euclidean_distances(x_test[i], x_test_2[i])
+#     print(f'i = {i}, e_test_x.diagonal() = {np.amax(e_test_x.diagonal())}\n')
+#     i += 1
 
-# # e_train_y = euclidean_distances(y_train, y_train_2)
-# # e_val_y = euclidean_distances(y_val, y_val_2)
-# # e_test_y = euclidean_distances(y_test, y_test_2)
+# e_train_y = euclidean_distances(y_train, y_train_2)
+# e_val_y = euclidean_distances(y_val, y_val_2)
+# e_test_y = euclidean_distances(y_test, y_test_2)
 
-# # print(f'e_train_y.diagonal() = {np.amax(e_train_y.diagonal())}\n')
-# # print(f'e_val_y.diagonal() = {np.amax(e_val_y.diagonal())}\n')
-# # print(f'e_test_y.diagonal() = {np.amax(e_test_y.diagonal())}\n')
+# print(f'e_train_y.diagonal() = {np.amax(e_train_y.diagonal())}\n')
+# print(f'e_val_y.diagonal() = {np.amax(e_val_y.diagonal())}\n')
+# print(f'e_test_y.diagonal() = {np.amax(e_test_y.diagonal())}\n')
 
-# sys.exit()
+sys.exit()
 
 # Not using Data Generators
 if(not args.datagen):
