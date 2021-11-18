@@ -347,9 +347,15 @@ class DataGenerator(keras.utils.Sequence):
                 i += 1
                 
         # data = np.asarray(data, dtype = object).astype('float32')
+        shortest_signal_size = 999999
+        for signal in data:
+            if signal.shape[1] < shortest_signal_size:
+                shortest_signal_size = signal.shape[1]
         
+        print(f'shortest_signal_size = {shortest_signal_size}')
+
         # Storing the information of all cropping that will be done in the EEG signals
-        crop_positions = get_crop_positions(self.dataset_type, data.shape[0], data[0].shape[0], self.dim,
+        crop_positions = get_crop_positions(self.dataset_type, len(data), shortest_signal_size, self.dim,
             self.offset, self.split_ratio)
 
         # if(self.dataset_type == 'train' or self.dataset_type == 'test'):
