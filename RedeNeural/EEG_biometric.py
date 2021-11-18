@@ -298,29 +298,11 @@ for task in train_tasks:
         print(f'file names were saved to processed_data/task{task}/x_list.csv')
 
 x_train_2_list = []
-# x_test_list = []
 
 for task in train_tasks:
     x_train_2_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
 
-# for task in test_tasks:
-#     x_test_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
-
-# x_train_2_list = np.asarray(x_train_2_list).astype('str')
-# x_train_2_list = x_train_2_list.reshape(-1)
-# x_train_2_list = x_train_2_list.tolist()
-
 x_train_2_list = [item for sublist in x_train_2_list for item in sublist]
-
-print(f'x_train_2_list = {x_train_2_list}')
-
-sys.exit()
-
-# x_test_list = np.asarray(x_test_list).astype('str')
-# x_test_list = x_test_list.reshape(-1)
-# x_test_list = x_test_list.tolist()
-
-# print(f'full_signal_size = {full_signal_size}') ####
 
 # Defining the data generators
 training_generator = data_manipulation.DataGenerator(x_train_2_list, batch_size, window_size, offset,
@@ -543,64 +525,20 @@ else:
                 
             savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
             print(f'file names were saved to processed_data/task{task}/x_list.csv')
-    
-    # Processing test data
-    # if(not args.noptest):
-    #     for task in test_tasks:
-
-    #         if(not os.path.exists(processed_data_path + 'processed_data/task'+str(task))):
-    #             folder = Path(processed_data_path + 'processed_data/task'+str(task))
-    #             folder.mkdir(parents=True)
-
-    #             # Loading the raw data
-    #             train_content, test_content = loader.load_data(folder_path, [], [task], 'csv', num_classes)   
-
-    #             # Filtering the raw data
-    #             test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type)
-
-    #             # Normalize the filtered data
-    #             test_content = preprocessing.normalize_data(test_content, 'sun')
-
-    #             # Getting the training, validation and testing data
-    #             x_test, y_test = data_manipulation.crop_data(test_content, [task], num_classes, full_signal_size,
-    #                                                 full_signal_size, reshape='data_generator')
-
-    #             list = []
-    #             for index in range(0, x_test.shape[0]):
-    #                 data = x_test[index]
-    #                 string = 'x_subject_' + str(index+1)
-    #                 savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
-    #                 print(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv was saved.')
-    #                 list.append(string+'.csv')
-                    
-    #             savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
-    #             print(f'file names were saved to processed_data/task{task}/x_list.csv')
 
     # Getting the file names that contains the preprocessed data
     x_train_list = []
-    # x_test_list = []
 
     for task in train_tasks:
         x_train_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
 
-    # for task in test_tasks:
-    #     x_test_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
-
-    x_train_list = np.asarray(x_train_list).astype('str')
-    x_train_list = x_train_list.reshape(-1)
-    x_train_list = x_train_list.tolist()
-
-    # x_test_list = np.asarray(x_test_list).astype('str')
-    # x_test_list = x_test_list.reshape(-1)
-    # x_test_list = x_test_list.tolist()
+    x_train_list = [item for sublist in x_train_list for item in sublist]
 
     # Defining the data generators
     training_generator = data_manipulation.DataGenerator(x_train_list, batch_size, window_size, offset,
         full_signal_size, num_channels, num_classes, train_tasks, 'train', split_ratio, processed_data_path, True)
     validation_generator = data_manipulation.DataGenerator(x_train_list, batch_size, window_size, offset,
         full_signal_size, num_channels, num_classes, train_tasks, 'validation', split_ratio, processed_data_path, True)
-    # testing_generator = data_manipulation.DataGenerator(x_test_list, batch_size, window_size, window_size,
-    #     full_signal_size, num_channels, num_classes, test_tasks, 'test', 1.0, processed_data_path)
 
     # Training the model
     if(not args.nofit):
@@ -684,47 +622,6 @@ else:
     
     # Running the model in Verification Mode
     if(not args.novmode):
-
-        # List of files that contains x_test data
-        # x_test_list = []
-        # for task in test_tasks:
-        #     x_test_list.append(loadtxt(processed_data_path + 'processed_data/task'+str(task)+'/x_list.csv', delimiter=',', dtype='str'))
-        # x_test_list = np.asarray(x_test_list).astype('str')
-        # x_test_list = x_test_list.reshape(-1)
-        # x_test_list = x_test_list.tolist()
-
-        # Loading x_test data
-        # temp_x = []
-        # subjects = []
-        # for task in test_tasks:
-        #     for i, ID in enumerate(x_test_list):
-        #         file_x = np.loadtxt(processed_data_path + 'processed_data/task' + str(task) + '/' + x_test_list[i], delimiter=';', usecols=range(num_channels))
-        #         string = processed_data_path + 'processed_data/task' + str(task) + '/' + x_test_list[i]
-
-        #         file_x = np.asarray(file_x, dtype = object).astype('float32')
-        #         file_x = file_x.T
-        #         temp_x.append(file_x)
-
-        #         string = string.split("_subject_")[1]    # 'X.csv'
-        #         subject = int(string.split(".csv")[0])   # X
-        #         subjects.append(subject)
-
-        # Cropping y_test data
-        # x_dataL = list()
-        # y_dataL = list()
-
-        # pos = 0
-        # for data in temp_x:
-        #     x_dataL, y_dataL = data_manipulation.signal_cropping(x_dataL, y_dataL, data, window_size, window_size, subjects[pos],
-        #                         num_classes, mode='labels_only')
-        #     pos += 1
-        
-        # y_test = np.asarray(y_dataL, dtype = object).astype('float32')
-        # y_test = y_test.reshape(y_test.shape[0], y_test.shape[2])
-
-        # Defining the generator
-        # testing_generator = data_manipulation.DataGenerator(x_test_list, batch_size, window_size, window_size,
-        #     full_signal_size, num_channels, num_classes, test_tasks, 'test', 1.0, processed_data_path)
 
         # Removing the last layers of the model and getting the features array
         model_for_verification = models.create_model_mixed(window_size, num_channels, num_classes, True)
