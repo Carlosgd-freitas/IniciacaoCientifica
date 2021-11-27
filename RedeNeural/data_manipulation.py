@@ -1,5 +1,6 @@
 import utils
 
+import os ###################################
 import math
 import random
 import numpy as np
@@ -318,14 +319,6 @@ class DataGenerator(keras.utils.Sequence):
         self.processed_data_path = processed_data_path
         self.shuffle = shuffle
 
-        # Calculating the number of samples per file
-        if(self.dataset_type == 'train'):
-            self.samples_per_file = utils.n_samples_with_sliding_window(0, self.full_signal_size * self.split_ratio, self.dim, self.offset)
-        elif(self.dataset_type == 'validation'):
-            self.samples_per_file = utils.n_samples_with_sliding_window(self.full_signal_size * self.split_ratio, self.full_signal_size, self.offset, self.offset) - 1
-        elif(self.dataset_type == 'test'):
-            self.samples_per_file = utils.n_samples_with_sliding_window(0, self.full_signal_size, self.dim, self.offset)
-
         # Loading all files from list_files
         data = []
         subjects = []
@@ -353,6 +346,27 @@ class DataGenerator(keras.utils.Sequence):
                 shortest_signal_size = signal.shape[1]
         
         print(f'shortest_signal_size = {shortest_signal_size}')
+
+        signal_sizes = []
+        for signal in data:
+            print(f'signal.shape is {signal.shape}') ########
+            signal_sizes.append(signal.shape[0])
+        
+        ########
+        print('\n')
+        for size in signal_sizes:
+            print(f'size is {size}')
+
+        os.exit()
+        ########
+
+        # Calculating the number of samples per file
+        if(self.dataset_type == 'train'):
+            self.samples_per_file = utils.n_samples_with_sliding_window(0, self.full_signal_size * self.split_ratio, self.dim, self.offset)
+        elif(self.dataset_type == 'validation'):
+            self.samples_per_file = utils.n_samples_with_sliding_window(self.full_signal_size * self.split_ratio, self.full_signal_size, self.offset, self.offset) - 1
+        elif(self.dataset_type == 'test'):
+            self.samples_per_file = utils.n_samples_with_sliding_window(0, self.full_signal_size, self.dim, self.offset)
 
         # Storing the information of all cropping that will be done in the EEG signals
         crop_positions = get_crop_positions(self.dataset_type, len(data), shortest_signal_size, self.dim,

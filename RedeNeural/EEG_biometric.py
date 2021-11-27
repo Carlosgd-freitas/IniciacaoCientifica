@@ -33,7 +33,7 @@ initial_learning_rate = 0.01    # Initial learning rate
 # folder_path = './Dataset_CSV/'
 folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
 processed_data_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
-num_classes = 5 #109 # 5              # Total number of classes (individuals)
+num_classes = 5 #109              # Total number of classes (individuals)
 
 # Parameters used in functions.filter_data()
 band_pass_1 = [1, 50]           # First filter option, 1~50Hz
@@ -71,7 +71,13 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # - Até a normalização está ok, o problema fica na hora de croppar o x_train_2 (linhas 239 e 240)
 #   * analisar o que o data_manipulation.crop_data() faz e replicar em uma função nova, mas que use o sinal completo
 #   de (9760, 64)
-# APLICAR O RESHAPE SÓ NA HORA DE FEEDAR A REDE!
+# 
+# ----------> O que é pra fazer: <-----------
+# Tirar a cache e as variáveis de controle que eu impus
+# Salvar o "estado natural" dos sinais após normalizar (blocão de 9760/9600 mesmo)
+# APLICAR O RESHAPE SÓ NA HORA DE FEEDAR A REDE! (de pegar o crop_position e tal)
+#
+# Cenário do Sun (Treino / Teste): [1, 2, 7, 8, 9, 10, 11, 12, 13, 14] / [3, 4, 5, 6]
 
 # Tasks:
 # Task 1 - EO
@@ -291,7 +297,7 @@ for task in train_tasks:
 
             string = 'x_subject_' + str(index+1)
             savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
-            print(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv was saved.')
+            print(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv, with shape ' + data.shape + ' was saved.')
             list.append(string+'.csv')
         
         savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
@@ -313,7 +319,7 @@ validation_generator = data_manipulation.DataGenerator(x_train_2_list, batch_siz
 (x_train_2, y_train_2) = training_generator.return_all_data()
 (x_val_2, y_val_2) = validation_generator.return_all_data()
 
-crop2_crop3 = x_train_2[0]
+# crop2_crop3 = x_train_2[0]
 
 # euclid = euclidean_distances(crop1_crop, crop2_crop1)
 # print(f'entre crop1_crop e crop2_crop1 = {np.amax(euclid.diagonal())}\n')
@@ -321,13 +327,13 @@ crop2_crop3 = x_train_2[0]
 # euclid = euclidean_distances(crop1_crop, crop2_crop2)
 # print(f'entre crop1_crop e crop2_crop2 = {np.amax(euclid.diagonal())}\n')
 
-euclid = euclidean_distances(crop1_crop, crop2_crop3)
-print(f'entre crop1_crop e crop2_crop3 = {np.amax(euclid.diagonal())}\n')
+# euclid = euclidean_distances(crop1_crop, crop2_crop3)
+# print(f'entre crop1_crop e crop2_crop3 = {np.amax(euclid.diagonal())}\n')
 
-print('depois do role todo')
-print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
-print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
-print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
+# print('depois do role todo')
+# print(f'x_train_2[0][0, :] = {x_train_2[0][0, :]}')
+# print(f'x_train_2[0][29, :] = {x_train_2[0][29, :]}')
+# print(f'x_train_2[0][30, :] = {x_train_2[0][30, :]}')
 
 print(f'x_train.shape = {x_train.shape}; x_train_2.shape = {x_train_2.shape}')
 print(f'y_train.shape = {y_train.shape}; y_train_2.shape = {y_train_2.shape}')
