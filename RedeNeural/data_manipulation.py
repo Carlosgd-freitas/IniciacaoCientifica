@@ -1,6 +1,6 @@
 import utils
 
-import os ###################################
+import sys ###################################
 import math
 import random
 import numpy as np
@@ -327,7 +327,7 @@ class DataGenerator(keras.utils.Sequence):
             i = 0
 
             while(i < self.n_classes):
-                file_x = np.loadtxt(processed_data_path + 'processed_data/task' + str(task) + '/' + list_files[i], delimiter=';', usecols=range(self.n_channels))
+                file_x = np.loadtxt(processed_data_path + 'processed_data/task' + str(task) + '/' + list_files[i], delimiter=';') #usecols=range(self.n_channels)
                 string = processed_data_path + 'processed_data/task' + str(task) + '/' + list_files[i]
 
                 file_x = np.asarray(file_x, dtype = object).astype('float32')
@@ -357,7 +357,7 @@ class DataGenerator(keras.utils.Sequence):
         for size in signal_sizes:
             print(f'size is {size}')
 
-        os.exit()
+        sys.exit()
         ########
 
         # Calculating the number of samples per file

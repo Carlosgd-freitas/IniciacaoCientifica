@@ -189,14 +189,14 @@ train_content = preprocessing.normalize_data(train_content, 'sun')
 test_content = preprocessing.normalize_data(test_content, 'sun')
 
 
-with open('apos_normalizar.csv', 'w', newline='\n') as f:
-    writer = csv.writer(f)
+# with open('apos_normalizar.csv', 'w', newline='\n') as f:
+#     writer = csv.writer(f)
 
-    aux = train_content[0].T
-    print(f'aux.shape = {aux.shape}')
+#     aux = train_content[0].T
+#     print(f'aux.shape = {aux.shape}')
 
-    for i in range (0, 9760):
-        writer.writerow(aux[i])
+#     for i in range (0, 9760):
+#         writer.writerow(aux[i])
 
 
 # Getting the training, validation and testing data
@@ -298,7 +298,7 @@ for task in train_tasks:
             string = 'x_subject_' + str(index+1)
             savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
             print(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv was saved.')
-            print(f'the data had shape {data.shape}')
+            print(f'the data had shape {data.shape}') ###
             list.append(string+'.csv')
         
         savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
