@@ -237,7 +237,7 @@ def crop_full_data(content, full_signal_size):
     return array
 
 
-def get_crop_positions(dataset_type, num_signals, signal_size, window_size, offset, split_ratio):
+def get_crop_positions(dataset_type, num_signals, signal_sizes, window_size, offset, split_ratio):
     """
     Stores and returns the information of all cropping that will be done in the EEG signals.
 
@@ -245,24 +245,25 @@ def get_crop_positions(dataset_type, num_signals, signal_size, window_size, offs
         - dataset_type: which type of dataset will be created by the data generator. Valid types are 'train',
         'validation' and 'test';
         - num_signals: number of signals being processed;
-        - signal_size: full size of the signals being processed;
+        - signal_sizes: a list containing the full size of the signals being processed;
         - window_size: size of the sliding window;
         - offset: amount of samples the window will slide in each iteration;
         - split_ratio: a number in the interval (0,1]. (split_ratio * 100)% of the processed signals will be
         stored separetly from the other [100 - (split_ratio * 100)]%.
     """
     crop_positions = []
-
-    if(dataset_type == 'train' or dataset_type == 'test'):
-        first_i = window_size
-        stop = signal_size * split_ratio
-    
-    elif(dataset_type == 'validation'):
-        first_i = math.floor(signal_size * split_ratio)
-        stop = signal_size
-
     signal_index = 0
-    while(signal_index < num_signals):
+
+    for size in signal_sizes:
+
+        if(dataset_type == 'train' or dataset_type == 'test'):
+            first_i = window_size
+            stop = size * split_ratio
+        
+        elif(dataset_type == 'validation'):
+            first_i = math.floor(size * split_ratio)
+            stop = size
+
         i = first_i
 
         while(i <= stop):
@@ -340,36 +341,29 @@ class DataGenerator(keras.utils.Sequence):
                 i += 1
                 
         # data = np.asarray(data, dtype = object).astype('float32')
-        shortest_signal_size = 999999
-        for signal in data:
-            if signal.shape[1] < shortest_signal_size:
-                shortest_signal_size = signal.shape[1]
+        # shortest_signal_size = 999999
+        # for signal in data:
+        #     if signal.shape[1] < shortest_signal_size:
+        #         shortest_signal_size = signal.shape[1]
         
-        print(f'shortest_signal_size = {shortest_signal_size}')
+        # print(f'shortest_signal_size = {shortest_signal_size}')
 
         signal_sizes = []
         for signal in data:
-            print(f'signal.shape is {signal.shape}') ########
-            signal_sizes.append(signal.shape[0])
-        
-        ########
-        print('\n')
-        for size in signal_sizes:
-            print(f'size is {size}')
-
-        sys.exit()
-        ########
+            signal_sizes.append(signal.shape[1])
 
         # Calculating the number of samples per file
-        if(self.dataset_type == 'train'):
-            self.samples_per_file = utils.n_samples_with_sliding_window(0, self.full_signal_size * self.split_ratio, self.dim, self.offset)
-        elif(self.dataset_type == 'validation'):
-            self.samples_per_file = utils.n_samples_with_sliding_window(self.full_signal_size * self.split_ratio, self.full_signal_size, self.offset, self.offset) - 1
-        elif(self.dataset_type == 'test'):
-            self.samples_per_file = utils.n_samples_with_sliding_window(0, self.full_signal_size, self.dim, self.offset)
+        # self.samples_per_file = 0
+        # for signal in signal_sizes:
+        #     if(self.dataset_type == 'train'):
+        #         self.samples_per_file += utils.n_samples_with_sliding_window(0, signal * self.split_ratio, self.dim, self.offset)
+        #     elif(self.dataset_type == 'validation'):
+        #         self.samples_per_file += utils.n_samples_with_sliding_window(signal * self.split_ratio, signal, self.offset, self.offset) - 1
+        #     elif(self.dataset_type == 'test'):
+        #         self.samples_per_file += utils.n_samples_with_sliding_window(0, signal, self.dim, self.offset)
 
         # Storing the information of all cropping that will be done in the EEG signals
-        crop_positions = get_crop_positions(self.dataset_type, len(data), shortest_signal_size, self.dim,
+        crop_positions = get_crop_positions(self.dataset_type, len(data), signal_sizes, self.dim,
             self.offset, self.split_ratio)
 
         # if(self.dataset_type == 'train' or self.dataset_type == 'test'):
@@ -402,6 +396,8 @@ class DataGenerator(keras.utils.Sequence):
         self.data = data
         self.subjects = subjects
         self.crop_positions = crop_positions
+
+        print(f'self.crop_positions = {self.crop_positions}')
 
         self.on_epoch_end()
 
