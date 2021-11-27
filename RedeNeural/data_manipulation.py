@@ -327,7 +327,7 @@ class DataGenerator(keras.utils.Sequence):
             i = 0
 
             while(i < self.n_classes):
-                file_x = np.loadtxt(processed_data_path + 'processed_data/task' + str(task) + '/' + list_files[i], delimiter=';') #usecols=range(self.n_channels)
+                file_x = np.loadtxt(processed_data_path + 'processed_data/task' + str(task) + '/' + list_files[i], delimiter=';') #usecols=range(self.n_channels) mas tem que ser o tamanho do sinal
                 string = processed_data_path + 'processed_data/task' + str(task) + '/' + list_files[i]
 
                 file_x = np.asarray(file_x, dtype = object).astype('float32')
