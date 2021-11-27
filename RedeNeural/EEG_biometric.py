@@ -205,21 +205,21 @@ x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, trai
 x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_classes, window_size,
                                     window_size)
 
-crop1_crop = x_train[0]
+# crop1_crop = x_train[0]
 
-print('depois de croppar')
-print(f'x_train[0][0, :] = {x_train[0][0, :]}')
-print(f'x_train[0][29, :] = {x_train[0][29, :]}')
-print(f'x_train[0][30, :] = {x_train[0][30, :]}')
+# print('depois de croppar')
+# print(f'x_train[0][0, :] = {x_train[0][0, :]}')
+# print(f'x_train[0][29, :] = {x_train[0][29, :]}')
+# print(f'x_train[0][30, :] = {x_train[0][30, :]}')
 
-with open('apos_croppar1.csv', 'w', newline='\n') as f:
-    writer = csv.writer(f)
+# with open('apos_croppar1.csv', 'w', newline='\n') as f:
+#     writer = csv.writer(f)
 
-    aux = x_train[0]
-    print(f'aux.shape = {aux.shape}')
+#     aux = x_train[0]
+#     print(f'aux.shape = {aux.shape}')
 
-    for i in range (0, 1920):
-        writer.writerow(aux[i])
+#     for i in range (0, 1920):
+#         writer.writerow(aux[i])
 
 ######################################################################################
 
@@ -297,7 +297,8 @@ for task in train_tasks:
 
             string = 'x_subject_' + str(index+1)
             savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv', data, fmt='%f', delimiter=';')
-            print(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv, with shape ' + data.shape + ' was saved.')
+            print(processed_data_path + 'processed_data/task' + str(task) + '/' + string + '.csv was saved.')
+            print(f'the data had shape {data.shape}')
             list.append(string+'.csv')
         
         savetxt(processed_data_path + 'processed_data/task' + str(task) + '/' + 'x_list.csv', [list], delimiter=',', fmt='%s')
