@@ -205,46 +205,33 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
         return x_data, y_data, x_data_2, y_data_2
 
-def crop_full_data(content, full_signal_size):
+def first_validation_crop(signal_size, window_size, offset, split_ratio):
     """
-    essa lógica está errada.
+    Returns the first crop position for a validation dataset.
+
+    Parameters:
+        - signal_size: full size of the signals being processed;
+        - window_size: size of the sliding window;
+        - offset: amount of samples the window will slide in each iteration;
+        - split_ratio: a number in the interval (0,1]. (split_ratio * 100)% of the processed signals will be
+        stored separetly from the other [100 - (split_ratio * 100)]%.
     """
 
-    num_channels = content[0].shape[0]
-    num_signals = len(content)
+    i = window_size
+    stop = signal_size * split_ratio
 
-    array = np.zeros((num_signals, full_signal_size, num_channels))
+    while(i <= stop):
+        i += offset
 
-    i = 0
-    for signal in content:
-        # array[i] = signal.T # signal = (num_channels, full_signal_size)
-        array[i] = signal.reshape(full_signal_size, num_channels)
-        i += 1
+    return i
 
-    # for signal in content:
-    #     list.append(signal.T)
-    
-    # content_array = np.asarray(list, dtype = object).astype('float32')
-
-    #  ###
-
-    # return content_array
-    # array = np.asarray(content, dtype = object).astype('float32')
-    # array = array.reshape(array.shape[0], array.shape[2], array.shape[1])
-
-    # print(f'array.shape = {array.shape}')
-
-    return array
-
-
-def get_crop_positions(dataset_type, num_signals, signal_sizes, window_size, offset, split_ratio):
+def get_crop_positions(dataset_type, signal_sizes, window_size, offset, split_ratio):
     """
     Stores and returns the information of all cropping that will be done in the EEG signals.
 
     Parameters:
         - dataset_type: which type of dataset will be created by the data generator. Valid types are 'train',
         'validation' and 'test';
-        - num_signals: number of signals being processed;
         - signal_sizes: a list containing the full size of the signals being processed;
         - window_size: size of the sliding window;
         - offset: amount of samples the window will slide in each iteration;
@@ -339,14 +326,6 @@ class DataGenerator(keras.utils.Sequence):
                 subjects.append(subject)
 
                 i += 1
-                
-        # data = np.asarray(data, dtype = object).astype('float32')
-        # shortest_signal_size = 999999
-        # for signal in data:
-        #     if signal.shape[1] < shortest_signal_size:
-        #         shortest_signal_size = signal.shape[1]
-        
-        # print(f'shortest_signal_size = {shortest_signal_size}')
 
         signal_sizes = []
         for signal in data:
@@ -363,8 +342,7 @@ class DataGenerator(keras.utils.Sequence):
         #         self.samples_per_file += utils.n_samples_with_sliding_window(0, signal, self.dim, self.offset)
 
         # Storing the information of all cropping that will be done in the EEG signals
-        crop_positions = get_crop_positions(self.dataset_type, len(data), signal_sizes, self.dim,
-            self.offset, self.split_ratio)
+        crop_positions = get_crop_positions(self.dataset_type, signal_sizes, self.dim, self.offset, self.split_ratio)
 
         # if(self.dataset_type == 'train' or self.dataset_type == 'test'):
         #     signal_index = 0
@@ -556,23 +534,6 @@ class DataGenerator(keras.utils.Sequence):
 
             x.append(sample)
 
-            #######
-            # if(self.dataset_type == 'train' and file_index == 0 and crop_end == 1920):
-            #     print(f'self.crop_positions[0] = {self.crop_positions[0]}')
-            #     print(f'sample.shape = {sample.shape}')
-            #     print(f'sample = {sample}')
-            #     savetxt(self.processed_data_path + 'segundo.csv', sample, fmt='%f', delimiter=';')
-            
-            # elif(self.dataset_type == 'train' and file_index == 0 and crop_end == 2935):
-            #     print(f'self.crop_positions[29] = {self.crop_positions[29]}')
-            #     print(f'sample.shape = {sample.shape}')
-            #     print(f'sample = {sample}')
-            
-            # elif(self.dataset_type == 'train' and file_index == 0 and crop_end == 2970):
-            #     print(f'self.crop_positions[30] = {self.crop_positions[30]}')
-            #     print(f'sample.shape = {sample.shape}')
-            #     print(f'sample = {sample}')
-
             subject = self.subjects[file_index]
 
             label = np.zeros((1, self.n_classes))
@@ -588,6 +549,6 @@ class DataGenerator(keras.utils.Sequence):
 
         # The initial format of "y" (label) is "a x 1 x num_classes", but the correct format
         # is "a x num_classes".
-        # y = y.reshape(y.shape[0], y.shape[2])
+        y = y.reshape(y.shape[0], y.shape[2])
 
         return (x, y)
