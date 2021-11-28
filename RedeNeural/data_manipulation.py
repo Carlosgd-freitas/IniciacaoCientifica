@@ -248,7 +248,7 @@ def get_crop_positions(dataset_type, signal_sizes, window_size, offset, split_ra
             stop = size * split_ratio
         
         elif(dataset_type == 'validation'):
-            first_i = math.floor(size * split_ratio)
+            first_i = first_validation_crop(size, window_size, offset, split_ratio)
             stop = size
 
         i = first_i
@@ -374,8 +374,6 @@ class DataGenerator(keras.utils.Sequence):
         self.data = data
         self.subjects = subjects
         self.crop_positions = crop_positions
-
-        print(f'self.crop_positions = {self.crop_positions}')
 
         self.on_epoch_end()
 
