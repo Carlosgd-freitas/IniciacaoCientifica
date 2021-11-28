@@ -64,15 +64,6 @@ occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
 
 ############################## TODO ##############################
-# - Até a normalização está ok, o problema fica na hora de croppar o x_train_2 (linhas 239 e 240)
-#   * analisar o que o data_manipulation.crop_data() faz e replicar em uma função nova, mas que use o sinal completo
-#   de (9760, 64)
-# 
-# ----------> O que é pra fazer: <-----------
-# Tirar a cache e as variáveis de controle que eu impus
-# Salvar o "estado natural" dos sinais após normalizar (blocão de 9760/9600 mesmo)
-# APLICAR O RESHAPE SÓ NA HORA DE FEEDAR A REDE! (de pegar o crop_position e tal)
-#
 # Cenário do Sun (Treino / Teste): [1, 2, 7, 8, 9, 10, 11, 12, 13, 14] / [3, 4, 5, 6]
 
 # Tasks:
