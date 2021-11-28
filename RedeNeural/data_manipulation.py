@@ -268,7 +268,7 @@ class DataGenerator(keras.utils.Sequence):
     """
     Generates data for the model on the fly, using a sliding window for data augmentation.
     """
-    def __init__(self, list_files, batch_size, dim, offset, full_signal_size, n_channels,
+    def __init__(self, list_files, batch_size, dim, offset, n_channels,
                 n_classes, tasks, dataset_type, split_ratio, processed_data_path, shuffle=False):
         """
         Initialization function of the class.
@@ -279,7 +279,6 @@ class DataGenerator(keras.utils.Sequence):
             (batch_size, dim, n_channels), which will be fed into the model;
             - dim: size of the sliding window;
             - offset: amount of samples the window will slide in each iteration;
-            - full_signal_size: full size of the signals being processed;
             - n_channels: number of channels in each signal being processed;
             - n_classes: total number of classes (individuals);
             - tasks: list that contains the numbers of the experimental runs that will be used;
@@ -298,7 +297,6 @@ class DataGenerator(keras.utils.Sequence):
         self.batch_size = batch_size
         self.dim = dim
         self.offset = offset
-        self.full_signal_size = full_signal_size
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.tasks = tasks
@@ -541,9 +539,6 @@ class DataGenerator(keras.utils.Sequence):
         
         x = np.asarray(x, dtype = object).astype('float32')
         y = np.asarray(y, dtype = object).astype('float32')
-
-        print(f'x.shape = {x.shape}')
-        print(f'y.shape = {y.shape}')
 
         # The initial format of "y" (label) is "a x 1 x num_classes", but the correct format
         # is "a x num_classes".
