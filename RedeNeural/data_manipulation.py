@@ -467,12 +467,12 @@ class DataGenerator(keras.utils.Sequence):
 
             #     count += 1
             
-            x = np.asarray(x, dtype = object).astype('float32')
-            y = np.asarray(y, dtype = object).astype('float32')
+        x = np.asarray(x, dtype = object).astype('float32')
+        y = np.asarray(y, dtype = object).astype('float32')
 
-            # The initial format of "y" (label) is "a x 1 x num_classes", but the correct format
-            # is "a x num_classes".
-            y = y.reshape(y.shape[0], y.shape[2])
+        # The initial format of "y" (label) is "a x 1 x num_classes", but the correct format
+        # is "a x num_classes".
+        y = y.reshape(y.shape[0], y.shape[2])
 
             # if(self.last_sample_used != 0):
             #     self.last_sample_used += count
