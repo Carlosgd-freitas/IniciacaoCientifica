@@ -321,9 +321,8 @@ class DataGenerator(keras.utils.Sequence):
                 subject = int(string.split(".csv")[0])     # X
                 subjects.append(subject)
 
+                print(f'DATA GENERATOR: {string} was loaded.')
                 i += 1
-            
-            print(f'DATA GENERATOR: Data from task {task} were loaded to compose the {self.dataset_type} dataset.')
         print('\n')
 
         signal_sizes = []
@@ -332,6 +331,7 @@ class DataGenerator(keras.utils.Sequence):
 
         # Storing the information of all cropping that will be done in the EEG signals
         crop_positions = get_crop_positions(self.dataset_type, signal_sizes, self.dim, self.offset, self.split_ratio)
+        print('DATA GENERATOR: The Crop Positions were defined.\n')
 
         self.data = data
         self.subjects = subjects
