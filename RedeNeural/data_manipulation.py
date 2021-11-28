@@ -283,7 +283,8 @@ class DataGenerator(keras.utils.Sequence):
             'validation' and 'test';
             - split_ratio: a number in the interval (0,1]. (split_ratio * 100)% of the processed signals will be
             stored separetly from the other [100 - (split_ratio * 100)]%;
-            - processed_data_path: .
+            - processed_data_path: path of the folder that contains the processed data, which are separated in
+            folders by task.
         
         Optional Parameters:
             - shuffle: if the data being fed into the model will be shuffled or not at each epoch. Default value is
@@ -321,6 +322,9 @@ class DataGenerator(keras.utils.Sequence):
                 subjects.append(subject)
 
                 i += 1
+            
+            print(f'DATA GENERATOR: Data from task {task} were loaded to compose the {self.dataset_type} dataset.')
+        print('\n')
 
         signal_sizes = []
         for signal in data:

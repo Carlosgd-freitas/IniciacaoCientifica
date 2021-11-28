@@ -28,7 +28,6 @@ training_epochs = 40            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
-# folder_path = './Dataset_CSV/'
 folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
 processed_data_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
 num_classes = 109               # Total number of classes (individuals)
@@ -106,9 +105,6 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # lstm 128  4 units -> 37 min for training ; 1.56 seconds for testing
 # lstm 128  6 units -> 53 min for training ; 2.31 seconds for testing
 # lstm 128 10 units -> 84 min for training ; 3.57 seconds for testing
-#
-# p1 yang 64 canais -> (all killed)
-# p1 yang  3 canais -> 198 min for training ; 3.38 seconds for testing
 #
 # EO / EC:
 # lstm 128, 160 windows size,  1 offset -> killed
