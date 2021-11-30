@@ -28,7 +28,10 @@ training_epochs = 40            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
-folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
+# folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
+# processed_data_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
+
+folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Frontal_Lobe_Yang/'
 processed_data_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
 num_classes = 109               # Total number of classes (individuals)
 
@@ -49,7 +52,7 @@ offset = 35                     # Sliding window offset (deslocation), used when
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
-num_channels = 64               # Number of channels in an EEG signal
+num_channels = 3 #64               # Number of channels in an EEG signal
 
 # Channels for some lobes of the brain
 frontal_lobe   = ['Fp1.', 'Fpz.', 'Fp2.', 'Af7.', 'Af3.', 'Afz.', 'Af4.', 'Af8.', 'F7..', 'F5..', 'F3..',
@@ -119,7 +122,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # lstm 128, 160 windows size, 120 offset-> 46,8562% acurácia ; 48,4491% EER ; 0,0741 Decidibilidade
 #                                          2 min for training ; 3,53 seconds for testing
 
-# functions.create_csv_database_from_edf('./Dataset/','./All_Channels_Yang/', num_classes, channels = all_channels_yang)
+# utils.create_csv_database_from_edf('./Dataset/','./All_Channels_Yang/', num_classes, channels = all_channels_yang)
 
 # Argparse
 parser = argparse.ArgumentParser()
@@ -158,6 +161,7 @@ for task in test_tasks:
 # Defining the optimizer and the learning rate scheduler
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
 lr_scheduler = LearningRateScheduler(models.scheduler, verbose=0)
+saver = models.SaveAtEpochEnd(1, 'model_weights_test')
 
 # Not using Data Generators
 if(not args.datagen):
@@ -348,7 +352,7 @@ else:
         results = model.fit(training_generator,
                             validation_data = validation_generator,
                             epochs = training_epochs,
-                            callbacks = [lr_scheduler],
+                            callbacks = [lr_scheduler, saver],
                             )
 
         fit_end = time.time()

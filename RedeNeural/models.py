@@ -5,6 +5,7 @@ from tensorflow.keras.layers import MultiHeadAttention, LayerNormalization, Bidi
 from tensorflow.keras import Input, Model
 from tensorflow import transpose, reshape, split
 from tensorflow.keras.layers import LSTMCell, StackedRNNCells
+from tensorflow.keras.callbacks import Callback
 
 def scheduler(current_epoch, learning_rate):
     """
@@ -29,6 +30,32 @@ def get_lr_metric(optimizer):
         return optimizer.lr
 
     return lr
+
+class SaveAtEpochEnd(Callback):
+    """
+    Saves the model after each N epochs.
+    """
+    def __init__(self, each_n_epochs, file_path):
+        """
+        Initialization function of the class.
+        
+        Parameters:
+            - each_n_epochs: determines the number of epochs that needs to end for the model to be saved;
+            - file_path: the model will be saved in a .h5 file with this path. The '.h5' part doesn't need to be
+            included in this parameter.
+        """
+        # Intializing variables
+        self.each_n_epochs = each_n_epochs
+        self.file_path = file_path
+
+    def on_epoch_end(self, epoch, logs={}):
+        if self.each_n_epochs == 1:
+            self.model.save(self.file_path + '.h5')
+            print(f'SaveAtEpochEnd: The model was saved in {self.file_path}.h5')
+
+        elif epoch % self.each_n_epochs == 0:
+            self.model.save(self.file_path + '.h5')
+            print(f'SaveAtEpochEnd: The model was saved in {self.file_path}.h5')
 
 def InceptionBlock(input_img, block_index, block_type='basic', filters_sizes=(64, 96, 128, 16, 32, 128, 32), factor=1):
     """
