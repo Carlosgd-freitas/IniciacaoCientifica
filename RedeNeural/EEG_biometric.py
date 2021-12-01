@@ -24,7 +24,7 @@ from numpy import savetxt, loadtxt
 
 # Hyperparameters
 batch_size = 100                # Batch Size
-training_epochs = 40            # Total number of training epochs
+training_epochs = 1 #40            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
@@ -343,6 +343,7 @@ else:
         # Creating the model
         model = models.create_model_mixed(window_size, num_channels, num_classes)
         model.summary()
+        model.load_weights('model_weights_test.h5', by_name=True)
 
         # Compiling, defining the LearningRateScheduler and training the model
         model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
@@ -352,7 +353,7 @@ else:
         results = model.fit(training_generator,
                             validation_data = validation_generator,
                             epochs = training_epochs,
-                            callbacks = [lr_scheduler, saver],
+                            callbacks = [lr_scheduler],
                             )
 
         fit_end = time.time()
