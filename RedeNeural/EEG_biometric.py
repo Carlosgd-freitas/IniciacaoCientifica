@@ -244,6 +244,7 @@ if(not args.datagen):
         model = models.create_model_mixed(window_size, num_channels, num_classes)
         model.summary()
         model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+        model.load_weights('model_weights.h5', by_name=True)
 
         print('\nEvaluating on training set...')
         (loss, accuracy) = model.evaluate(x_train, y_train, verbose = 0)
@@ -342,7 +343,6 @@ else:
         # Creating the model
         model = models.create_model_mixed(window_size, num_channels, num_classes)
         model.summary()
-        model.load_weights('model_weights_test.h5', by_name=True)
 
         # Compiling, defining the LearningRateScheduler and training the model
         model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
