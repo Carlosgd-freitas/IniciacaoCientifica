@@ -24,15 +24,15 @@ from numpy import savetxt, loadtxt
 
 # Hyperparameters
 batch_size = 100                # Batch Size
-training_epochs = 1 #40            # Total number of training epochs
+training_epochs = 40            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
-# folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
-# processed_data_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
-
-folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Frontal_Lobe_Yang/'
+folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
 processed_data_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
+
+# folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Frontal_Lobe_Yang/'
+
 num_classes = 109               # Total number of classes (individuals)
 
 # Parameters used in functions.filter_data()
@@ -244,7 +244,6 @@ if(not args.datagen):
         model = models.create_model_mixed(window_size, num_channels, num_classes)
         model.summary()
         model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-        model.load_weights('model_weights.h5', by_name=True)
 
         print('\nEvaluating on training set...')
         (loss, accuracy) = model.evaluate(x_train, y_train, verbose = 0)
