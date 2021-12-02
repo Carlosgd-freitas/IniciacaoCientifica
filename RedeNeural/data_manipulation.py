@@ -307,6 +307,8 @@ class DataGenerator(keras.utils.Sequence):
         data = []
         subjects = []
 
+        print(f'self.tasks = {self.tasks}')
+
         for task in self.tasks:
             i = 0
 
