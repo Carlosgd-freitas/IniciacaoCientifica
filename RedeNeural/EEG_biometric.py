@@ -335,9 +335,9 @@ else:
 
     # Defining the data generators
     training_generator = data_manipulation.DataGenerator(x_train_list, batch_size, window_size, offset,
-        num_channels, num_classes, train_tasks, 'train', split_ratio, processed_data_path)
+        num_channels, num_classes, train_tasks, 'train', split_ratio, processed_data_path, True)
     validation_generator = data_manipulation.DataGenerator(x_train_list, batch_size, window_size, offset,
-        num_channels, num_classes, train_tasks, 'validation', split_ratio, processed_data_path)
+        num_channels, num_classes, train_tasks, 'validation', split_ratio, processed_data_path, True)
 
     # Training the model
     if(not args.nofit):
