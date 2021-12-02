@@ -234,9 +234,9 @@ x_train_2_list = [item for sublist in x_train_2_list for item in sublist]
 
 # Defining the data generators
 training_generator = data_manipulation.DataGenerator(x_train_2_list, batch_size, window_size, offset,
-    full_signal_size, num_channels, num_classes, train_tasks, 'train', split_ratio, processed_data_path)
+    num_channels, num_classes, train_tasks, 'train', split_ratio, processed_data_path)
 validation_generator = data_manipulation.DataGenerator(x_train_2_list, batch_size, window_size, offset,
-    full_signal_size, num_channels, num_classes, train_tasks, 'validation', split_ratio, processed_data_path)
+    num_channels, num_classes, train_tasks, 'validation', split_ratio, processed_data_path)
 
 (x_train_2, y_train_2) = training_generator.return_all_data()
 (x_val_2, y_val_2) = validation_generator.return_all_data()

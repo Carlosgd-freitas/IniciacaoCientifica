@@ -10,10 +10,10 @@ train_content = preprocessing.normalize_data(train_content, 'sun')
 test_content = preprocessing.normalize_data(test_content, 'sun')
 
 # Getting the training, validation and testing data
-x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, train_tasks, num_classes,
-                                                    window_size, offset, split_ratio)
-x_test, y_test = data_manipulation.crop_data(test_content, test_tasks, num_classes, window_size,
-                                    window_size)
+training_generator = data_manipulation.DataGenerator(x_train_2_list, batch_size, window_size, offset,
+    num_channels, num_classes, train_tasks, 'train', split_ratio, processed_data_path)
+validation_generator = data_manipulation.DataGenerator(x_train_2_list, batch_size, window_size, offset,
+    num_channels, num_classes, train_tasks, 'validation', split_ratio, processed_data_path)
 
 ######################################################################################
 
