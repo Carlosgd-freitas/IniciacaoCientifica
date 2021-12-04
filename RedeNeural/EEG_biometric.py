@@ -53,7 +53,7 @@ offset = 35                     # Sliding window offset (deslocation), used when
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
-num_channels = 64 # 3               # Number of channels in an EEG signal
+num_channels = 64 # 3           # Number of channels in an EEG signal
 
 # Channels for some lobes of the brain
 frontal_lobe   = ['Fp1.', 'Fpz.', 'Fp2.', 'Af7.', 'Af3.', 'Afz.', 'Af4.', 'Af8.', 'F7..', 'F5..', 'F3..',
@@ -125,6 +125,10 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 
 # utils.create_csv_database_from_edf('./Dataset/','./All_Channels_Yang/', num_classes, channels = all_channels_yang)
 
+# Logger
+sys.stdout = utils.Logger(os.path.join(processed_data_path, 'results', 'log_script.txt'))
+sys.stderr = sys.stdout
+
 # Argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--datagen', action='store_true',
@@ -161,8 +165,9 @@ for task in test_tasks:
 
 # Defining the optimizer and the learning rate scheduler
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
-lr_scheduler = LearningRateScheduler(models.scheduler, verbose=0)
+lr_scheduler = LearningRateScheduler(models.scheduler, verbose = 0)
 saver = models.SaveAtEpochEnd(1, 'model_weights_test')
+model = None
 
 # Not using Data Generators
 if(not args.datagen):
@@ -395,10 +400,11 @@ else:
     if(not args.noimode):
 
         # Evaluate the model to see the accuracy
-        model = models.create_model(window_size, num_channels, num_classes)
-        model.summary()
-        model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-        model.load_weights('model_weights.h5', by_name=True)
+        if(model is None):
+            model = models.create_model(window_size, num_channels, num_classes)
+            model.summary()
+            model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+            model.load_weights('model_weights.h5', by_name=True)
 
         print('\nEvaluating on training set...')
         (loss, accuracy) = model.evaluate(training_generator, verbose = 0)
@@ -428,10 +434,10 @@ else:
         model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
         model_for_verification.load_weights('model_weights.h5', by_name=True)
 
-        x_pred = model_for_verification.predict(x_test, batch_size=batch_size)
+        x_pred = model_for_verification.predict(x_test, batch_size = batch_size)
 
         # Calculating EER and Decidability
         y_test_classes = utils.one_hot_encoding_to_classes(y_test)
         d, eer, thresholds = utils.calc_metrics(x_pred, y_test_classes, x_pred, y_test_classes)
-        print(f'EER: {eer*100.0} %')
+        print(f'EER: {eer * 100.0} %')
         print(f'Decidability: {d}')

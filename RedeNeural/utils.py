@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics.pairwise import euclidean_distances
@@ -236,3 +237,33 @@ def calc_metrics(feature1, label1, feature2, label2, plot_det=True, path=None):
     thresholds = t[min_index]
 
     return d, eer, thresholds
+
+class Logger(object):
+    """
+    Direct all output from terminal to an output file.
+    """
+
+    def __init__(self, output_file: str):
+        """
+        Constructor.
+        :param output_file: the file which the console log will be written.
+        """
+        self.terminal = sys.stdout
+        self.output_file = output_file
+        self.log = None
+
+    def write(self, message: str):
+        """
+        Append a message from the console log to the file.
+        :param message:
+        :return:
+        """
+        with open(self.output_file, 'a', encoding='utf-8') as self.log:
+            self.log.write(message)
+        self.terminal.write(message)
+
+    def flush(self):
+        # this flush method is needed for python 3 compatibility.
+        # this handles the flush command by doing nothing.
+        # you might want to specify some extra behavior here.
+        pass
