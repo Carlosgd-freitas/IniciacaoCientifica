@@ -192,7 +192,7 @@ if(not args.datagen):
     if(not args.nofit):
 
         # Creating the model
-        model = models.create_model(window_size, num_channels, num_classes)
+        model = models.create_model_mixed(window_size, num_channels, num_classes)
         model.summary()
 
         # Compiling, defining the LearningRateScheduler and training the model
@@ -247,7 +247,7 @@ if(not args.datagen):
     if(not args.noimode):
 
         # Evaluate the model to see the accuracy
-        model = models.create_model(window_size, num_channels, num_classes)
+        model = models.create_model_mixed(window_size, num_channels, num_classes)
         model.summary()
         model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
         model.load_weights('model_weights.h5', by_name=True)
@@ -275,7 +275,7 @@ if(not args.datagen):
     if(not args.novmode):
 
         # Removing the last layers of the model and getting the features array
-        model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
+        model_for_verification = models.create_model_mixed(window_size, num_channels, num_classes, True)
         model_for_verification.summary()
         model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
         model_for_verification.load_weights('model_weights.h5', by_name=True)
@@ -347,7 +347,7 @@ else:
     # Training the model
     if(not args.nofit):
         # Creating the model
-        model = models.create_model(window_size, num_channels, num_classes)
+        model = models.create_model_mixed(window_size, num_channels, num_classes)
         model.summary()
 
         # Compiling, defining the LearningRateScheduler and training the model
@@ -401,7 +401,7 @@ else:
 
         # Evaluate the model to see the accuracy
         if(model is None):
-            model = models.create_model(window_size, num_channels, num_classes)
+            model = models.create_model_mixed(window_size, num_channels, num_classes)
             model.summary()
             model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
             model.load_weights('model_weights.h5', by_name=True)
@@ -429,7 +429,7 @@ else:
     if(not args.novmode):
 
         # Removing the last layers of the model and getting the features array
-        model_for_verification = models.create_model(window_size, num_channels, num_classes, True)
+        model_for_verification = models.create_model_mixed(window_size, num_channels, num_classes, True)
         model_for_verification.summary()
         model_for_verification.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
         model_for_verification.load_weights('model_weights.h5', by_name=True)
