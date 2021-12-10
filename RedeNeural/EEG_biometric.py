@@ -28,10 +28,10 @@ training_epochs = 40            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
-folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
+# folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
 processed_data_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
 
-# folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Frontal_Lobe_Yang/' 
+folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Frontal_Lobe_Yang/' 
 # folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Motor_Cortex_Yang/' 
 # folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Occipital_Lobe_Yang/' 
 # folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/All_Channels_Yang/' 
@@ -55,13 +55,7 @@ offset = 35                     # Sliding window offset (deslocation), used when
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
-num_channels = 64 # 3           # Number of channels in an EEG signal
-
-# Channels for some lobes of the brain
-frontal_lobe   = ['Fp1.', 'Fpz.', 'Fp2.', 'Af7.', 'Af3.', 'Afz.', 'Af4.', 'Af8.', 'F7..', 'F5..', 'F3..',
-                  'F1..', 'Fz..', 'F2..', 'F4..', 'F6..', 'F8..', 'Ft7.', 'Ft8.']
-motor_cortex   = ['C5..', 'C3..', 'C1..', 'Cz..', 'C2..', 'C4..', 'C6..']
-occipital_lobe = ['Po7.', 'Po3.', 'Poz.', 'Po4.', 'Po8.', 'O1..', 'Oz..', 'O2..']
+num_channels = 3 # 64           # Number of channels in an EEG signal
 
 # 9 channels present in Yang et al. article
 frontal_lobe_yang = ['Af3.', 'Afz.', 'Af4.']
