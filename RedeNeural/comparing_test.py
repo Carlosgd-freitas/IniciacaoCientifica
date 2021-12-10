@@ -1,3 +1,5 @@
+from sklearn.metrics.pairwise import euclidean_distances
+
 # Data without Data Generators
 train_content, test_content = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes)
 

@@ -5,7 +5,7 @@ import random
 import numpy as np
 import tensorflow.keras as keras
 
-def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, num_classes, split_ratio=1.0, x_data_2=0, y_data_2=0, mode=None):
+def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, num_classes, split_ratio=1.0, x_data_2=0, y_data_2=0):
     """
     Crops a content (EEG signal) and returns the processed signal and its' respective label using a sliding
     window.
@@ -49,14 +49,12 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
     else:
         i = window_size
         while i <= content.shape[1] * split_ratio:
-            if(mode != 'second_data_only'):
-                if(mode != 'labels_only'):
-                    arr = content[: , (i-window_size):i]
-                    x_data.append(arr)
+            arr = content[: , (i-window_size):i]
+            x_data.append(arr)
 
-                arr2 = np.zeros((1,num_classes))
-                arr2[0, num_subject] = 1
-                y_data.append(arr2)
+            arr2 = np.zeros((1,num_classes))
+            arr2[0, num_subject] = 1
+            y_data.append(arr2)
 
             i += offset
 
@@ -64,20 +62,18 @@ def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, n
             return x_data, y_data
         
         while i <= content.shape[1]:
-            if(mode != 'first_data_only'):
-                if(mode != 'labels_only'):
-                    arr = content[: , (i-window_size):i]
-                    x_data_2.append(arr)
+            arr = content[: , (i-window_size):i]
+            x_data_2.append(arr)
 
-                arr2 = np.zeros((1,num_classes))
-                arr2[0, num_subject] = 1
-                y_data_2.append(arr2)
+            arr2 = np.zeros((1,num_classes))
+            arr2[0, num_subject] = 1
+            y_data_2.append(arr2)
 
             i += offset
 
         return x_data, y_data, x_data_2, y_data_2
 
-def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.0, reshape='classic', mode=None, verbose=0):
+def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.0, verbose=0):
     """
     Applies a sliding window cropping for data augmentation of the signals recieved as input and outputs them
     as numpy arrays.
@@ -119,7 +115,7 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
         for task in range(0, len(data_tasks)):
             for i in range(1, num_classes + 1):
                 x_dataL, y_dataL = signal_cropping(x_dataL, y_dataL, data[ (task * num_classes) + i - 1],
-                                                   window_size, offset, i, num_classes, mode=mode)
+                                                   window_size, offset, i, num_classes)
 
                 if verbose == 1:
                     count += 1
@@ -133,24 +129,11 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
         # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
         # input shape of the CNN is "a x window_size x num_channels".
-        if reshape == 'classic':
-            x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
-        elif reshape == 'data_generator':
-            temp = np.empty((x_data.shape[0], x_data.shape[2], x_data.shape[1]))
-
-            i = 0
-            while(i < x_data.shape[0]):
-                temp[i] = x_data[i].reshape(x_data.shape[2], x_data.shape[1])
-                i += 1
-
-            x_data = temp
-        elif reshape != 'no_reshape':
-            print('ERROR: Invalid reshape parameter.')
+        x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
 
         # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
         # is "a x num_classes".
-        if reshape == 'classic':
-            y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
+        y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
 
         return x_data, y_data
     else:
@@ -158,7 +141,7 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
             for i in range(1, num_classes + 1):
                 x_dataL, y_dataL, x_dataL_2, y_dataL_2 = signal_cropping(x_dataL, y_dataL, data[ (task * num_classes) + i - 1],
                                                                          window_size, offset, i, num_classes,
-                                                                         split_ratio, x_dataL_2, y_dataL_2, mode)
+                                                                         split_ratio, x_dataL_2, y_dataL_2)
                 
                 if verbose == 1:
                     count += 1
@@ -174,31 +157,13 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
         # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
         # input shape of the CNN is "a x window_size x num_channels".
-        if reshape == 'classic':
-            x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
-            x_data_2 = x_data_2.reshape(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
-        elif reshape == 'data_generator':
-            temp = np.empty((x_data.shape[0], x_data.shape[2], x_data.shape[1]))
-            i = 0
-            while(i < x_data.shape[0]):
-                temp[i] = x_data[i].reshape(x_data.shape[2], x_data.shape[1])
-                i += 1
-            x_data = temp
-            
-            temp = np.empty((x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1]))
-            i = 0
-            while(i < x_data_2.shape[0]):
-                temp[i] = x_data_2[i].reshape(x_data_2.shape[2], x_data_2.shape[1])
-                i += 1
-            x_data_2 = temp
-        elif reshape != 'no_reshape':
-            print('ERROR: Invalid reshape parameter.')
+        x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
+        x_data_2 = x_data_2.reshape(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
 
         # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
         # is "a x num_classes".
-        if reshape == 'classic':
-            y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
-            y_data_2 = y_data_2.reshape(y_data_2.shape[0], y_data_2.shape[2])
+        y_data = y_data.reshape(y_data.shape[0], y_data.shape[2])
+        y_data_2 = y_data_2.reshape(y_data_2.shape[0], y_data_2.shape[2])
 
         return x_data, y_data, x_data_2, y_data_2
 

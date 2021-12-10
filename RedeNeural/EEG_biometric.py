@@ -16,12 +16,11 @@ from pathlib import Path
 from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.optimizers import SGD
 from numpy import savetxt, loadtxt
-from sklearn.metrics.pairwise import euclidean_distances
 
 # Seeds
-# random.seed(1051)
-# np.random.seed(1051)
-# tf.random.set_seed(1051)
+random.seed(1051)
+np.random.seed(1051)
+tf.random.set_seed(1051)
 
 # Hyperparameters
 batch_size = 100                # Batch Size
@@ -33,6 +32,9 @@ folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_
 processed_data_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
 
 # folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Frontal_Lobe_Yang/' 
+# folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Motor_Cortex_Yang/' 
+# folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Occipital_Lobe_Yang/' 
+# folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/All_Channels_Yang/' 
 
 num_classes = 109               # Total number of classes (individuals)
 
