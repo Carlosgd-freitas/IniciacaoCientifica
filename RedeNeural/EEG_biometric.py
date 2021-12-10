@@ -19,9 +19,9 @@ from numpy import savetxt, loadtxt
 from sklearn.metrics.pairwise import euclidean_distances
 
 # Seeds
-random.seed(1051)
-np.random.seed(1051)
-tf.random.set_seed(1051)
+# random.seed(1051)
+# np.random.seed(1051)
+# tf.random.set_seed(1051)
 
 # Hyperparameters
 batch_size = 100                # Batch Size
