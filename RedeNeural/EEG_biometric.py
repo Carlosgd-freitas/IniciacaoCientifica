@@ -32,7 +32,7 @@ initial_learning_rate = 0.01    # Initial learning rate
 folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
 processed_data_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
 
-# folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Frontal_Lobe_Yang/'
+# folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Frontal_Lobe_Yang/' 
 
 num_classes = 109               # Total number of classes (individuals)
 
