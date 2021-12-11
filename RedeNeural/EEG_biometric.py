@@ -238,6 +238,7 @@ if(not args.datagen):
 
         # Saving model weights
         model.save('model_weights.h5')
+        print('model was saved to model_weights.h5.\n')
 
     # Running the model in Identification Mode
     if(not args.noimode):
@@ -391,6 +392,7 @@ else:
         
         # Saving model weights
         model.save('model_weights.h5')
+        print('model was saved to model_weights.h5.\n')
 
     # Running the model in Identification Mode
     if(not args.noimode):
