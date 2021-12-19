@@ -28,7 +28,7 @@ training_epochs = 40            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
-# folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
+folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
 processed_data_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
 
 # folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Frontal_Lobe_Yang/' 
@@ -162,7 +162,7 @@ for task in test_tasks:
 # Defining the optimizer and the learning rate scheduler
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
 lr_scheduler = LearningRateScheduler(models.scheduler, verbose = 0)
-saver = models.SaveAtEpochEnd(1, 'model_weights_test')
+saver = models.SaveAtEpochEnd(1, 'model_weights')
 model = None
 
 # Not using Data Generators
@@ -244,10 +244,11 @@ if(not args.datagen):
     if(not args.noimode):
 
         # Evaluate the model to see the accuracy
-        model = models.create_model_mixed(window_size, num_channels, num_classes)
-        model.summary()
-        model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
-        model.load_weights('model_weights.h5', by_name=True)
+        if(model is None):
+            model = models.create_model_mixed(window_size, num_channels, num_classes)
+            model.summary()
+            model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+            model.load_weights('model_weights.h5', by_name=True)
 
         print('\nEvaluating on training set...')
         (loss, accuracy) = model.evaluate(x_train, y_train, verbose = 0)
@@ -355,7 +356,7 @@ else:
         results = model.fit(training_generator,
                             validation_data = validation_generator,
                             epochs = training_epochs,
-                            callbacks = [lr_scheduler]
+                            callbacks = [lr_scheduler, saver]
                             )
 
         fit_end = time.time()
