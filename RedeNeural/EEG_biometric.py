@@ -162,7 +162,7 @@ for task in test_tasks:
 # Defining the optimizer and the learning rate scheduler
 opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
 lr_scheduler = LearningRateScheduler(models.scheduler, verbose = 0)
-saver = models.SaveAtEpochEnd(1, 'model_weights')
+saver = models.SaveAtEpochEnd(5, 'model_weights')
 model = None
 
 # Not using Data Generators
@@ -358,7 +358,7 @@ else:
         results = model.fit(training_generator,
                             validation_data = validation_generator,
                             epochs = training_epochs,
-                            callbacks = [lr_scheduler]
+                            callbacks = [lr_scheduler, saver]
                             )
 
         fit_end = time.time()
