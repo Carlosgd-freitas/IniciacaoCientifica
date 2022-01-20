@@ -63,6 +63,10 @@ motor_cortex_yang = ['C1..', 'Cz..', 'C2..']
 occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
 
+###### When the connection breaks ######
+initial_learning_rate = 0.001
+training_epochs = 14
+
 ############################## TODO ##############################
 # Cenário do Sun (Treino / Teste): [1, 2, 7, 8, 9, 10, 11, 12, 13, 14] / [3, 4, 5, 6]
 
@@ -348,7 +352,7 @@ else:
         model = models.create_model_mixed(window_size, num_channels, num_classes)
         model.summary()
 
-        # model.load_weights('model_weights.h5', by_name=True) ###### When the connection breaks ######
+        model.load_weights('model_weights.h5', by_name=True) ###### When the connection breaks ######
 
         # Compiling, defining the LearningRateScheduler and training the model
         model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
