@@ -65,7 +65,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 
 ###### When the connection breaks ######
 initial_learning_rate = 0.001
-training_epochs = 14
+training_epochs = 13
 
 ############################## TODO ##############################
 # Cenário do Sun (Treino / Teste): [1, 2, 7, 8, 9, 10, 11, 12, 13, 14] / [3, 4, 5, 6]
