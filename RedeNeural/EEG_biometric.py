@@ -28,13 +28,13 @@ training_epochs = 40            # Total number of training epochs
 initial_learning_rate = 0.01    # Initial learning rate
 
 # Parameters used in functions.load_data()
-# folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
+folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Dataset_CSV/'
 processed_data_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/'
 
 # folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Frontal_Lobe_Yang/' 
 # folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Motor_Cortex_Yang/' 
 # folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/Occipital_Lobe_Yang/' 
-folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/All_Channels_Yang/' 
+# folder_path = '/media/work/carlosfreitas/IniciacaoCientifica/RedeNeural/All_Channels_Yang/' 
 
 num_classes = 109               # Total number of classes (individuals)
 
@@ -55,17 +55,13 @@ offset = 35                     # Sliding window offset (deslocation), used when
 split_ratio = 0.9               # 90% for training | 10% for validation
 
 # Other Parameters
-num_channels = 9                # Number of channels in an EEG signal
+num_channels = 64               # Number of channels in an EEG signal
 
 # 9 channels present in Yang et al. article
 frontal_lobe_yang = ['Af3.', 'Afz.', 'Af4.']
 motor_cortex_yang = ['C1..', 'Cz..', 'C2..']
 occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
-
-###### When the connection breaks ######
-initial_learning_rate = 0.0001
-training_epochs = 4
 
 ############################## TODO ##############################
 # Cenário do Sun (Treino / Teste): [1, 2, 7, 8, 9, 10, 11, 12, 13, 14] / [3, 4, 5, 6]
@@ -352,7 +348,7 @@ else:
         model = models.create_model_mixed(window_size, num_channels, num_classes)
         model.summary()
 
-        model.load_weights('model_weights.h5', by_name=True) ###### When the connection breaks ######
+        # model.load_weights('model_weights.h5', by_name=True) ###### When the connection breaks ######
 
         # Compiling, defining the LearningRateScheduler and training the model
         model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
@@ -362,7 +358,7 @@ else:
         results = model.fit(training_generator,
                             validation_data = validation_generator,
                             epochs = training_epochs,
-                            callbacks = [] # [lr_scheduler, saver] ######  When the connection breaks ######
+                            callbacks = [lr_scheduler]
                             )
 
         fit_end = time.time()
