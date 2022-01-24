@@ -358,7 +358,7 @@ else:
         results = model.fit(training_generator,
                             validation_data = validation_generator,
                             epochs = training_epochs,
-                            callbacks = [lr_scheduler]
+                            callbacks = [lr_scheduler, saver]
                             )
 
         fit_end = time.time()
