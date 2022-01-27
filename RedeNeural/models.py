@@ -11,19 +11,13 @@ def scheduler(current_epoch, learning_rate):
     """
     Lowers the learning rate hyperparameter relative to the number of epochs.
     """
-    if current_epoch < 6:
+    if current_epoch < 2:
+        learning_rate = 0.01
+    elif current_epoch < 37:
         learning_rate = 0.001
     else:
         learning_rate = 0.0001
     return learning_rate
-
-    # if current_epoch < 2:
-    #     learning_rate = 0.01
-    # elif current_epoch < 37:
-    #     learning_rate = 0.001
-    # else:
-    #     learning_rate = 0.0001
-    # return learning_rate
 
 def get_lr_metric(optimizer):
     """
