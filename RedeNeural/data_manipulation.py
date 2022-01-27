@@ -275,6 +275,7 @@ class DataGenerator(keras.utils.Sequence):
         for task in self.tasks:
             i = 0
 
+            print(f'DATA GENERATOR: Loading data from task {task}.')
             while(i < self.n_classes):
                 file_x = np.loadtxt(processed_data_path + 'processed_data/task' + str(task) + '/' + list_files[i], delimiter=';') #usecols=range(self.n_channels) mas tem que ser o tamanho do sinal
                 string = processed_data_path + 'processed_data/task' + str(task) + '/' + list_files[i]
@@ -288,7 +289,8 @@ class DataGenerator(keras.utils.Sequence):
 
                 print(f'DATA GENERATOR: {string} was loaded.')
                 i += 1
-        print('\n')
+            print('')
+        print('')
 
         signal_sizes = []
         for signal in data:
