@@ -15,17 +15,15 @@ def scheduler(current_epoch, learning_rate):
         learning_rate = 0.001
     else:
         learning_rate = 0.0001
-        return learning_rate
+    return learning_rate
 
     # if current_epoch < 2:
     #     learning_rate = 0.01
-    #     return learning_rate
     # elif current_epoch < 37:
     #     learning_rate = 0.001
-    #     return learning_rate
     # else:
     #     learning_rate = 0.0001
-    #     return learning_rate
+    # return learning_rate
 
 def get_lr_metric(optimizer):
     """
