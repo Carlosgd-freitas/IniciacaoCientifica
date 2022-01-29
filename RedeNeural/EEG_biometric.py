@@ -165,7 +165,6 @@ lr_scheduler = LearningRateScheduler(models.scheduler, verbose = 0)
 saver = models.SaveAtEpochEnd(5, 'model_weights')
 model = None
 
-training_epochs = 9  # When the connection breaks
 ############## Plotting ##############
 # offset = 1920
 # num_classes = 5
@@ -382,7 +381,7 @@ else:
         model = models.create_model_mixed(window_size, num_channels, num_classes)
         model.summary()
 
-        model.load_weights('model_weights.h5', by_name=True) ###### When the connection breaks ######
+        # model.load_weights('model_weights.h5', by_name=True) ###### When the connection breaks ######
 
         # Compiling, defining the LearningRateScheduler and training the model
         model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
