@@ -64,7 +64,7 @@ occipital_lobe_yang = ['O1..', 'Oz..', 'O2..']
 all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz..', 'O2..']
 
 ############################## TODO ##############################
-# Cenário do Sun (Treino / Teste): [1, 2, 7, 8, 9, 10, 11, 12, 13, 14] / [3, 4, 5, 6]
+# Cenário do Sun (Treino / Teste): [1, 2, 7, 8, 9, 10, 11, 12, 13, 14] / [3, 4, 5, 6] -> window_size = 160, offset = 35
 
 # Tasks:
 # Task 1 - EO
@@ -164,6 +164,40 @@ opt = SGD(learning_rate = initial_learning_rate, momentum = 0.9)
 lr_scheduler = LearningRateScheduler(models.scheduler, verbose = 0)
 saver = models.SaveAtEpochEnd(5, 'model_weights')
 model = None
+
+training_epochs = 9  # When the connection breaks
+############## Plotting ##############
+# offset = 1920
+# num_classes = 5
+# folder_path = 'Dataset_CSV/'
+# processed_data_path = ''
+
+# print('0')
+
+# # Loading the raw data
+# train_content, test_content = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
+
+# plt.subplot(211)
+# plt.plot(train_content[0], color = "blue")
+# plt.title('Sem filtro')
+# plt.tight_layout()
+
+# print('1')
+
+# # Filtering the raw data
+# train_content = preprocessing.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+# test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+
+# plt.subplot(212)
+# plt.plot(train_content[0], color = "red")
+# plt.title('Com filtro')
+# plt.show()
+
+# print('2')
+
+# time.sleep(10)
+# sys.exit()
+############## Plotting ##############
 
 # Not using Data Generators
 if(not args.datagen):
@@ -348,7 +382,7 @@ else:
         model = models.create_model_mixed(window_size, num_channels, num_classes)
         model.summary()
 
-        # model.load_weights('model_weights.h5', by_name=True) ###### When the connection breaks ######
+        model.load_weights('model_weights.h5', by_name=True) ###### When the connection breaks ######
 
         # Compiling, defining the LearningRateScheduler and training the model
         model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
