@@ -102,6 +102,7 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
     plt.subplot(311)
     plt.plot(data[0][0], color = "blue")
     plt.xlim(-500, 10500)
+    plt.ylim(-300, 400)
     ############## Plotting ##############
 
     x_dataL = list()
@@ -137,12 +138,14 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
         ############## Plotting ##############
         plt.subplot(312)
-        plt.plot(x_data[0], color = "red")
+        plt.plot(x_data[0][0], color = "red")
         plt.xlim(-500, 10500)
+        plt.ylim(-300, 400)
 
         plt.subplot(313)
-        plt.plot(x_data[1], color = "green")
+        plt.plot(x_data[1][0], color = "green")
         plt.xlim(-500, 10500)
+        plt.ylim(-300, 400)
 
         plt.savefig(r'data_augmentation.png', format='png')
         plt.show()
