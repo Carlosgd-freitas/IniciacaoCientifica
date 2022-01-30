@@ -167,29 +167,14 @@ model = None
 
 ############## Plotting ##############
 offset = 2000
-num_classes = 1
+num_classes = 5
 
 # Loading the raw data
 train_content, test_content = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
 
-plt.subplot(311)
-plt.plot(train_content[0][0], color = "blue")
-plt.xlim(-500, 10500)
-
 # Getting the training, validation and testing data
 x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, train_tasks, num_classes,
                                                     window_size, offset, split_ratio)
-
-plt.subplot(312)
-plt.plot(x_train[0], color = "red")
-plt.xlim(-500, 10500)
-
-plt.subplot(313)
-plt.plot(x_train[1], color = "green")
-plt.xlim(-500, 10500)
-
-plt.savefig(r'data_augmentation.png', format='png')
-plt.show()
 
 sys.exit()
 ############## Plotting ##############

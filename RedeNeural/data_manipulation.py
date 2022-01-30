@@ -5,6 +5,8 @@ import random
 import numpy as np
 import tensorflow.keras as keras
 
+import matplotlib.pyplot as plt #####
+
 def signal_cropping(x_data, y_data, content, window_size, offset, num_subject, num_classes, split_ratio=1.0, x_data_2=0, y_data_2=0):
     """
     Crops a content (EEG signal) and returns the processed signal and its' respective label using a sliding
@@ -96,6 +98,12 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
         Default value is 0.
     """
 
+    ############## Plotting ##############
+    plt.subplot(311)
+    plt.plot(data[0][0], color = "blue")
+    plt.xlim(-500, 10500)
+    ############## Plotting ##############
+
     x_dataL = list()
     x_dataL_2 = list()
     y_dataL = list()
@@ -126,6 +134,19 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
 
         x_data = np.asarray(x_dataL, dtype = object).astype('float32')
         y_data = np.asarray(y_dataL, dtype = object).astype('float32')
+
+        ############## Plotting ##############
+        plt.subplot(312)
+        plt.plot(x_data[0], color = "red")
+        plt.xlim(-500, 10500)
+
+        plt.subplot(313)
+        plt.plot(x_data[1], color = "green")
+        plt.xlim(-500, 10500)
+
+        plt.savefig(r'data_augmentation.png', format='png')
+        plt.show()
+        ############## Plotting ##############
 
         # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
         # input shape of the CNN is "a x window_size x num_channels".
