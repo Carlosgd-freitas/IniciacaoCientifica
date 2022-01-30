@@ -174,7 +174,7 @@ train_content, test_content = loader.load_data(folder_path, train_tasks, test_ta
 
 plt.subplot(211)
 plt.plot(train_content[0][0], color = "blue")
-plt.axis.set(xlim=(-500, 10500))
+plt.xlim(-500, 10500)
 
 # Getting the training, validation and testing data
 x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, train_tasks, num_classes,
@@ -182,11 +182,9 @@ x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, trai
 
 plt.subplot(212)
 plt.plot(x_train[0][0], color = "red")
-plt.axis.set(xlim=(-500, 10500))
 
 plt.subplot(213)
 plt.plot(x_train[1][0], color = "green")
-plt.axis.set(xlim=(-500, 10500))
 
 plt.savefig(r'data_augmentation.png', format='png')
 plt.show()
