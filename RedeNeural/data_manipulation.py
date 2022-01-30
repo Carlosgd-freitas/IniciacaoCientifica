@@ -136,23 +136,8 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
         x_data = np.asarray(x_dataL, dtype = object).astype('float32')
         y_data = np.asarray(y_dataL, dtype = object).astype('float32')
 
-        ############## Plotting ##############
-        plt.subplot(312)
-        plt.plot(x_data[0][0], color = "red")
-        plt.xlim(-500, 10500)
-        plt.ylim(-300, 400)
-
-        plt.subplot(313)
-        plt.plot(x_data[1][0], color = "green")
-        plt.xlim(-500, 10500)
-        plt.ylim(-300, 400)
-
-        plt.savefig(r'data_augmentation.png', format='png')
-        plt.show()
-        ############## Plotting ##############
-
         # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
-        # input shape of the CNN is "a x window_size x num_channels".
+        # input shape of the CNN is "window_size x num_channels".
         x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
 
         # The initial format of a "y_data" (label) is "a x 1 x num_classes", but the correct format
@@ -179,8 +164,23 @@ def crop_data(data, data_tasks, num_classes, window_size, offset, split_ratio=1.
         y_data = np.asarray(y_dataL, dtype = object).astype('float32')
         y_data_2 = np.asarray(y_dataL_2, dtype = object).astype('float32')
 
+        ############## Plotting ##############
+        plt.subplot(312)
+        plt.plot(x_data[0][0], color = "red")
+        plt.xlim(-500, 10500)
+        plt.ylim(-300, 400)
+
+        plt.subplot(313)
+        plt.plot(x_data[1][0], color = "green")
+        plt.xlim(-500, 10500)
+        plt.ylim(-300, 400)
+
+        plt.savefig(r'data_augmentation.png', format='png')
+        plt.show()
+        ############## Plotting ##############
+
         # The initial format of a "x_data" (EEG signal) is "a x num_channels x window_size", but the 
-        # input shape of the CNN is "a x window_size x num_channels".
+        # input shape of the CNN is "window_size x num_channels".
         x_data = x_data.reshape(x_data.shape[0], x_data.shape[2], x_data.shape[1])
         x_data_2 = x_data_2.reshape(x_data_2.shape[0], x_data_2.shape[2], x_data_2.shape[1])
 
