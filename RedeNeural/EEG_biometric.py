@@ -166,7 +166,7 @@ saver = models.SaveAtEpochEnd(5, 'model_weights')
 model = None
 
 ############## Plotting ##############
-offset = 1920
+offset = 2000
 num_classes = 1
 
 # Loading the raw data
@@ -181,11 +181,11 @@ x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, trai
                                                     window_size, offset, split_ratio)
 
 plt.subplot(312)
-plt.plot(x_train[0][:][0], color = "red")
+plt.plot(x_train[0], color = "red")
 plt.xlim(-500, 10500)
 
 plt.subplot(313)
-plt.plot(x_train[1][:][0], color = "green")
+plt.plot(x_train[1], color = "green")
 plt.xlim(-500, 10500)
 
 plt.savefig(r'data_augmentation.png', format='png')
