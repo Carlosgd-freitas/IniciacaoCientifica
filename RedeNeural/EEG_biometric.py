@@ -165,20 +165,6 @@ lr_scheduler = LearningRateScheduler(models.scheduler, verbose = 0)
 saver = models.SaveAtEpochEnd(5, 'model_weights')
 model = None
 
-############## Plotting ##############
-offset = 2000
-num_classes = 5
-
-# Loading the raw data
-train_content, test_content = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
-
-# Getting the training, validation and testing data
-x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, train_tasks, num_classes,
-                                                    window_size, offset, split_ratio)
-
-sys.exit()
-############## Plotting ##############
-
 # Not using Data Generators
 if(not args.datagen):
     # Loading the raw data
