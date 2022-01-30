@@ -172,7 +172,7 @@ num_classes = 1
 # Loading the raw data
 train_content, test_content = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
 
-plt.subplot(211)
+plt.subplot(311)
 plt.plot(train_content[0][0], color = "blue")
 plt.xlim(-500, 10500)
 
@@ -180,10 +180,10 @@ plt.xlim(-500, 10500)
 x_train, y_train, x_val, y_val = data_manipulation.crop_data(train_content, train_tasks, num_classes,
                                                     window_size, offset, split_ratio)
 
-plt.subplot(212)
+plt.subplot(312)
 plt.plot(x_train[0][0], color = "red")
 
-plt.subplot(213)
+plt.subplot(313)
 plt.plot(x_train[1][0], color = "green")
 
 plt.savefig(r'data_augmentation.png', format='png')
