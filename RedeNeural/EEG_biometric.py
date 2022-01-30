@@ -166,36 +166,35 @@ saver = models.SaveAtEpochEnd(5, 'model_weights')
 model = None
 
 ############## Plotting ##############
-# offset = 1920
-# num_classes = 5
-# folder_path = 'Dataset_CSV/'
-# processed_data_path = ''
+offset = 1920
+num_classes = 5
 
-# print('0')
+print('0')
 
-# # Loading the raw data
-# train_content, test_content = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
+# Loading the raw data
+train_content, test_content = loader.load_data(folder_path, train_tasks, test_tasks, 'csv', num_classes, 1)   
 
-# plt.subplot(211)
-# plt.plot(train_content[0], color = "blue")
-# plt.title('Sem filtro')
-# plt.tight_layout()
+plt.subplot(211)
+plt.plot(train_content[0], color = "blue")
+plt.title('Sem filtro')
+plt.tight_layout()
 
-# print('1')
+print('1')
 
-# # Filtering the raw data
-# train_content = preprocessing.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
-# test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+# Filtering the raw data
+train_content = preprocessing.filter_data(train_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
+test_content = preprocessing.filter_data(test_content, band_pass_3, sample_frequency, filter_order, filter_type, 1)
 
-# plt.subplot(212)
-# plt.plot(train_content[0], color = "red")
-# plt.title('Com filtro')
-# plt.show()
+plt.subplot(212)
+plt.plot(train_content[0], color = "red")
+plt.title('Com filtro')
+plt.savefig(r'filtragem.png', format='png')
+plt.show()
 
-# print('2')
+print('2')
 
-# time.sleep(10)
-# sys.exit()
+time.sleep(10)
+sys.exit()
 ############## Plotting ##############
 
 # Not using Data Generators
