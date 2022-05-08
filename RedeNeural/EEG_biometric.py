@@ -17,6 +17,9 @@ from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.optimizers import SGD
 from numpy import savetxt, loadtxt
 
+from tensorflow.keras.optimizers import Adam ##
+from tensorflow.keras.callbacks import ReduceLROnPlateau, ModelCheckpoint ##
+
 # Seeds
 random.seed(1051)
 np.random.seed(1051)
@@ -345,20 +348,27 @@ else:
     # Training the model
     if(not args.nofit):
         # Creating the model
-        model = models.create_model_mixed(window_size, num_channels, num_classes)
+        # model = models.create_model_mixed(window_size, num_channels, num_classes)
+        model = models.create_model_resnet_1D((window_size, num_channels), num_classes) ##
         model.summary()
 
         # model.load_weights('model_weights.h5', by_name=True) ###### When the connection breaks ######
 
         # Compiling, defining the LearningRateScheduler and training the model
-        model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+        #model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
+        model.compile(Adam(), loss='categorical_crossentropy', metrics=['accuracy']) ##
 
         fit_begin = time.time()
+
+        reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=50, min_lr=0.0001)
+        model_checkpoint = ModelCheckpoint(filepath='resnet1d_best_model.hdf5', monitor='loss',
+                                                        save_best_only=True)
 
         results = model.fit(training_generator,
                             validation_data = validation_generator,
                             epochs = training_epochs,
-                            callbacks = [lr_scheduler, saver]
+                            # callbacks = [lr_scheduler, saver]
+                            callbacks = [reduce_lr, model_checkpoint]
                             )
 
         fit_end = time.time()
