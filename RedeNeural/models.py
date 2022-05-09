@@ -493,7 +493,7 @@ def create_model_sun(window_size, num_channels, num_classes, remove_last_layer=F
     # return model
 
 ### Redes Neurais e Aprendizagem em Profundidade###
-
+# ResNet
 import tensorflow.keras as keras
 
 def create_model_resnet_1D(input_shape, nb_classes):
@@ -569,3 +569,71 @@ def create_model_resnet_1D(input_shape, nb_classes):
     model = keras.models.Model(inputs=input_layer, outputs=output_layer)
 
     return model
+
+# Inception
+bottleneck_size = 32
+nb_filters = 32
+kernel_size = 41
+depth = 6
+
+def inception_module(input_tensor, stride=1, activation='linear'):
+
+    if int(input_tensor.shape[-1]) > bottleneck_size:
+        input_inception = keras.layers.Conv1D(filters=bottleneck_size, kernel_size=1,
+                                                padding='same', activation=activation, use_bias=False)(input_tensor)
+    else:
+        input_inception = input_tensor
+
+    # kernel_size_s = [3, 5, 8, 11, 17]
+    kernel_size_s = [kernel_size // (2 ** i) for i in range(3)]
+
+    conv_list = []
+
+    for i in range(len(kernel_size_s)):
+        conv_list.append(keras.layers.Conv1D(filters=nb_filters, kernel_size=kernel_size_s[i],
+                                                strides=stride, padding='same', activation=activation, use_bias=False)(
+            input_inception))
+
+    max_pool_1 = keras.layers.MaxPool1D(pool_size=3, strides=stride, padding='same')(input_tensor)
+
+    conv_6 = keras.layers.Conv1D(filters=nb_filters, kernel_size=1,
+                                    padding='same', activation=activation, use_bias=False)(max_pool_1)
+
+    conv_list.append(conv_6)
+
+    x = keras.layers.Concatenate(axis=2)(conv_list)
+    x = keras.layers.BatchNormalization()(x)
+    x = keras.layers.Activation(activation='relu')(x)
+    return x
+
+def shortcut_layer(input_tensor, out_tensor):
+    shortcut_y = keras.layers.Conv1D(filters=int(out_tensor.shape[-1]), kernel_size=1,
+                                        padding='same', use_bias=False)(input_tensor)
+    shortcut_y = keras.layers.BatchNormalization()(shortcut_y)
+
+    x = keras.layers.Add()([shortcut_y, out_tensor])
+    x = keras.layers.Activation('relu')(x)
+    return x
+
+def create_model_inception_1D(input_shape, nb_classes):
+    input_layer = keras.layers.Input(input_shape)
+
+    x = input_layer
+    input_res = input_layer
+
+    for d in range(depth):
+
+        x = inception_module(x)
+
+        if d % 3 == 2:
+            x = shortcut_layer(input_res, x)
+            input_res = x
+
+    gap_layer = keras.layers.GlobalAveragePooling1D()(x)
+
+    output_layer = keras.layers.Dense(nb_classes, activation='softmax')(gap_layer)
+
+    model = keras.models.Model(inputs=input_layer, outputs=output_layer)
+
+    return model
+    
