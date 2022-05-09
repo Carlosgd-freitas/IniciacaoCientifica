@@ -125,8 +125,9 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # utils.create_csv_database_from_edf('./Dataset/','./All_Channels_Yang/', num_classes, channels = all_channels_yang)
 
 # Usando modelos do artigo "Deep Learning for Time Series Classification"
-# ResNet 1D: 44,5872% acurácia
-# Inception 1D: XX% acurácia
+#    ResNet 1D: 44,5872% acurácia ; 1,02 h for training ; 0,9 seconds for testing
+# Inception 1D: 28,4404% acurácia  ; 1,01 h for training ; 0,63 seconds for testing
+#       FCN 1D: XX% acurácia  ; X h for training ; X seconds for testing
 
 # Logger
 sys.stdout = utils.Logger(os.path.join(processed_data_path, 'results', 'log_script.txt'))
@@ -352,9 +353,10 @@ else:
     # Training the model
     if(not args.nofit):
         # Creating the model
-        # model = models.create_model_mixed(window_size, num_channels, num_classes)
+        #model = models.create_model_mixed(window_size, num_channels, num_classes)
         # model = models.create_model_resnet_1D((window_size, num_channels), num_classes) ##
-        model = models.create_model_inception_1D((window_size, num_channels), num_classes) ##
+        # model = models.create_model_inception_1D((window_size, num_channels), num_classes) ##
+        model = models.create_model_fcn((window_size, num_channels), num_classes) ##
         model.summary()
 
         # model.load_weights('model_weights.h5', by_name=True) ###### When the connection breaks ######
@@ -362,21 +364,24 @@ else:
         # Compiling, defining the LearningRateScheduler and training the model
         #model.compile(opt, loss='categorical_crossentropy', metrics=['accuracy'])
         # model.compile(Adam(), loss='categorical_crossentropy', metrics=['accuracy']) ##
-        model.compile(Adam(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy']) ##
+        # model.compile(Adam(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy']) ##
+        model.compile(Adam(), loss='categorical_crossentropy', metrics=['accuracy']) ##
 
         fit_begin = time.time()
 
         reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=50, min_lr=0.0001) ##
         # model_checkpoint = ModelCheckpoint(filepath='resnet1d_best_model.hdf5', monitor='loss',
         #                                                save_best_only=True) ##
-        model_checkpoint = ModelCheckpoint(filepath='inception1d_best_model.hdf5', monitor='loss',
+        # model_checkpoint = ModelCheckpoint(filepath='inception1d_best_model.hdf5', monitor='loss',
+        #                                                 save_best_only=True) ##
+        model_checkpoint = ModelCheckpoint(filepath='fcn1d_best_model.hdf5', monitor='loss',
                                                         save_best_only=True) ##
 
         results = model.fit(training_generator,
                             validation_data = validation_generator,
                             epochs = training_epochs,
-                            # callbacks = [lr_scheduler, saver]
-                            callbacks = [reduce_lr, model_checkpoint]
+                            #callbacks = [lr_scheduler, saver]
+                            callbacks = [reduce_lr, model_checkpoint] ##
                             )
 
         fit_end = time.time()
