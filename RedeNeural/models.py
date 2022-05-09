@@ -704,17 +704,17 @@ def create_model_resnet_1D_v2(input_shape, nb_classes):
     output_block_2 = keras.layers.add([shortcut_y, conv_z])
     output_block_2 = keras.layers.Activation('relu')(output_block_2)
 
-    # BLOCK 3 - CHANGED # OF FILTERS TO 256
+    # BLOCK 3 - CHANGED # OF FILTERS OF TO 128
 
-    conv_x = keras.layers.Conv1D(filters=256, kernel_size=8, padding='same')(output_block_2)
+    conv_x = keras.layers.Conv1D(filters=128, kernel_size=8, padding='same')(output_block_2)
     conv_x = keras.layers.BatchNormalization()(conv_x)
     conv_x = keras.layers.Activation('relu')(conv_x)
 
-    conv_y = keras.layers.Conv1D(filters=256, kernel_size=5, padding='same')(conv_x)
+    conv_y = keras.layers.Conv1D(filters=128, kernel_size=5, padding='same')(conv_x)
     conv_y = keras.layers.BatchNormalization()(conv_y)
     conv_y = keras.layers.Activation('relu')(conv_y)
 
-    conv_z = keras.layers.Conv1D(filters=256, kernel_size=3, padding='same')(conv_y)
+    conv_z = keras.layers.Conv1D(filters=128, kernel_size=3, padding='same')(conv_y)
     conv_z = keras.layers.BatchNormalization()(conv_z)
 
     # no need to expand channels because they are equal
@@ -784,15 +784,15 @@ def create_model_resnet_1D_v3(input_shape, nb_classes):
 
     # BLOCK 3
 
-    conv_x = keras.layers.Conv1D(filters=256, kernel_size=8, padding='same')(output_block_2)
+    conv_x = keras.layers.Conv1D(filters=128, kernel_size=8, padding='same')(output_block_2)
     conv_x = keras.layers.BatchNormalization()(conv_x)
     conv_x = keras.layers.Activation('relu')(conv_x)
 
-    conv_y = keras.layers.Conv1D(filters=256, kernel_size=5, padding='same')(conv_x)
+    conv_y = keras.layers.Conv1D(filters=128, kernel_size=5, padding='same')(conv_x)
     conv_y = keras.layers.BatchNormalization()(conv_y)
     conv_y = keras.layers.Activation('relu')(conv_y)
 
-    conv_z = keras.layers.Conv1D(filters=256, kernel_size=3, padding='same')(conv_y)
+    conv_z = keras.layers.Conv1D(filters=128, kernel_size=3, padding='same')(conv_y)
     conv_z = keras.layers.BatchNormalization()(conv_z)
 
     # no need to expand channels because they are equal
