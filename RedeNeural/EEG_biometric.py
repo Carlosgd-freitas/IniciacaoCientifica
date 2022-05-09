@@ -129,8 +129,8 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # Inception 1D: 28,4404% acurácia  ; 1,01 h for training ; 0,63 seconds for testing - Adam(learning_rate=0.001) + reduce_lr
 #       FCN 1D: 27,8899% acurácia  ; 59 min for training ; 0,34 seconds for testing - Adam() + reduce_lr
 #
-# ResNet 1D v2: X% acurácia ; X h for training ; X seconds for testing - opt + lr_scheduler
-# ResNet 1D v3: X% acurácia ; X h for training ; X seconds for testing - opt + lr_scheduler
+#        ResNet 1D v2: 32,2936% acurácia ; 1 h for training ; 0,6 seconds for testing - opt + lr_scheduler
+# LSTM + ResNet 1D v1: X% acurácia ; X h for training ; X seconds for testing - opt + lr_scheduler
 
 # Logger
 sys.stdout = utils.Logger(os.path.join(processed_data_path, 'results', 'log_script.txt'))
@@ -357,7 +357,7 @@ else:
     if(not args.nofit):
         # Creating the model
         #model = models.create_model_mixed(window_size, num_channels, num_classes)
-        model = models.create_model_resnet_1D_v2((window_size, num_channels), num_classes) ##
+        model = models.create_model_resnet_1D_v1_lstm((window_size, num_channels), num_classes) ##
         model.summary()
 
         # model.load_weights('model_weights.h5', by_name=True) ###### When the connection breaks ######
