@@ -360,7 +360,7 @@ else:
     if(not args.nofit):
         # Creating the model
         #model = models.create_model_mixed(window_size, num_channels, num_classes)
-        model = models.create_model_causal((window_size, num_channels), num_classes) ##
+        model = models.create_model_causal(window_size, num_channels, num_classes) ##
         model.summary()
 
         # model.load_weights('model_weights.h5', by_name=True) ###### When the connection breaks ######
