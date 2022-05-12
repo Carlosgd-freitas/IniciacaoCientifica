@@ -813,3 +813,80 @@ def create_model_resnet_1D_v1_lstm(input_shape, nb_classes):
     model = keras.models.Model(inputs=input_layer, outputs=output_layer)
 
     return model
+
+def create_model_causal(window_size, num_channels, num_classes, remove_last_layer=False):
+    model = None
+
+    if(remove_last_layer == False):
+        model = Sequential(name='Biometric_for_Identification')
+    else:
+        model = Sequential(name='Biometric_for_Verification')
+
+    model.add(Input(shape=(window_size, num_channels)))
+
+    model.add(LSTM(128, return_sequences=True))
+    model.add(LSTM(128, return_sequences=True))
+    model.add(LSTM(128, return_sequences=True))
+    model.add(LSTM(128, return_sequences=True))
+    model.add(LSTM(128, return_sequences=True))
+
+    model.add(Conv1D(96, (11), input_shape=(window_size, num_channels), activation='relu', padding='causal', name='Conv1'))
+    model.add(BatchNormalization(name='Norm1'))
+    model.add(MaxPooling1D(strides=4, name='Pool1'))
+    
+    model.add(Conv1D(128, (9), activation='relu', padding='causal', name='Conv2'))
+    model.add(BatchNormalization(name='Norm2'))
+    model.add(MaxPooling1D(strides=2, name='Pool2'))
+    
+    model.add(Conv1D(256, (9), activation='relu', padding='causal', name='Conv3')) 
+    model.add(BatchNormalization(name='Norm3'))
+    model.add(MaxPooling1D(strides=2, name='Pool3'))
+
+    model.add(Flatten())
+    model.add(Dense(4096, activation='relu', name='FC1'))
+    model.add(Dense(4096, activation='relu', name='FC2'))
+    model.add(Dense(256, name='FC3'))
+    model.add(BatchNormalization(name='Norm4'))
+
+    if(remove_last_layer == False):
+        model.add(Dropout(0.1, name='Drop'))
+        model.add(Dense(num_classes, activation='softmax', name='FC4'))
+
+    return model
+
+def create_model_dilation(window_size, num_channels, num_classes, remove_last_layer=False):
+    model = None
+
+    if(remove_last_layer == False):
+        model = Sequential(name='Biometric_for_Identification')
+    else:
+        model = Sequential(name='Biometric_for_Verification')
+
+    model.add(Input(shape=(window_size, num_channels)))
+
+    model.add(LSTM(128, return_sequences=True))
+    model.add(LSTM(128, return_sequences=True))
+    model.add(LSTM(128, return_sequences=True))
+    model.add(LSTM(128, return_sequences=True))
+    model.add(LSTM(128, return_sequences=True))
+
+    model.add(Conv1D(96, (11), input_shape=(window_size, num_channels), activation='relu', padding='causal', dilation_rate = 4, name='Conv1'))
+    model.add(BatchNormalization(name='Norm1'))
+    
+    model.add(Conv1D(128, (9), activation='relu', padding='causal', dilation_rate = 2, name='Conv2'))
+    model.add(BatchNormalization(name='Norm2'))
+    
+    model.add(Conv1D(256, (9), activation='relu', padding='causal', dilation_rate = 2, name='Conv3')) 
+    model.add(BatchNormalization(name='Norm3'))
+
+    model.add(Flatten())
+    model.add(Dense(4096, activation='relu', name='FC1'))
+    model.add(Dense(4096, activation='relu', name='FC2'))
+    model.add(Dense(256, name='FC3'))
+    model.add(BatchNormalization(name='Norm4'))
+
+    if(remove_last_layer == False):
+        model.add(Dropout(0.1, name='Drop'))
+        model.add(Dense(num_classes, activation='softmax', name='FC4'))
+
+    return model

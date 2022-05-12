@@ -130,7 +130,10 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 #       FCN 1D: 27,8899% acurácia  ; 59 min for training ; 0,34 seconds for testing - Adam() + reduce_lr
 #
 #        ResNet 1D v2: 32,2936% acurácia ; 1 h for training ; 0,6 seconds for testing - opt + lr_scheduler
-# LSTM + ResNet 1D v1: X% acurácia ; X h for training ; X seconds for testing - opt + lr_scheduler
+# LSTM + ResNet 1D v1: 46,9725% acurácia ; 1,3 h for training ; 3,5 seconds for testing - opt + lr_scheduler
+#
+#                 Causal Padding: X% acurácia ; X h for training ; X seconds for testing
+# Causal Padding + Dilation Rate: X% acurácia ; X h for training ; X seconds for testing
 
 # Logger
 sys.stdout = utils.Logger(os.path.join(processed_data_path, 'results', 'log_script.txt'))
@@ -357,7 +360,7 @@ else:
     if(not args.nofit):
         # Creating the model
         #model = models.create_model_mixed(window_size, num_channels, num_classes)
-        model = models.create_model_resnet_1D_v1_lstm((window_size, num_channels), num_classes) ##
+        model = models.create_model_causal((window_size, num_channels), num_classes) ##
         model.summary()
 
         # model.load_weights('model_weights.h5', by_name=True) ###### When the connection breaks ######
@@ -369,10 +372,6 @@ else:
 
         # reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=50, min_lr=0.0001) ##
         # model_checkpoint = ModelCheckpoint(filepath='resnet1d_best_model.hdf5', monitor='loss',
-        #                                                save_best_only=True) ##
-        # model_checkpoint = ModelCheckpoint(filepath='inception1d_best_model.hdf5', monitor='loss',
-        #                                                 save_best_only=True) ##
-        # model_checkpoint = ModelCheckpoint(filepath='fcn1d_best_model.hdf5', monitor='loss',
         #                                                save_best_only=True) ##
 
         results = model.fit(training_generator,
