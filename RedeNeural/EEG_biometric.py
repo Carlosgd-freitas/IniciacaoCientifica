@@ -132,7 +132,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 #        ResNet 1D v2: 32,2936% acurácia ; 1 h for training ; 0,6 seconds for testing - opt + lr_scheduler
 # LSTM + ResNet 1D v1: 46,9725% acurácia ; 1,3 h for training ; 3,5 seconds for testing - opt + lr_scheduler
 #
-#                 Causal Padding: X% acurácia ; X h for training ; X seconds for testing
+#                 Causal Padding: 96,1468% acurácia ; 1,37 h for training ; 3,31 seconds for testing
 # Causal Padding + Dilation Rate: X% acurácia ; X h for training ; X seconds for testing
 
 # Logger
@@ -360,7 +360,7 @@ else:
     if(not args.nofit):
         # Creating the model
         #model = models.create_model_mixed(window_size, num_channels, num_classes)
-        model = models.create_model_causal(window_size, num_channels, num_classes) ##
+        model = models.create_model_dilation(window_size, num_channels, num_classes) ##
         model.summary()
 
         # model.load_weights('model_weights.h5', by_name=True) ###### When the connection breaks ######
