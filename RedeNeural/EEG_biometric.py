@@ -133,7 +133,7 @@ all_channels_yang = ['C1..', 'Cz..', 'C2..', 'Af3.', 'Afz.', 'Af4.', 'O1..', 'Oz
 # LSTM + ResNet 1D v1: 46,9725% acurácia ; 1,3 h for training ; 3,5 seconds for testing - opt + lr_scheduler
 #
 #         Causal Padding: 96,1468% acurácia ; 1,37 h for training ; 3,31 seconds for testing
-# Causal Padding (P3.10): X% acurácia ; X h for training ; X seconds for testing
+# Causal Padding (P3.10): 99,8155% acurácia ; 18,84 h for training ; 5,72 seconds for testing
 
 # Logger
 sys.stdout = utils.Logger(os.path.join(processed_data_path, 'results', 'log_script.txt'))
